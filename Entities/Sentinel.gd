@@ -21,6 +21,9 @@ const ORDER_TYPES = {
 	PRINT = 0, # PRINT:
 }
 
+var displayName = "Robot 1"
+var type = "Robot"
+
 var attachments = []
 var positionToAttachment = {}
 var possibleOrders = {}
@@ -121,12 +124,12 @@ func print_message(message: String):
 	print(message)
 
 
-func select():
+func _select():
 	# Highlight ourselves
 	get_selection_indicator().visible = true
 
 
-func deselect():
+func _deselect():
 	# Unhighlight ourselves
 	get_selection_indicator().visible = false
 	
@@ -166,8 +169,16 @@ func get_attachment_positions():
 	return get_attachment_container().get_children()
 
 
-func get_entity_id():
+func _get_entity_id():
 	return $Reprogrammable.entityId
+
+
+func _get_display_name() -> String:
+	return displayName
+
+
+func _get_type() -> String:
+	return type
 
 
 ##### SETTERS #####
@@ -190,7 +201,11 @@ func set_input(input: Vector2):
 		send_input_command(input)
 
 
-func set_inspect_items(inspectUI: PopupMenu):
+func _set_display_name(displayName: String):
+	self.displayName = displayName
+
+
+func _set_inspect_items(inspectUI: PopupMenu):
 	inspectUI.add_separator(self.name)
 	inspectUI.add_item("Edit Code", Constants.INSPECT_ITEMS.EDIT_CODE)
 

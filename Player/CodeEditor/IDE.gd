@@ -7,6 +7,8 @@ var currentIndex: int = -1
 
 var files = []
 
+signal file_dirtied(index)
+
 func _ready():
 	# Get the files in the original code
 	var originalCodeFiles = get_files_in_directory(get_file_directory())
@@ -22,14 +24,11 @@ func _ready():
 	visible = false
 	
 	# Select the first file
-	get_file_list().select(0)
-	file_selected(0)
+	get_file_list().select(1)
+	file_selected(1)
 	
 	# Process
 	set_process(true)
-	
-	# Connect the save all files to ourselves
-#	get_child(0).connect("save_all_files", self, "save_all_files")
 
 
 func _process(delta):
@@ -42,10 +41,8 @@ func _process(delta):
 
 func handle_input():
 	
-	if Input.is_action_just_pressed("save_file"):
+	if Input.is_action_just_pressed("ide_save"):
 		save_file()
-	if Input.is_action_just_pressed("save_all_files"):
-		save_all_files()
 
 
 # Revert to default code and reset focus
@@ -116,12 +113,12 @@ func save_focus():
 
 """ GETTERS """
 
-func get_target_name_label():
-	return $LeftBar/TargetName
+func get_target_name():
+	return $LeftBar/GridContainer/TargetName
 
 
 func get_target_type_label():
-	return $LeftBar/TargetType
+	return $LeftBar/GridContainer/Type
 
 
 func get_text_editor():
@@ -165,6 +162,14 @@ func get_files_in_directory(fileDirectory):
 
 
 """ SETTERS """
+
+func set_target_name(text: String):
+	get_target_name().text = text
+
+
+func set_target_type(type: String):
+	get_target_type_label().text = type
+
 
 func set_focus():
 	# If we don't have a file selected yet
@@ -224,7 +229,10 @@ func _on_TextEditor_text_changed():
 		
 		# Save the user's focus
 		save_focus()
-	# Otherwise, reset the code to the last valid one and set the focus
+		
+		# Emit the dirtied signal
+		emit_signal("file_dirtied", currentIndex)
+	# Otherwise, undo whatever just happened...
 	else:
 		# Don't let the user write invalid code
 		# UNDO!
@@ -238,3 +246,12 @@ func _on_TextEditor_cursor_changed():
 
 func _on_SaveButton_pressed():
 	save_file()
+
+
+func _on_FileList_item_selected(index):
+	file_selected(index)
+
+
+func _on_TargetName_text_changed(new_text):
+	# Set the inspected entity's name with the new text
+	Player.set_inspected_entity_name(new_text)

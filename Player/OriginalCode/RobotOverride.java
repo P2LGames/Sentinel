@@ -1,4 +1,4 @@
-//// *READONLY
+//// *NOACCESS
 package command;
 
 import annotations.Command;
@@ -13,7 +13,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+//// *READONLY
+
 public class RobotOverride {
+
     //// *NOACCESS
 
     @Command(commandName = "process", id = 0)
@@ -54,9 +57,10 @@ public class RobotOverride {
         this.robot = (Robot)robot;
     }
 
+    private Robot robot;
+
     //// *READWRITE
 
-    private Robot robot;
     private int move = 0;
     private int rotate = 0;
 
@@ -87,7 +91,7 @@ public class RobotOverride {
         }
     }
 
-    //// *READONLY
+    //// *NOACCESS
 
     public void moveForward() {
         int position = Robot.AttachmentPosition.BASE.getNumVal();
@@ -137,6 +141,6 @@ public class RobotOverride {
 
     public Robot getRobot() { return robot; }
 
+    //// *READONLY
+
 }
-
-

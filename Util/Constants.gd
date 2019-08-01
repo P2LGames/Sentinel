@@ -46,8 +46,6 @@ func setup_physics_masks():
 	
 		if not layerName: 
 			layerName = str("Layer ", i)
-		else:
-			print(layerName)
 		
 		MASK_BIT_TO_NAME[pow(2, i-1)] = layerName
 		NAME_TO_BIT_MASK[layerName] = pow(2, i-1)

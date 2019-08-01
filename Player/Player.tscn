@@ -6,7 +6,6 @@
 script/source = "extends Node2D
 
 var camera
-var textEditor
 
 var selectedEntities = []
 var inspectingEntity
@@ -16,7 +15,7 @@ var isSelectingMultiple = false
 
 func _ready():
 	
-	textEditor = $CanvasLayer/IDE
+	pass
 
 
 func _process(delta):
@@ -33,14 +32,14 @@ func handle_input():
 
 	# Show editor if escape is pressed
 	if Input.is_action_just_pressed(\"ui_focus_next\"):
-		if not textEditor.visible:
-			textEditor.toggle_visibility()
+		if not get_text_editor().visible:
+			get_text_editor().toggle_visibility()
 	
 	# If we want to select multiple people we can
 	isSelectingMultiple = Input.is_action_pressed(\"select_multiple\")
 	
 	# Handle user input if not in code editor
-	if textEditor == null or not textEditor.visible:
+	if not get_text_editor().visible:
 		# Track move and rotate
 		var move = 0
 		var rotate = 0
@@ -61,12 +60,12 @@ func handle_input():
 
 func handle_mouse_inputs():
 	# Handle user mouse events
-	if Input.is_action_just_pressed(\"left_click\"):
+	if not get_text_editor().visible and Input.is_action_just_pressed(\"left_click\"):
 		# Get the clicked entity
 		var clickedEntity = get_clicked_entity()
 		
 		# See if we can select that entity
-		if clickedEntity != null and clickedEntity.has_method(\"select\"):
+		if clickedEntity != null and clickedEntity.has_method(\"_select\"):
 			# Then we left clicked on an entity, select it
 			left_clicked_on_entity(clickedEntity)
 		elif clickedEntity == null:
@@ -105,7 +104,7 @@ func deselect():
 	if not isSelectingMultiple:
 		# Deselect all selected entities
 		for entity in selectedEntities:
-			entity.deselect()
+			entity._deselect()
 		
 		# Clear the selectedEntities
 		selectedEntities.clear()
@@ -117,14 +116,14 @@ func left_clicked_on_entity(clickedEntity):
 	# If we clicked on somene we had selected, and we are selecting multiple
 	if clickedEntity in selectedEntities and isSelectingMultiple:
 		# Deselect him
-		clickedEntity.deselect()
+		clickedEntity._deselect()
 		
 		# Remove the entity from our selection
 		selectedEntities.erase(clickedEntity)
 	# Otherwise, select the entity
 	else:
 		# Call select on the entity (Highlights him)
-		clickedEntity.select()
+		clickedEntity._select()
 	
 		# Add the entity to my list of selected entities
 		selectedEntities.append(clickedEntity)
@@ -138,7 +137,7 @@ func inspect_entity(clickedEntity):
 	var inspectUI = get_inspect_ui()
 	
 	# Attempt to get the inspect items from the entity we clicked on
-	if clickedEntity.has_method(\"set_inspect_items\"):
+	if clickedEntity.has_method(\"_set_inspect_items\"):
 		# Remove all it's items
 		for x in range(inspectUI.get_item_count()):
 			inspectUI.remove_item(0)
@@ -147,7 +146,7 @@ func inspect_entity(clickedEntity):
 		inspectingEntity = clickedEntity
 		
 		# Set the inspectUI items from the clicked entity
-		clickedEntity.set_inspect_items(inspectUI)
+		clickedEntity._set_inspect_items(inspectUI)
 	else:
 		return
 	
@@ -180,10 +179,20 @@ func set_inspected_entity(entity):
 	inspectingEntity = entity
 
 
+func set_inspected_entity_name(text: String):
+	if inspectingEntity and inspectingEntity.has_method(\"_set_display_name\"):
+		inspectingEntity._set_display_name(text)
+
+
 ##### SIGNALS #####
 
 func _on_Inspect_id_pressed(ID):
 	if ID == Constants.INSPECT_ITEMS.EDIT_CODE:
+		# Set the IDE target name and type
+		get_text_editor().set_target_name(inspectingEntity._get_display_name())
+		get_text_editor().set_target_type(inspectingEntity._get_type())
+		
+		# Show the IDE
 		get_text_editor().toggle_visibility()
 "
 

@@ -1,9 +1,9 @@
 [gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Player/CodeEditor/IDE.gd" type="Script" id=1]
-[ext_resource path="res://Assets/Fonts/NunitoBody.tres" type="DynamicFont" id=2]
-[ext_resource path="res://Player/CodeEditor/FileList.gd" type="Script" id=3]
-[ext_resource path="res://Player/CodeEditor/TextEditor.gd" type="Script" id=4]
+[ext_resource path="res://Player/CodeEditor/FileList.gd" type="Script" id=2]
+[ext_resource path="res://Player/CodeEditor/TextEditor.gd" type="Script" id=3]
+[ext_resource path="res://Assets/Fonts/NunitoBody.tres" type="DynamicFont" id=4]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Tree
@@ -51,54 +51,74 @@ script = ExtResource( 1 )
 margin_right = 190.0
 margin_bottom = 40.0
 
-[node name="TargetName" type="Label" parent="LeftBar"]
+[node name="GridContainer" type="GridContainer" parent="LeftBar"]
 margin_right = 190.0
-margin_bottom = 23.0
-custom_fonts/font = ExtResource( 2 )
-text = "Target Name"
+margin_bottom = 42.0
+columns = 2
 
-[node name="TargetType" type="Label" parent="LeftBar"]
-margin_top = 27.0
-margin_right = 190.0
-margin_bottom = 50.0
-custom_fonts/font = ExtResource( 2 )
-text = "Target Type"
+[node name="NameLabel" type="Label" parent="LeftBar/GridContainer"]
+margin_top = 5.0
+margin_right = 82.0
+margin_bottom = 19.0
+text = "Entity Name:"
+
+[node name="TargetName" type="LineEdit" parent="LeftBar/GridContainer"]
+margin_left = 86.0
+margin_right = 186.0
+margin_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "None"
+max_length = 20
+
+[node name="TypeLabel" type="Label" parent="LeftBar/GridContainer"]
+margin_top = 28.0
+margin_right = 82.0
+margin_bottom = 42.0
+text = "Entity Type:"
+
+[node name="Type" type="Label" parent="LeftBar/GridContainer"]
+margin_left = 90.0
+margin_top = 28.0
+margin_right = 188.0
+margin_bottom = 42.0
+text = "None"
 
 [node name="FileList" type="ItemList" parent="LeftBar"]
-margin_top = 54.0
+margin_top = 46.0
 margin_right = 190.0
-margin_bottom = 554.0
+margin_bottom = 546.0
 rect_min_size = Vector2( 0, 500 )
-script = ExtResource( 3 )
+script = ExtResource( 2 )
 
 [node name="ResetButton" type="Button" parent="LeftBar"]
-margin_top = 558.0
+margin_top = 550.0
 margin_right = 190.0
-margin_bottom = 578.0
+margin_bottom = 570.0
 text = "Reset"
 
 [node name="RecompileButton" type="Button" parent="LeftBar"]
-margin_top = 582.0
+margin_top = 574.0
 margin_right = 190.0
-margin_bottom = 602.0
+margin_bottom = 594.0
 text = "Recompile"
 
 [node name="SaveButton" type="Button" parent="LeftBar"]
-margin_top = 606.0
+margin_top = 598.0
 margin_right = 190.0
-margin_bottom = 626.0
+margin_bottom = 618.0
 text = "Save"
 
 [node name="CloseButton" type="Button" parent="LeftBar"]
-margin_top = 630.0
+margin_top = 622.0
 margin_right = 190.0
-margin_bottom = 650.0
+margin_bottom = 642.0
 text = "Close"
 
 [node name="Control" type="Control" parent="LeftBar"]
-margin_top = 654.0
+margin_top = 646.0
 margin_right = 190.0
-margin_bottom = 654.0
+margin_bottom = 646.0
 
 [node name="TextEditor" type="TextEdit" parent="."]
 anchor_right = 1.0
@@ -108,10 +128,11 @@ margin_right = 1.00781
 highlight_current_line = true
 syntax_highlighting = true
 show_line_numbers = true
+breakpoint_gutter = true
 highlight_all_occurrences = true
 smooth_scrolling = true
 hiding_enabled = 1
-script = ExtResource( 4 )
+script = ExtResource( 3 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchor_top = 0.8
@@ -126,7 +147,6 @@ margin_bottom = 225.0
 script = SubResource( 1 )
 
 [node name="OutputArea" type="Control" parent="."]
-visible = false
 anchor_top = 0.8
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -136,7 +156,7 @@ margin_left = 190.0
 margin_left = -0.40918
 margin_right = 48.5908
 margin_bottom = 23.0
-custom_fonts/font = ExtResource( 2 )
+custom_fonts/font = ExtResource( 4 )
 text = "Output"
 
 [node name="Output" type="TextEdit" parent="OutputArea"]
@@ -150,8 +170,10 @@ readonly = true
 highlight_all_occurrences = true
 smooth_scrolling = true
 hiding_enabled = 1
-script = ExtResource( 4 )
-[connection signal="item_selected" from="LeftBar/FileList" to="LeftBar/FileList" method="_on_FileList_item_selected"]
+script = ExtResource( 3 )
+[connection signal="file_dirtied" from="." to="LeftBar/FileList" method="_on_IDE_file_dirtied"]
+[connection signal="text_changed" from="LeftBar/GridContainer/TargetName" to="." method="_on_TargetName_text_changed"]
+[connection signal="item_selected" from="LeftBar/FileList" to="." method="_on_FileList_item_selected"]
 [connection signal="pressed" from="LeftBar/ResetButton" to="." method="_on_ResetButton_pressed"]
 [connection signal="pressed" from="LeftBar/RecompileButton" to="." method="_on_RecompileButton_pressed"]
 [connection signal="pressed" from="LeftBar/SaveButton" to="." method="_on_SaveButton_pressed"]
