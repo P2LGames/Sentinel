@@ -84,12 +84,18 @@ func entity_register_handler(responseData: PoolByteArray):
 		# Delete the old mapping in the placeholder
 		entityPlaceholderMap.erase(str(placeholderId))
 	else:
-		# Slice off the first two values of the byte array, they are the failure short
-		var stringData = PoolByteArray(Util.slice_array(responseData, 2))
+		# Get the placeholder id from the failed register request
+		var placeholderId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 2, 6)))
+		
+		# Slice off the first 6 values of the byte array, they are the failure short and placeholder id
+		var stringData = PoolByteArray(Util.slice_array(responseData, 6))
 		
 		# Turn the error data into a string and print it
-		var errorString = stringData.get_string_from_ascii()
-		print("Error: ", errorString)
+		var errorString = "Register Error: " + stringData.get_string_from_ascii()
+		
+		# Pass the error and string to the entity
+		entityPlaceholderMap[str(placeholderId)].print_message(errorString, 
+			Constants.MESSAGE_TYPE.ERROR)
 
 
 func command_handler(responseData: PoolByteArray):
@@ -118,12 +124,19 @@ func command_handler(responseData: PoolByteArray):
 		else:
 			print("ERROR: Reprogrammable entities must have the _handle_command(commandId: int, value: PoolByteArray) method")
 	else:
-		# Slice off the first two values of the byte array, they are the failure short
-		var stringData = PoolByteArray(Util.slice_array(responseData, 2))
+		# Get the entity and command id from the failed register request
+		var entityId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 2, 6)))
+		var commandId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 6, 10)))
+		
+		# Slice off the first two values and the two ints, they are the failure short, etc
+		var stringData = PoolByteArray(Util.slice_array(responseData, 10))
 		
 		# Turn the error data into a string and print it
-		var errorString = stringData.get_string_from_ascii()
-		print("Command Error: ", errorString)
+		var errorString = "Command Error: " + stringData.get_string_from_ascii()
+		
+		# Pass the error and string to the entity
+		entityMap[str(entityId)].print_message(errorString, 
+			Constants.MESSAGE_TYPE.ERROR)
 
 
 func file_update_handler(responseData: PoolByteArray):
@@ -138,14 +151,23 @@ func file_update_handler(responseData: PoolByteArray):
 		var entityId = Util.bytes2int(entityIdArray)
 		var commandId = Util.bytes2int(commandIdArray)
 		
-		print("Recompile success! ", entityId, " ", commandId)
+		# Print a messsage
+		entityMap[str(entityId)].print_message("Recompile Successful!\n", 
+			Constants.MESSAGE_TYPE.NORMAL)
 	else:
-		# Slice off the first two values of the byte array, they are the failure short
-		var stringData = PoolByteArray(Util.slice_array(responseData, 2))
+		# Get the entity and command id from the failed register request
+		var entityId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 2, 6)))
+		var commandId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 6, 10)))
+		
+		# Slice off the first two values and the two ints, they are the failure short, etc
+		var stringData = PoolByteArray(Util.slice_array(responseData, 10))
 		
 		# Turn the error data into a string and print it
-		var errorString = stringData.get_string_from_ascii()
-		print("File Update Error: ", errorString)
+		var errorString = "File Update Error: " + stringData.get_string_from_ascii() + "\n"
+		
+		# Pass the error and string to the entity
+		entityMap[str(entityId)].print_message(errorString, 
+			Constants.MESSAGE_TYPE.ERROR)
 
 
 """ MESSAGE SENDING """
@@ -166,7 +188,7 @@ func add_entity(newEntity):
 	return currPlaceholderId
 
 
-func register_entity(newEntity, entityType: int) -> bool:
+func register_entity(newEntity, entityTypeId: int) -> bool:
 	"""Register the entity with the server and track it via our entityMap.
 	
 	Parameters:
@@ -180,7 +202,7 @@ func register_entity(newEntity, entityType: int) -> bool:
 	var placeholderId = add_entity(newEntity)
 	
 	# Create the request
-	var registerRequest = FrameworkModels.create_entity_register_request(entityType, placeholderId)
+	var registerRequest = FrameworkModels.create_entity_register_request(entityTypeId, placeholderId)
 	
 	# Send the request to the server
 	return send_message(registerRequest)

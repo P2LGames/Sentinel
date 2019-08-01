@@ -16,7 +16,7 @@ import java.util.List;
 //// *READONLY
 
 public class RobotOverride {
-    
+
     //// *NOACCESS
 
     @Command(commandName = "process", id = 0)
@@ -62,6 +62,7 @@ public class RobotOverride {
     //// *READWRITE
 
     private int move = 0;
+    private String moveString = new String("Test");
     private int rotate = 0;
 
     public void playerInput(int move, int rotate) {
@@ -70,27 +71,27 @@ public class RobotOverride {
     }
 
     public void giveOrders() {
-	
+        "1234567890";
+        print( Integer.toString(this.move) );
 
-        // If the user want's to move, meaning input is -1 or 1
-        if (this.move > 0) {
-            moveForward();
-        }
-        else {
-            // Use this if you want to stop the robot's movementgfd
-            stopMoving();
-        }
+	if (this.move > 0) {
+		moveForward () ; 
+	}
+	else if (this.move < 0) {
+		moveBackward () ;
+	}
+	if (this.rotate > 0) {
+		turnRight () ;
+	}	
+    else if (this.rotate < 0) {
+		turnLeft () ;
+	}
+	else if (this.rotate == 0) {
+		stopTurning () ;
+	}
+    }
 
-        // If the user wants to rotate, meaning input is -1 or 1
-        if (this.rotate < 0) {
-            // Right now I can only turn to the left, can you fix me?
-            turnLeft();
-        }
-        else {
-            // Use this if you want to stop the robot from turning
-            stopTurning();
-        }
-    //// *NOACCESS
+   //// *NOACCESS
 
     public void moveForward() {
         int position = Robot.AttachmentPosition.BASE.getNumVal();
@@ -143,10 +144,4 @@ public class RobotOverride {
     //// *READONLY
 
 }
-
-
-
-
-
-
 

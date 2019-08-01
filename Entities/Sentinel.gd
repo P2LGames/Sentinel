@@ -22,7 +22,6 @@ const ORDER_TYPES = {
 }
 
 var displayName = "Robot 1"
-var type = "Robot"
 
 var attachments = []
 var positionToAttachment = {}
@@ -50,7 +49,6 @@ func _ready():
 
 func _process(delta):
 	
-	
 	# We can print, and stop everything
 	if orders.size() > 0:
 		if ORDER_TYPES.PRINT in orders[0]:
@@ -67,12 +65,6 @@ func _process(delta):
 func _physics_process(delta):
 	
 	var motion = move_and_slide(movement)
-
-#    if (is_colliding()):
-#        var n = get_collision_normal()
-#        motion = n.slide(motion)
-#        velocity = n.slide(velocity)
-#        move(motion)
 
 
 func _handle_command(commandId: int, value: PoolByteArray):
@@ -117,11 +109,10 @@ func route_order(attachmentPosition: int, orderType: int, messageBytes: PoolByte
 
 
 func print_error(error: int, message: String):
-	print("Error Code: ", error, ". ", message)
-
-
-func print_message(message: String):
-	print(message)
+	var mess = "Error Code: " + str(error) + ". " + message
+	
+	# Print the error
+	print_message(mess, Constants.MESSAGE_TYPE.ERROR)
 
 
 func _select():
@@ -177,10 +168,6 @@ func _get_display_name() -> String:
 	return displayName
 
 
-func _get_type() -> String:
-	return type
-
-
 ##### SETTERS #####
 
 func set_movement(movement: Vector2):
@@ -206,8 +193,11 @@ func _set_display_name(displayName: String):
 
 
 func _set_inspect_items(inspectUI: PopupMenu):
-	inspectUI.add_separator(self.name)
-	inspectUI.add_item("Edit Code", Constants.INSPECT_ITEMS.EDIT_CODE)
+	# Set the display name
+	inspectUI.add_separator(self.displayName)
+	
+	# Call the super method
+	._set_inspect_items(inspectUI)
 
 
 ##### ATTACHMENTS #####
@@ -247,7 +237,7 @@ func add_attachment(position: int, attachment):
 
 func pass_order(orderType: int, orderBytes: PoolByteArray):
 	if orderType == ORDER_TYPES.PRINT:
-		print_message(orderBytes.get_string_from_ascii())
+		print_message(orderBytes.get_string_from_ascii(), Constants.MESSAGE_TYPE.NORMAL)
 	
 
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Player/CodeEditor/IDE.gd" type="Script" id=1]
 [ext_resource path="res://Player/CodeEditor/FileList.gd" type="Script" id=2]
@@ -8,7 +8,7 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Tree
 
-var current_selection = -1
+#var current_selection = -1
 
 #func file_dirtied():
 #	if current_selection != -1:
@@ -40,6 +40,35 @@ var current_selection = -1
 #	get_parent().get_child(0).connect(\"save_all_files\", self, \"save_all_files\")
 "
 
+[sub_resource type="GDScript" id=2]
+script/source = "extends TextEdit
+
+
+func add_output(printMessage):
+	# Add the text to the text edit
+	insert_text_at_cursor(printMessage.message)
+	
+	# TODO: Color the text depending on the type
+
+
+func set_output(output: Array):
+	# Clear the current text
+	text = \"\"
+	
+	# Loop through each message in the output and add it to the text edit
+	for message in output:
+		add_output(message)
+
+
+\"\"\" SIGNALS \"\"\"
+
+func _on_TargetEntity_print_message(printMessage):
+	add_output(printMessage)
+
+
+
+"
+
 [node name="IDE" type="Panel" groups=[
 "CodePanel",
 ]]
@@ -68,8 +97,10 @@ margin_right = 186.0
 margin_bottom = 24.0
 grow_horizontal = 2
 grow_vertical = 2
+rect_min_size = Vector2( 100, 0 )
 text = "None"
 max_length = 20
+expand_to_text_length = true
 
 [node name="TypeLabel" type="Label" parent="LeftBar/GridContainer"]
 margin_top = 28.0
@@ -78,10 +109,11 @@ margin_bottom = 42.0
 text = "Entity Type:"
 
 [node name="Type" type="Label" parent="LeftBar/GridContainer"]
-margin_left = 90.0
+margin_left = 86.0
 margin_top = 28.0
-margin_right = 188.0
+margin_right = 186.0
 margin_bottom = 42.0
+rect_min_size = Vector2( 100, 0 )
 text = "None"
 
 [node name="FileList" type="ItemList" parent="LeftBar"]
@@ -170,7 +202,7 @@ readonly = true
 highlight_all_occurrences = true
 smooth_scrolling = true
 hiding_enabled = 1
-script = ExtResource( 3 )
+script = SubResource( 2 )
 [connection signal="file_dirtied" from="." to="LeftBar/FileList" method="_on_IDE_file_dirtied"]
 [connection signal="text_changed" from="LeftBar/GridContainer/TargetName" to="." method="_on_TargetName_text_changed"]
 [connection signal="item_selected" from="LeftBar/FileList" to="." method="_on_FileList_item_selected"]
@@ -180,7 +212,6 @@ script = ExtResource( 3 )
 [connection signal="pressed" from="LeftBar/CloseButton" to="." method="_on_CloseButton_pressed"]
 [connection signal="cursor_changed" from="TextEditor" to="." method="_on_TextEditor_cursor_changed"]
 [connection signal="text_changed" from="TextEditor" to="." method="_on_TextEditor_text_changed"]
-[connection signal="text_changed" from="TextEditor" to="LeftBar/FileList" method="_on_TextEditor_text_changed"]
 [connection signal="cursor_changed" from="OutputArea/Output" to="." method="_on_TextEditor_cursor_changed"]
-[connection signal="text_changed" from="OutputArea/Output" to="." method="_on_TextEditor_text_changed"]
 [connection signal="text_changed" from="OutputArea/Output" to="LeftBar/FileList" method="_on_TextEditor_text_changed"]
+[connection signal="text_changed" from="OutputArea/Output" to="." method="_on_TextEditor_text_changed"]

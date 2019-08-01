@@ -15,8 +15,6 @@ const GetFileType = {
 	TAG = "TAG"
 }
 
-const ROBOT_TYPE: int = 0
-
 const EntitySetupData = {
 	Robot = {
 		type = 0,

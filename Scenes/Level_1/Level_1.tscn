@@ -7,14 +7,17 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# Set the player's camera
 	Player.camera = get_camera()
+	
+	give_orders()
+
+
+func give_orders():
+	print(\"We are giving orders\")
 
 
 \"\"\" GETTERS \"\"\"
@@ -128,6 +131,7 @@ __meta__ = {
 }
 
 [node name="FinishedUI" type="Control" parent="."]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 653.853

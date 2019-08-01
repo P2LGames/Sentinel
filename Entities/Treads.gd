@@ -133,10 +133,10 @@ func handle_rotation(delta: float):
 		pass
 	# Rotate left
 	elif currOrders.rotate[0] == ORDER_TYPES.ROTATE_LEFT:
-		rotateInDirection(delta, 1)
+		rotateInDirection(delta, -1)
 	# Rotate right
 	elif currOrders.rotate[0] == ORDER_TYPES.ROTATE_RIGHT:
-		rotateInDirection(delta, -1)
+		rotateInDirection(delta, 1)
 
 
 func rotateInDirection(delta: float, direction: int):

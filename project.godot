@@ -13,9 +13,15 @@ _global_script_classes=[ {
 "class": "IDEFile",
 "language": "GDScript",
 "path": "res://Player/CodeEditor/IDEFile.gd"
+}, {
+"base": "Node",
+"class": "PrintMessage",
+"language": "GDScript",
+"path": "res://Util/Models.gd"
 } ]
 _global_script_class_icons={
-"IDEFile": ""
+"IDEFile": "",
+"PrintMessage": ""
 }
 
 [application]

@@ -40,7 +40,6 @@ func _process(delta):
 
 
 func handle_input():
-	
 	if Input.is_action_just_pressed("ide_save"):
 		save_file()
 
@@ -123,6 +122,10 @@ func get_target_type_label():
 
 func get_text_editor():
 	return $TextEditor
+
+
+func get_output_text_edit():
+	return $OutputArea/Output
 
 
 func get_file_list():

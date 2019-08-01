@@ -1,5 +1,9 @@
 extends Node
 
+const TYPE_TO_TYPE_ID = {
+	Robot = 0
+}
+
 const ATTACHMENT_TYPES = {
 	WHEELS = "WHEELS",
 	ARM = "ARM",
@@ -28,9 +32,14 @@ const ERROR_CODE = {
 var MASK_BIT_TO_NAME = {}
 var NAME_TO_BIT_MASK = {}
 
-var LAYER = {
+const LAYER = {
 	UNITS = "Units",
 	TERRAIN = "Terrain"
+}
+
+const MESSAGE_TYPE = {
+	NORMAL = 0,
+	ERROR = 1
 }
 
 
