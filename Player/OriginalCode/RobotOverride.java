@@ -17,7 +17,22 @@ import java.util.List;
 
 public class RobotOverride {
 
+    //// *READWRITE
+
+    public void giveOrders() {
+
+    }
+
     //// *NOACCESS
+
+    private Robot robot;
+    private int move = 0;
+    private int rotate = 0;
+
+    public void playerInput(int move, int rotate) {
+        this.move = move;
+        this.rotate = rotate;
+    }
 
     @Command(commandName = "process", id = 0)
     public byte[] process() {
@@ -56,42 +71,6 @@ public class RobotOverride {
     public void setRobot(GenericEntity robot) {
         this.robot = (Robot)robot;
     }
-
-    private Robot robot;
-
-    //// *READWRITE
-
-    private int move = 0;
-    private int rotate = 0;
-
-    public void playerInput(int move, int rotate) {
-        this.move = move;
-        this.rotate = rotate;
-    }
-
-    public void giveOrders() {
-
-        // If the user want's to move, meaning input is -1 or 1
-        if (this.move > 0) {
-            moveForward();
-        }
-        else {
-            // Use this if you want to stop the robot's movement
-            stopMoving();
-        }
-
-        // If the user wants to rotate, meaning input is -1 or 1
-        if (this.rotate < 0) {
-            // Right now I can only turn to the left, can you fix me?
-            turnLeft();
-        }
-        else {
-            // Use this if you want to stop the robot from turning
-            stopTurning();
-        }
-    }
-
-    //// *NOACCESS
 
     public void moveForward() {
         int position = Robot.AttachmentPosition.BASE.getNumVal();
@@ -144,3 +123,5 @@ public class RobotOverride {
     //// *READONLY
 
 }
+
+

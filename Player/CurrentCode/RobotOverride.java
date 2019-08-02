@@ -17,7 +17,37 @@ import java.util.List;
 
 public class RobotOverride {
 
+    //// *READWRITE
+
+    public void giveOrders() {
+		if (this.move > 0) {
+			moveForward () ; 
+		}
+		else if (this.move < 0) {
+			moveBackward () ;
+		}
+		
+		if (this.rotate > 0) {
+			turnRight () ;
+		}	
+	    else if (this.rotate < 0) {
+			turnLeft () ;
+		}
+		else if (this.rotate == 0) {
+			stopTurning () ;
+		}
+    }
+
     //// *NOACCESS
+
+    private Robot robot;
+    private int move = 0;
+    private int rotate = 0;
+
+    public void playerInput(int move, int rotate) {
+        this.move = move;
+        this.rotate = rotate;
+    }
 
     @Command(commandName = "process", id = 0)
     public byte[] process() {
@@ -56,42 +86,6 @@ public class RobotOverride {
     public void setRobot(GenericEntity robot) {
         this.robot = (Robot)robot;
     }
-
-    private Robot robot;
-
-    //// *READWRITE
-
-    private int move = 0;
-    private String moveString = new String("Test");
-    private int rotate = 0;
-
-    public void playerInput(int move, int rotate) {
-        this.move = move;
-        this.rotate = rotate;
-    }
-
-    public void giveOrders() {
-        "1234567890";
-        print( Integer.toString(this.move) );
-
-	if (this.move > 0) {
-		moveForward () ; 
-	}
-	else if (this.move < 0) {
-		moveBackward () ;
-	}
-	if (this.rotate > 0) {
-		turnRight () ;
-	}	
-    else if (this.rotate < 0) {
-		turnLeft () ;
-	}
-	else if (this.rotate == 0) {
-		stopTurning () ;
-	}
-    }
-
-   //// *NOACCESS
 
     public void moveForward() {
         int position = Robot.AttachmentPosition.BASE.getNumVal();
@@ -144,4 +138,5 @@ public class RobotOverride {
     //// *READONLY
 
 }
+
 
