@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Player/CodeEditor/IDE.gd" type="Script" id=1]
 [ext_resource path="res://Player/CodeEditor/FileList.gd" type="Script" id=2]
@@ -40,7 +40,9 @@ script/source = "extends Tree
 #	get_parent().get_child(0).connect(\"save_all_files\", self, \"save_all_files\")
 "
 
-[sub_resource type="GDScript" id=2]
+[sub_resource type="StyleBoxEmpty" id=2]
+
+[sub_resource type="GDScript" id=3]
 script/source = "extends TextEdit
 
 
@@ -155,8 +157,8 @@ margin_bottom = 646.0
 [node name="TextEditor" type="TextEdit" parent="."]
 anchor_right = 1.0
 anchor_bottom = 0.8
-margin_left = 191.008
-margin_right = 1.00781
+margin_left = 191.948
+margin_right = 1.94763
 highlight_current_line = true
 syntax_highlighting = true
 show_line_numbers = true
@@ -197,12 +199,14 @@ anchor_bottom = 1.0
 margin_left = -0.958984
 margin_top = 20.0
 margin_right = -0.958984
+custom_styles/read_only = SubResource( 2 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
 text = "This is a test"
 readonly = true
 highlight_all_occurrences = true
 smooth_scrolling = true
 hiding_enabled = 1
-script = SubResource( 2 )
+script = SubResource( 3 )
 [connection signal="file_dirtied" from="." to="LeftBar/FileList" method="_on_IDE_file_dirtied"]
 [connection signal="text_changed" from="LeftBar/GridContainer/TargetName" to="." method="_on_TargetName_text_changed"]
 [connection signal="item_selected" from="LeftBar/FileList" to="." method="_on_FileList_item_selected"]
@@ -213,5 +217,5 @@ script = SubResource( 2 )
 [connection signal="cursor_changed" from="TextEditor" to="." method="_on_TextEditor_cursor_changed"]
 [connection signal="text_changed" from="TextEditor" to="." method="_on_TextEditor_text_changed"]
 [connection signal="cursor_changed" from="OutputArea/Output" to="." method="_on_TextEditor_cursor_changed"]
-[connection signal="text_changed" from="OutputArea/Output" to="LeftBar/FileList" method="_on_TextEditor_text_changed"]
 [connection signal="text_changed" from="OutputArea/Output" to="." method="_on_TextEditor_text_changed"]
+[connection signal="text_changed" from="OutputArea/Output" to="LeftBar/FileList" method="_on_TextEditor_text_changed"]

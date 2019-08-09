@@ -1,4 +1,4 @@
-//// *READONLY
+//// *NOACCESS
 package command;
 
 import annotations.Command;
@@ -8,23 +8,68 @@ import entity.Robot;
 import entity.RobotAttachments.Base;
 import util.ByteManager;
 
-import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+
+//// *READONLY
 
 public class RobotDefault {
-    private Robot robot;
+
+    //// *READWRITE
+
+    int w = 0;
+
+    /**
+     * Called when you have this robot selected, and you press a key.
+     * @param code An integer representing the key that you pressed
+     * @param pressed Whether or not you pressed or released the key. 1 is pressed, 0 is released.
+     */
+    public void playerKeyPressed(int code, int pressed) {
+        print(code + " " + pressed + "\n");
+
+        if (code == 87) {
+            this.w = pressed;
+        }
+
+    }
+
+    /**
+     * Fill this in to give the robot his orders. Right now he can only move forward when w is pressed.
+     * Can you help him do more things?
+     */
+    public void giveOrders() {
+
+        if (this.w > 0) {
+            moveForward();
+        }
+
+    }
+
+    //// *READONLY
+
+    // moveForward()
+    // moveBackward()
+    // stopMoving()
+    // turnLeft()
+    // turnRight()
+    // stopTurning()
+    // print(String)
 
     //// *NOACCESS
 
+    private Robot robot;
+
+    public boolean isActionPressed(int pressed) {
+        return pressed == 1;
+    }
+
     @Command(commandName = "process", id = 0)
     public byte[] process() {
-        robot.clearOrders();
-
         giveOrders();
 
         byte[] orders = robot.getOrders();
+
+        // Clear the robot's orders for the next loop
+        robot.clearOrders();
 
         return orders;
     }
@@ -36,16 +81,24 @@ public class RobotDefault {
         int type = ByteBuffer.wrap(bytes, 4, 4).getInt();
 //        System.out.println("Position: " + position + " Type: " + type + " Byte length: " + bytes.length);
 
-        // If it was ourselves, and the player
-        if (position == Robot.AttachmentType.SELF.getNumVal()
-                && type == Robot.InputType.PLAYER.getNumVal()) {
+        // If the signal came from the robot
+        if (position == Robot.AttachmentType.SELF.getNumVal()) {
 
-            // There will we two ints, move and rotate that follow
-            int move = ByteBuffer.wrap(bytes, 8, 4).getInt();
-            int rotate = ByteBuffer.wrap(bytes, 12, 4).getInt();
+            // If the input type was a player key stroke
+            if (type == Robot.InputType.PLAYER_KEY.getNumVal()) {
+                // Handle the data from the keystroke
+                // Get the character code and the action
+                int code = ByteBuffer.wrap(bytes, 8, 4).getInt();
+                int action = ByteBuffer.wrap(bytes, 12, 4).getInt();
 
-            // Pass it to the viewable playerInput function
-            this.playerInput(move, rotate);
+                // Pass it to the viewable playerKeyPressed function
+                this.playerKeyPressed(code, action);
+            }
+            // If the input type was a player mouse input
+            else if (type == Robot.InputType.PLAYER_MOUSE.getNumVal()) {
+
+            }
+
         }
 
         return new byte[0];
@@ -54,55 +107,6 @@ public class RobotDefault {
     @SetEntity
     public void setRobot(GenericEntity robot) {
         this.robot = (Robot)robot;
-    }
-
-    //// *READONLY
-
-    private String message = "";
-    private int move = 0;
-    private int rotate = 0;
-
-    public void playerInput(int move, int rotate) {
-        this.move = move;
-        this.rotate = rotate;
-    }
-
-    public void giveOrders() {
-
-        // If the user want's to move, meaning input is -1 or 1
-        if (this.move != 0) {
-
-            // We should move!
-            if (this.move > 0) {
-                // Right now I can only move forward, can you fix me?
-                moveForward();
-            }
-            else if (this.move < 0) {
-                moveBackward();
-            }
-        }
-        else {
-            // Use this if you want to stop the robot's movement
-            stopMoving();
-        }
-
-        // If the user wants to rotate, meaning input is -1 or 1
-        if (this.rotate != 0) {
-
-            // We should rotate
-            if (this.rotate > 0) {
-                // Right now I can only rotate to the right, can you fix me?
-                turnRight();
-            }
-        }
-        else {
-            // Use this if you want tto stop the robot from turning
-            stopTurning();
-        }
-
-        if (message != "") {
-            print(message);
-        }
     }
 
     public void moveForward() {
@@ -153,4 +157,8 @@ public class RobotDefault {
 
     public Robot getRobot() { return robot; }
 
+    //// *READONLY
+
 }
+
+

@@ -1,8 +1,9 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Entities/Sentinel.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Assets/TileMap/tilemap_simple.png" type="Texture" id=2]
 [ext_resource path="res://Assets/Fonts/NunitoTitle.tres" type="DynamicFont" id=3]
+[ext_resource path="res://Assets/Fonts/NunitoBody.tres" type="DynamicFont" id=4]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
@@ -92,7 +93,7 @@ points = PoolVector2Array( 0, 0, 200, 0, 200, 200 )
 2/z_index = 0
 
 [sub_resource type="RectangleShape2D" id=6]
-extents = Vector2( 179.603, 186.757 )
+extents = Vector2( 179.603, 109.143 )
 
 [node name="Level_1" type="Node2D"]
 scale = Vector2( 1.02941, 1 )
@@ -121,7 +122,7 @@ position = Vector2( 640.672, 394.111 )
 current = true
 
 [node name="Finish" type="Area2D" parent="."]
-position = Vector2( 728.492, 159.345 )
+position = Vector2( 729.535, 150.752 )
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Finish"]
@@ -134,7 +135,7 @@ __meta__ = {
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 653.853
+margin_left = 640.0
 margin_top = 23.017
 margin_right = 653.853
 margin_bottom = 23.017
@@ -160,8 +161,8 @@ __meta__ = {
 [node name="HintsPanel" type="Panel" parent="."]
 margin_left = 574.0
 margin_top = 333.0
-margin_right = 1034.0
-margin_bottom = 537.0
+margin_right = 1051.0
+margin_bottom = 642.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HintsPanel"]
 anchor_right = 1.0
@@ -172,8 +173,9 @@ margin_right = -10.0
 margin_bottom = -10.0
 
 [node name="Label" type="Label" parent="HintsPanel/VBoxContainer"]
-margin_right = 440.0
-margin_bottom = 184.0
+margin_right = 457.0
+margin_bottom = 283.0
+custom_fonts/font = ExtResource( 4 )
 text = "You can click on your units to select them.
 Units that are selected are highlighted in green.
 

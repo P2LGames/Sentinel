@@ -14,7 +14,8 @@ const ATTACHMENT_POSITIONS = {
 }
 
 const INPUT_TYPES = {
-	PLAYER = 0
+	PLAYER_KEY = 0,
+	PLAYER_MOUSE = 1
 }
 
 const ORDER_TYPES = {
@@ -48,24 +49,128 @@ func _ready():
 
 
 func _process(delta):
-	
-	# We can print, and stop everything
+	# We can print
 	if orders.size() > 0:
 		if ORDER_TYPES.PRINT in orders[0]:
 			print(orders[0].split(":")[1])
 			orders.remove(0)
 	
 	# If we are ready to send stuff, and we haven't processed, process!
-	if $Reprogrammable.ready and not hasProcessed:
+	if is_reprogrammable_ready() and not hasProcessed:
 		hasProcessed = true
 		
-		CommunicationManager.command(int($Reprogrammable.entityId), COMMAND_ID_PROCESS, false, [])
+		CommunicationManager.command(get_reprogrammable_id(), COMMAND_ID_PROCESS, false, [])
 
 
 func _physics_process(delta):
 	
 	var motion = move_and_slide(movement)
 
+
+""" INPUT """
+
+func _select():
+	# Highlight ourselves
+	get_selection_indicator().visible = true
+
+
+func _deselect():
+	# Unhighlight ourselves
+	get_selection_indicator().visible = false
+
+
+func send_key_input(code: int, pressed: int):
+	var bytes: PoolByteArray = []
+	
+	# Attach the position that the input is coming from
+	bytes += Util.int2bytes(ATTACHMENT_POSITIONS.SELF)
+	
+	# Attach the type of input
+	bytes += Util.int2bytes(INPUT_TYPES.PLAYER_KEY)
+	
+	# Attach the input values, in this case, 0's
+	bytes += Util.int2bytes(code)
+	bytes += Util.int2bytes(pressed)
+	
+	# Send it all to the server
+	CommunicationManager.command(get_reprogrammable_id(), COMMAND_ID_INPUT, true, bytes)
+
+
+""" GETTERS """
+
+func get_selection_indicator():
+	return $SpriteContainer/SelectionIndicator
+
+
+func get_attachment_container():
+	return $SpriteContainer/AttachmentContainer
+
+
+func get_attachment_positions():
+	return get_attachment_container().get_children()
+
+
+func _get_display_name() -> String:
+	return displayName
+
+
+""" SETTERS """
+
+func set_movement(movement: Vector2):
+	self.movement = movement
+
+
+func set_input(code: int, action: int):
+	# Send the input command to the server
+	send_key_input(code, action)
+
+
+func _set_display_name(displayName: String):
+	self.displayName = displayName
+
+
+func _set_inspect_items(inspectUI: PopupMenu):
+	# Set the display name
+	inspectUI.add_separator(self.displayName)
+	
+	# Call the super method
+	._set_inspect_items(inspectUI)
+
+
+""" ATTACHMENTS """
+
+func setup_attachments():
+	# Clear our list of attachments and our dictionary
+	attachments = []
+	positionToAttachment = {}
+	
+	# Add the robot
+	add_attachment(ATTACHMENT_POSITIONS.SELF, self)
+	
+	# Get all of the attachment positions
+	var attachmentPositions = get_attachment_positions()
+	
+	# Setup our position to attachment with the nodes we just got
+	for attachmentPosition in attachmentPositions:
+		# Get the position tag and the attachment
+		var positionId = attachmentPosition.get_attachment_position()
+		var attachment = attachmentPosition.get_attachment()
+		
+		# Even if the attachment is null, add it
+		add_attachment(positionId, attachment)
+
+
+func add_attachment(position: int, attachment):
+	# Add the attachment to our list of attachments
+	attachments.append(attachment)
+	positionToAttachment[position] = attachment
+	
+	# Set the attachment's robot to be myself
+	if attachment != null and attachment.has_method("set_robot"):
+		attachment.set_robot(self)
+
+
+""" ORDER HANDLING """
 
 func _handle_command(commandId: int, value: PoolByteArray):
 	# Process command
@@ -108,6 +213,11 @@ func route_order(attachmentPosition: int, orderType: int, messageBytes: PoolByte
 		print_error(Constants.ERROR_CODE.NO_ATTACHMENT, "No attachment at this location, can't pass order")
 
 
+func pass_order(orderType: int, orderBytes: PoolByteArray):
+	if orderType == ORDER_TYPES.PRINT:
+		print_message(orderBytes.get_string_from_ascii(), Constants.MESSAGE_TYPE.NORMAL)
+
+
 func print_error(error: int, message: String):
 	var mess = "Error Code: " + str(error) + ". " + message
 	
@@ -115,131 +225,5 @@ func print_error(error: int, message: String):
 	print_message(mess, Constants.MESSAGE_TYPE.ERROR)
 
 
-func _select():
-	# Highlight ourselves
-	get_selection_indicator().visible = true
-
-
-func _deselect():
-	# Unhighlight ourselves
-	get_selection_indicator().visible = false
-	
-	# We should no longer have user input
-#	var fieldsToUpdate = { "move": 0, "rotate": 0 }
-	send_input_command(Vector2.ZERO)
-
-
-func send_input_command(input: Vector2):
-	var bytes: PoolByteArray = []
-	
-	# Attach the position that the input is coming from
-	bytes += Util.int2bytes(ATTACHMENT_POSITIONS.SELF)
-	
-	# Attach the type of input
-	bytes += Util.int2bytes(INPUT_TYPES.PLAYER)
-	
-	# Attach the input values, in this case, 0's
-	bytes += Util.int2bytes(int(input.x))
-	bytes += Util.int2bytes(int(input.y))
-	
-	# Send it all to the server
-	CommunicationManager.command(int($Reprogrammable.entityId), COMMAND_ID_INPUT, true, bytes)
-
-
-##### GETTERS #####
-
-func get_selection_indicator():
-	return $SpriteContainer/SelectionIndicator
-
-
-func get_attachment_container():
-	return $SpriteContainer/AttachmentContainer
-
-
-func get_attachment_positions():
-	return get_attachment_container().get_children()
-
-
-func _get_entity_id():
-	return $Reprogrammable.entityId
-
-
-func _get_display_name() -> String:
-	return displayName
-
-
-##### SETTERS #####
-
-func set_movement(movement: Vector2):
-	self.movement = movement
-
-
-func set_input(input: Vector2):
-	move = input.x
-	rotate = input.y
-	
-	# So we aren't sending a ton of unnecessary data every loop, check if the move or rotate has changed
-	if prevMove != move or prevRotate != rotate:
-		# Update our previous move and rotate
-		prevMove = move
-		prevRotate = rotate
-
-		# Send the input command to the server
-		send_input_command(input)
-
-
-func _set_display_name(displayName: String):
-	self.displayName = displayName
-
-
-func _set_inspect_items(inspectUI: PopupMenu):
-	# Set the display name
-	inspectUI.add_separator(self.displayName)
-	
-	# Call the super method
-	._set_inspect_items(inspectUI)
-
-
-##### ATTACHMENTS #####
-
-func setup_attachments():
-	# Clear our list of attachments and our dictionary
-	attachments = []
-	positionToAttachment = {}
-	
-	# Add the robot
-	add_attachment(ATTACHMENT_POSITIONS.SELF, self)
-	
-	# Get all of the attachment positions
-	var attachmentPositions = get_attachment_positions()
-	
-	# Setup our position to attachment with the nodes we just got
-	for attachmentPosition in attachmentPositions:
-		# Get the position tag and the attachment
-		var positionId = attachmentPosition.get_attachment_position()
-		var attachment = attachmentPosition.get_attachment()
-		
-		# Even if the attachment is null, add it
-		add_attachment(positionId, attachment)
-
-
-func add_attachment(position: int, attachment):
-	# Add the attachment to our list of attachments
-	attachments.append(attachment)
-	positionToAttachment[position] = attachment
-	
-	# Set the attachment's robot to be myself
-	if attachment != null and attachment.has_method("set_robot"):
-		attachment.set_robot(self)
-
-
-##### ORDER HANDLING #####
-
-func pass_order(orderType: int, orderBytes: PoolByteArray):
-	if orderType == ORDER_TYPES.PRINT:
-		print_message(orderBytes.get_string_from_ascii(), Constants.MESSAGE_TYPE.NORMAL)
-	
-
-
-##### SIGNALS #####
+""" SIGNALS """
 

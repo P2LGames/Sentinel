@@ -13,8 +13,36 @@ func print_message(message: String, type: int):
 
 ##### ENTITY ID AND COMMUNICATION #####
 
-func _get_entity_id():
-	return ""
+func get_reprogrammable_component():
+	# If we are reprogrammable
+	if get_node("Reprogrammable"):
+		# Get the entity type from that
+		return get_node("Reprogrammable")
+	
+	# Otherwise, return null
+	return null
+
+
+func get_reprogrammable_id():
+	var reprogrammable = get_reprogrammable_component()
+	
+	# If the reprogrammable exists, get its entityId
+	if reprogrammable != null:
+		return int(reprogrammable.entityId)
+	
+	# Otherwise, return null
+	return null
+
+
+func is_reprogrammable_ready():
+	var reprogrammable = get_reprogrammable_component()
+	
+	# If the reprogrammable exists, get its entityId
+	if reprogrammable != null:
+		return reprogrammable.ready
+	
+	# Otherwise, return null
+	return null
 
 
 ##### ENTITY INTERACTION #####

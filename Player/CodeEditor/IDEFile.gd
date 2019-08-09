@@ -18,19 +18,27 @@ var requiredParts = []
 
 
 func _init(fileName, className, entityId):
-	self._origPath = "res://Player/OriginalCode/" + fileName
-	self._currPath = "res://Player/CurrentCode/" + fileName
+	self._origPath = Constants.ORIGINAL_CODE_DIR + fileName
+	self._currPath = Constants.PLAYER_CODE_DIR + fileName
 	self._className = className
 	self._entityId = entityId
 	self._focusLine = 0
 	self._focusCol = 0
 	
+	# Create a new directory to make sure the code dir exists
+	var currentCodePath := Directory.new()
+	
+	# Make sure the code directory exists
+	if not currentCodePath.dir_exists(Constants.PLAYER_CODE_DIR):
+		currentCodePath.make_dir(Constants.PLAYER_CODE_DIR)
+	
+	# Create new file readers and writers
 	var fileReader = File.new()
 	var fileWriter = File.new()
 	
 	# If the files doesn't exist, make it
 	# If we haven't edited/created this file before, the current code is the same as the original code
-	if !fileWriter.file_exists(self._currPath):
+	if not fileWriter.file_exists(self._currPath):
 		fileWriter.open(self._currPath, File.WRITE)
 		fileReader.open(self._origPath, File.READ)
 		self._text = fileReader.get_as_text()
@@ -41,9 +49,11 @@ func _init(fileName, className, entityId):
 		fileReader.open(self._currPath, File.READ)
 		self._text = fileReader.get_as_text()
 	
+	# Close our file streams
 	fileWriter.close()
 	fileReader.close()
 	
+	# Setup display text
 	setup_display_text()
 
 

@@ -1,12 +1,13 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Entities/Sentinel.gd" type="Script" id=1]
 [ext_resource path="res://Assets/Sentinel/SentinelSelection.png" type="Texture" id=2]
 [ext_resource path="res://Assets/Sentinel/SentinelBody.png" type="Texture" id=3]
-[ext_resource path="res://Assets/Sentinel/SentinelTreads.png" type="Texture" id=4]
-[ext_resource path="res://Entities/Treads.gd" type="Script" id=5]
-[ext_resource path="res://Assets/Sentinel/SentinelSensor.png" type="Texture" id=6]
-[ext_resource path="res://Communication/Reprogrammable.tscn" type="PackedScene" id=7]
+[ext_resource path="res://Assets/Sentinel/SentinelStripes.png" type="Texture" id=4]
+[ext_resource path="res://Assets/Sentinel/SentinelTreads.png" type="Texture" id=5]
+[ext_resource path="res://Entities/Treads.gd" type="Script" id=6]
+[ext_resource path="res://Assets/Sentinel/SentinelSensor.png" type="Texture" id=7]
+[ext_resource path="res://Communication/Reprogrammable.tscn" type="PackedScene" id=8]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
@@ -47,6 +48,13 @@ __meta__ = {
 "_edit_lock_": true
 }
 
+[node name="ColorStripes" type="Sprite" parent="SpriteContainer"]
+self_modulate = Color( 1, 0, 0, 1 )
+texture = ExtResource( 4 )
+__meta__ = {
+"_edit_lock_": true
+}
+
 [node name="AttachmentContainer" type="Node2D" parent="SpriteContainer"]
 
 [node name="Base" type="Node2D" parent="SpriteContainer/AttachmentContainer"]
@@ -55,8 +63,8 @@ attachmentPosition = 2
 
 [node name="Treads" type="Sprite" parent="SpriteContainer/AttachmentContainer/Base"]
 z_index = -1
-texture = ExtResource( 4 )
-script = ExtResource( 5 )
+texture = ExtResource( 5 )
+script = ExtResource( 6 )
 
 [node name="Head" type="Node2D" parent="SpriteContainer/AttachmentContainer"]
 visible = false
@@ -66,7 +74,7 @@ attachmentPosition = 1
 [node name="Sensor" type="Sprite" parent="SpriteContainer/AttachmentContainer/Head"]
 self_modulate = Color( 1, 0, 0, 1 )
 z_index = 5
-texture = ExtResource( 6 )
+texture = ExtResource( 7 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
@@ -75,4 +83,4 @@ __meta__ = {
 "_edit_lock_": true
 }
 
-[node name="Reprogrammable" parent="." instance=ExtResource( 7 )]
+[node name="Reprogrammable" parent="." instance=ExtResource( 8 )]

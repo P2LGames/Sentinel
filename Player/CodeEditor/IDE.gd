@@ -11,7 +11,7 @@ signal file_dirtied(index)
 
 func _ready():
 	# Get the files in the original code
-	var originalCodeFiles = get_files_in_directory(get_file_directory())
+	var originalCodeFiles = get_files_in_directory(Constants.ORIGINAL_CODE_DIR)
 	
 	# Count the files
 	var fileCount = 1
@@ -36,12 +36,13 @@ func _process(delta):
 	if currentFile == null:
 		return
 	
-	handle_input()
-
-
-func handle_input():
 	if Input.is_action_just_pressed("ide_save"):
 		save_file()
+
+
+func _unhandled_key_input(event):
+	if visible:
+		accept_event()
 
 
 # Revert to default code and reset focus
@@ -132,10 +133,6 @@ func get_file_list():
 	return $LeftBar/FileList
 
 
-func get_file_directory():
-	return "res://Player/OriginalCode/"
-
-
 func get_files_in_directory(fileDirectory):
 	var files = []
 	var dir = Directory.new()
@@ -150,9 +147,11 @@ func get_files_in_directory(fileDirectory):
 	while true:
 		# Get the next file
 		var file = dir.get_next()
+		
 		# If it was empty, stop
 		if file == "":
 			break
+		
 		# As long as the file doesn't start with a period, add it
 		elif not file.begins_with("."):
 			files.append(file)

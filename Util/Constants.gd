@@ -1,5 +1,8 @@
 extends Node
 
+const ORIGINAL_CODE_DIR = "res://Player/OriginalCode/"
+const PLAYER_CODE_DIR = "user://Code/"
+
 const TYPE_TO_TYPE_ID = {
 	Robot = 0
 }

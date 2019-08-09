@@ -7,6 +7,7 @@ script/source = "extends Node2D
 
 var camera
 
+var pressedKeys = []
 var selectedEntities = []
 var inspectedEntity
 
@@ -14,7 +15,6 @@ var isSelectingMultiple = false
 
 
 func _ready():
-	
 	pass
 
 
@@ -26,36 +26,48 @@ func _physics_process(delta):
 	handle_mouse_inputs()
 
 
-##### INPUT #####
+\"\"\" INPUT \"\"\"
+
+func _unhandled_key_input(event):
+	# If we pressed the key
+	if event.pressed:
+		# And the input is not in our pressed keys
+		if not pressedKeys.has(event.scancode):
+			# Add the key
+			pressedKeys.append(event.scancode)
+			
+			# Set the input of our entities
+			handle_key_input(event.scancode, event.pressed)
+	# Otherwise, we released the key
+	else:
+		# If the pressed keys has the scancode
+		if pressedKeys.has(event.scancode):
+			# Then remove the scancode
+			pressedKeys.erase(event.scancode)
+			
+			# And set the input of our entities
+			handle_key_input(event.scancode, event.pressed)
+
+
+func handle_key_input(code: int, pressed: int):
+	print(str(code) + \" \" + str(pressed))
+	# Loop through all of hte selected entities
+	for entity in selectedEntities:
+		# If we can send them the key input, then send it
+		if entity.has_method(\"send_key_input\"):
+			entity.send_key_input(code, pressed)
+
 
 func handle_input():
 
 	# Show editor if escape is pressed
 	if Input.is_action_just_pressed(\"ui_focus_next\"):
+		
 		if not get_ide().visible:
 			get_ide().toggle_visibility()
 	
 	# If we want to select multiple people we can
 	isSelectingMultiple = Input.is_action_pressed(\"select_multiple\")
-	
-	# Handle user input if not in code editor
-	if not get_ide().visible:
-		# Track move and rotate
-		var move = 0
-		var rotate = 0
-		
-		if Input.is_action_pressed(\"move_up\"):
-			move += 1
-		if Input.is_action_pressed(\"move_down\"):
-			move -= 1
-		if Input.is_action_pressed(\"move_left\"):
-			rotate -= 1
-		if Input.is_action_pressed(\"move_right\"):
-			rotate += 1
-		
-		for entity in selectedEntities:
-			if entity.has_method(\"set_input\"):
-				entity.set_input(Vector2(move, rotate))
 
 
 func handle_mouse_inputs():
@@ -70,11 +82,11 @@ func handle_mouse_inputs():
 			left_clicked_on_entity(clickedEntity)
 		elif clickedEntity == null:
 			deselect()
-		
+	# Right Click
 	elif Input.is_action_just_pressed(\"right_click\"):
 		pass
-	
-	elif Input.is_action_just_pressed(\"inspect_entity\"):
+	# Q Pressed and IDE is invisible
+	elif not get_ide().visible and Input.is_action_just_pressed(\"inspect_entity\"):
 		# Get the clicked entity
 		var clickedEntity = get_clicked_entity()
 		
@@ -180,7 +192,7 @@ func inspect_entity(clickedEntity):
 	inspectUI.popup()
 
 
-##### GETTERS #####
+\"\"\" GETTERS \"\"\"
 
 func get_inspect_ui():
 	return $CanvasLayer/Inspect
@@ -198,7 +210,7 @@ func get_ide():
 	return $CanvasLayer/IDE
 
 
-##### SETTERS #####
+\"\"\" SETTERS \"\"\"
 
 func set_inspected_entity(entity):
 	inspectedEntity = entity
@@ -209,7 +221,7 @@ func set_inspected_entity_name(text: String):
 		inspectedEntity._set_display_name(text)
 
 
-##### SIGNALS #####
+\"\"\" SIGNALS \"\"\"
 
 func _on_Inspect_id_pressed(ID):
 	if ID == Constants.INSPECT_ITEMS.EDIT_CODE:
