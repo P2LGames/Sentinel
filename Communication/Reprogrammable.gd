@@ -8,7 +8,13 @@ var registerMessageSent: bool = false
 
 var currentOutput := Array()
 
+# Default and current classes
+var defaultClass: String = ""
+var currentClass: String = ""
+
 signal message_printed(printMessage)
+signal class_changed(newClass)
+
 
 func _ready():
 	# We are processing
@@ -38,16 +44,39 @@ func _process(delta: float):
 	else:
 		set_process(false)
 
+""" GETTERS """
+
+func get_current_output_text():
+	return currentOutput
+
+
+func get_current_class():
+	return currentClass
+
+
+func get_default_class():
+	return defaultClass
+
+
+""" SETTERS """
 
 func set_id(newId: String):
 	# Set our new id
 	entityId = newId
+	
 	# We are now ready to send and recieve messages
 	ready = true
 
 
-func get_current_output():
-	return currentOutput
+func set_current_class(_class: String):
+	print("Setting new class: " + _class)
+	
+	currentClass = _class
+	
+	# Emit a signal saying that the class changed
+	emit_signal("class_changed", _class)
+
+
 
 
 

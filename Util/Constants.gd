@@ -1,7 +1,9 @@
 extends Node
 
-const ORIGINAL_CODE_DIR = "res://Player/OriginalCode/"
+const GENERIC_CODE_DIR = "res://Player/OriginalCode/"
 const PLAYER_CODE_DIR = "user://Code/"
+
+const LEVEL_1_CODE_DIR = "res://Scenes/Level_1/Level_1_Code/"
 
 const TYPE_TO_TYPE_ID = {
 	Robot = 0
@@ -25,7 +27,8 @@ const ATTACHMENT_POSITIONS = {
 }
 
 const INSPECT_ITEMS = {
-	EDIT_CODE = 1
+	EDIT_CODE = 1,
+	VIEW_OUTPUT = 2
 }
 
 const ERROR_CODE = {

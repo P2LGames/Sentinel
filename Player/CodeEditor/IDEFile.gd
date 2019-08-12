@@ -7,7 +7,6 @@ const DO_NOT_EDIT_END = '// DO NOT EDIT ABOVE THIS LINE'
 var _origPath
 var _currPath
 var _className
-var _entityId
 var _focusLine
 var _focusCol
 var _text = ""
@@ -17,11 +16,10 @@ var allAccessParts = []
 var requiredParts = []
 
 
-func _init(fileName, className, entityId):
-	self._origPath = Constants.ORIGINAL_CODE_DIR + fileName
+func _init(originalPath, fileName, className):
+	self._origPath = originalPath + fileName
 	self._currPath = Constants.PLAYER_CODE_DIR + fileName
 	self._className = className
-	self._entityId = entityId
 	self._focusLine = 0
 	self._focusCol = 0
 	

@@ -1,75 +1,10 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Player/CodeEditor/IDE.gd" type="Script" id=1]
-[ext_resource path="res://Player/CodeEditor/FileList.gd" type="Script" id=2]
+[ext_resource path="res://Player/CodeEditor/FileTree.gd" type="Script" id=2]
 [ext_resource path="res://Player/CodeEditor/TextEditor.gd" type="Script" id=3]
 [ext_resource path="res://Assets/Fonts/NunitoBody.tres" type="DynamicFont" id=4]
-
-[sub_resource type="GDScript" id=1]
-script/source = "extends Tree
-
-#var current_selection = -1
-
-#func file_dirtied():
-#	if current_selection != -1:
-#		var oldText = self.get_item_text(current_selection)
-#		if !oldText.ends_with('*'):
-#			self.set_item_text(current_selection, oldText + '*')
-#
-#func file_saved(index):
-#	var oldText = self.get_item_text(index)
-#	if oldText.ends_with('*'):
-#		self.set_item_text(index, oldText.substr(0, oldText.length() - 1))
-#
-#func save_all_files():
-#	for i in range(self.get_item_count()):
-#		self.file_saved(i)
-#
-#func add_file(file):
-#	add_item(file.get_class_name())
-#
-#func _item_selected(index):
-#	current_selection = index
-#	get_parent().file_selected(index)
-#
-## Called when the node enters the scene tree for the first time.
-#func _ready():
-#	self.connect(\"item_selected\", self, \"_item_selected\")
-#	get_parent().get_child(0).connect(\"file_dirtied\", self, \"file_dirtied\")
-#	get_parent().get_child(0).connect(\"file_saved\", self, \"file_saved\")
-#	get_parent().get_child(0).connect(\"save_all_files\", self, \"save_all_files\")
-"
-
-[sub_resource type="StyleBoxEmpty" id=2]
-
-[sub_resource type="GDScript" id=3]
-script/source = "extends TextEdit
-
-
-func add_output(printMessage):
-	# Add the text to the text edit
-	insert_text_at_cursor(printMessage.message)
-	
-	# TODO: Color the text depending on the type
-
-
-func set_output(output: Array):
-	# Clear the current text
-	text = \"\"
-	
-	# Loop through each message in the output and add it to the text edit
-	for message in output:
-		add_output(message)
-
-
-\"\"\" SIGNALS \"\"\"
-
-func _on_TargetEntity_print_message(printMessage):
-	add_output(printMessage)
-
-
-
-"
+[ext_resource path="res://Player/OutputText.tscn" type="PackedScene" id=5]
 
 [node name="IDE" type="Panel" groups=[
 "CodePanel",
@@ -82,21 +17,27 @@ script = ExtResource( 1 )
 margin_right = 190.0
 margin_bottom = 40.0
 
-[node name="GridContainer" type="GridContainer" parent="LeftBar"]
+[node name="EntityName" type="Control" parent="LeftBar"]
+margin_left = 2.0
 margin_right = 190.0
-margin_bottom = 42.0
-columns = 2
+margin_bottom = 25.0
+rect_min_size = Vector2( 0, 25 )
 
-[node name="NameLabel" type="Label" parent="LeftBar/GridContainer"]
-margin_top = 5.0
+[node name="NameLabel" type="Label" parent="LeftBar/EntityName"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_top = -7.0
 margin_right = 82.0
-margin_bottom = 19.0
+margin_bottom = 7.0
 text = "Entity Name:"
 
-[node name="TargetName" type="LineEdit" parent="LeftBar/GridContainer"]
-margin_left = 86.0
-margin_right = 186.0
-margin_bottom = 24.0
+[node name="TargetName" type="LineEdit" parent="LeftBar/EntityName"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_left = 170.0
+margin_top = -12.0
+margin_right = 100.0
+margin_bottom = 12.0
 grow_horizontal = 2
 grow_vertical = 2
 rect_min_size = Vector2( 100, 0 )
@@ -104,61 +45,96 @@ text = "None"
 max_length = 20
 expand_to_text_length = true
 
-[node name="TypeLabel" type="Label" parent="LeftBar/GridContainer"]
-margin_top = 28.0
-margin_right = 82.0
-margin_bottom = 42.0
+[node name="EntityType" type="Control" parent="LeftBar"]
+margin_left = 2.0
+margin_top = 29.0
+margin_right = 190.0
+margin_bottom = 54.0
+rect_min_size = Vector2( 0, 25 )
+
+[node name="TypeLabel" type="Label" parent="LeftBar/EntityType"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_top = -7.0
+margin_right = 77.0
+margin_bottom = 7.0
 text = "Entity Type:"
 
-[node name="Type" type="Label" parent="LeftBar/GridContainer"]
-margin_left = 86.0
-margin_top = 28.0
-margin_right = 186.0
-margin_bottom = 42.0
+[node name="Type" type="Label" parent="LeftBar/EntityType"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_left = 90.0
+margin_top = -6.11897
+margin_right = 180.0
+margin_bottom = 7.88103
 rect_min_size = Vector2( 100, 0 )
 text = "None"
 
-[node name="FileList" type="ItemList" parent="LeftBar"]
-margin_top = 46.0
+[node name="EntityClass" type="Control" parent="LeftBar"]
+anchor_right = 1.0
+margin_left = 2.0
+margin_top = 58.0
+margin_bottom = 83.0
+rect_min_size = Vector2( 0, 25 )
+
+[node name="ClassLabel" type="Label" parent="LeftBar/EntityClass"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_top = -7.0
+margin_right = 77.0
+margin_bottom = 7.0
+text = "Entity Class:"
+
+[node name="Class" type="Label" parent="LeftBar/EntityClass"]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_left = 90.0
+margin_top = -7.0
+margin_right = 180.0
+margin_bottom = 7.0
+rect_min_size = Vector2( 90, 0 )
+text = "Robot Default"
+valign = 1
+clip_text = true
+
+[node name="FileTree" type="Tree" parent="LeftBar"]
+margin_top = 87.0
 margin_right = 190.0
-margin_bottom = 546.0
+margin_bottom = 587.0
 rect_min_size = Vector2( 0, 500 )
 script = ExtResource( 2 )
 
 [node name="ResetButton" type="Button" parent="LeftBar"]
-margin_top = 550.0
+margin_top = 591.0
 margin_right = 190.0
-margin_bottom = 570.0
+margin_bottom = 611.0
 text = "Reset"
 
 [node name="RecompileButton" type="Button" parent="LeftBar"]
-margin_top = 574.0
+margin_top = 615.0
 margin_right = 190.0
-margin_bottom = 594.0
+margin_bottom = 635.0
 text = "Recompile"
 
 [node name="SaveButton" type="Button" parent="LeftBar"]
-margin_top = 598.0
+margin_top = 639.0
 margin_right = 190.0
-margin_bottom = 618.0
+margin_bottom = 659.0
 text = "Save"
 
 [node name="CloseButton" type="Button" parent="LeftBar"]
-margin_top = 622.0
+margin_top = 663.0
 margin_right = 190.0
-margin_bottom = 642.0
+margin_bottom = 683.0
 text = "Close"
-
-[node name="Control" type="Control" parent="LeftBar"]
-margin_top = 646.0
-margin_right = 190.0
-margin_bottom = 646.0
 
 [node name="TextEditor" type="TextEdit" parent="."]
 anchor_right = 1.0
 anchor_bottom = 0.8
 margin_left = 191.948
+margin_top = 1.612
 margin_right = 1.94763
+margin_bottom = 1.612
 highlight_current_line = true
 syntax_highlighting = true
 show_line_numbers = true
@@ -167,18 +143,6 @@ highlight_all_occurrences = true
 smooth_scrolling = true
 hiding_enabled = 1
 script = ExtResource( 3 )
-
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-anchor_top = 0.8
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 190.0
-
-[node name="Tree" type="Tree" parent="."]
-visible = false
-margin_right = 188.0
-margin_bottom = 225.0
-script = SubResource( 1 )
 
 [node name="OutputArea" type="Control" parent="."]
 anchor_top = 0.8
@@ -193,29 +157,13 @@ margin_bottom = 23.0
 custom_fonts/font = ExtResource( 4 )
 text = "Output"
 
-[node name="Output" type="TextEdit" parent="OutputArea"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = -0.958984
-margin_top = 20.0
-margin_right = -0.958984
-custom_styles/read_only = SubResource( 2 )
-custom_colors/font_color = Color( 1, 1, 1, 1 )
-text = "This is a test"
-readonly = true
-highlight_all_occurrences = true
-smooth_scrolling = true
-hiding_enabled = 1
-script = SubResource( 3 )
-[connection signal="file_dirtied" from="." to="LeftBar/FileList" method="_on_IDE_file_dirtied"]
-[connection signal="text_changed" from="LeftBar/GridContainer/TargetName" to="." method="_on_TargetName_text_changed"]
-[connection signal="item_selected" from="LeftBar/FileList" to="." method="_on_FileList_item_selected"]
+[node name="OutputText" parent="OutputArea" instance=ExtResource( 5 )]
+[connection signal="file_dirtied" from="." to="LeftBar/FileTree" method="_on_IDE_file_dirtied"]
+[connection signal="text_changed" from="LeftBar/EntityName/TargetName" to="." method="_on_TargetName_text_changed"]
+[connection signal="item_selected" from="LeftBar/FileTree" to="." method="_on_FileTree_item_selected"]
 [connection signal="pressed" from="LeftBar/ResetButton" to="." method="_on_ResetButton_pressed"]
 [connection signal="pressed" from="LeftBar/RecompileButton" to="." method="_on_RecompileButton_pressed"]
 [connection signal="pressed" from="LeftBar/SaveButton" to="." method="_on_SaveButton_pressed"]
 [connection signal="pressed" from="LeftBar/CloseButton" to="." method="_on_CloseButton_pressed"]
 [connection signal="cursor_changed" from="TextEditor" to="." method="_on_TextEditor_cursor_changed"]
 [connection signal="text_changed" from="TextEditor" to="." method="_on_TextEditor_text_changed"]
-[connection signal="cursor_changed" from="OutputArea/Output" to="." method="_on_TextEditor_cursor_changed"]
-[connection signal="text_changed" from="OutputArea/Output" to="." method="_on_TextEditor_text_changed"]
-[connection signal="text_changed" from="OutputArea/Output" to="LeftBar/FileList" method="_on_TextEditor_text_changed"]

@@ -39,13 +39,18 @@ var hasProcessed = false
 
 
 func _ready():
+	# Super call to ready
+	._ready()
+	
+	# Our default class is RobotDefault
+	get_reprogrammable_component().defaultClass = "RobotDefault"
+	get_reprogrammable_component().currentClass = "RobotDefault"
+	
 	# Setup my possible orders
 	possibleOrders[self] = ORDER_TYPES.values()
 	
 	# Setup my attachments
 	setup_attachments()
-	
-	set_process(true)
 
 
 func _process(delta):

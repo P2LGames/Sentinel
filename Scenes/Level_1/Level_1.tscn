@@ -14,11 +14,8 @@ func _ready():
 	# Set the player's camera
 	Player.camera = get_camera()
 	
-	give_orders()
-
-
-func give_orders():
-	print(\"We are giving orders\")
+	# Add the level 1 code directory to the file tree
+	Player.get_ide().add_directory(Constants.LEVEL_1_CODE_DIR)
 
 
 \"\"\" GETTERS \"\"\"

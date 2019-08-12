@@ -3,29 +3,27 @@ extends Panel
 var IDEFile = load("res://Player/CodeEditor/IDEFile.gd")
 
 var currentFile = null
-var currentIndex: int = -1
+var currentFilePath: String = ""
 
 var files = []
+var itemPathToFile: Dictionary = {}
 
-signal file_dirtied(index)
+signal file_dirtied(filePath)
+signal closing()
 
 func _ready():
-	# Get the files in the original code
-	var originalCodeFiles = get_files_in_directory(Constants.ORIGINAL_CODE_DIR)
+	# Setup the root of the file tree
+	get_file_tree().create_item()
+	get_file_tree().set_hide_root(true)
 	
-	# Count the files
-	var fileCount = 1
-	
-	# Add each file to our list
-	for file in originalCodeFiles:
-		add_file(file, file.split(".")[0], String(fileCount))
+	add_directory(Constants.GENERIC_CODE_DIR)
 	
 	# Set ourselves to be invisible
 	visible = false
 	
 	# Select the first file
-	get_file_list().select(1)
-	file_selected(1)
+	get_file_tree().get_root().get_children().get_children().select(0)
+	#file_selected(1)
 	
 	# Process
 	set_process(true)
@@ -64,19 +62,53 @@ func reset_code():
 	set_focus()
 
 
-# Add file to list of files
-func add_file(fileName, className, entityId):
-	files.append(IDEFile.new(fileName, className, entityId))
-	get_file_list().add_file(files[files.size() - 1])
+func add_directory(dir: String):
+	# Create the folder item
+	var fileTree = get_file_tree()
+	var folder = fileTree.create_item(fileTree.get_root())
+	
+	# Set the folder to the file name
+	var folderName = Util.get_file_name(dir)
+	folder.set_text(0, folderName)
+	
+	# Get the files in the original code
+	var files = get_files_in_directory(dir)
+	
+	# Add each file to our list
+	for file in files:
+		# Get the file name
+		var fileName = file.split(".")[0]
+		
+		# Create a new ide file
+		var newIDEFile = IDEFile.new(dir, file, fileName)
+		
+		# Create a tree item with it, with folder as the parent
+		var treeItem = fileTree.create_item(folder)
+		treeItem.set_text(0, fileName)
+		
+		# Create the item's path
+		var itemPath = fileTree.get_path_from_item(treeItem)
+		
+		# Save it to our dictionary
+		itemPathToFile[itemPath] = newIDEFile
 
 
 # When a file is selected, code editor should load it
-func file_selected(index):
-	currentFile = files[index]
-	currentIndex = index
+func file_selected():
+	# Get the selected item
+	var selectedItem = get_file_tree().get_selected()
 	
-	# Get the current file display text
-	get_text_editor().text = currentFile.get_display_text()
+	# Get the item path
+	var itemPath = get_file_tree().get_path_from_item(selectedItem)
+	
+	# Set the current file and the item path to it
+	if itemPath in itemPathToFile.keys():
+		# Set the current file and the file path
+		currentFile = itemPathToFile[itemPath]
+		currentFilePath = itemPath
+		
+		# Set the text to the current file
+		get_text_editor().text = currentFile.get_display_text()
 
 
 # Show or hide the code editor
@@ -96,7 +128,7 @@ func toggle_visibility():
 func save_file():
 	save_focus()
 	
-	get_file_list().file_saved(currentIndex)
+	get_file_tree().file_saved(currentFilePath)
 	
 	currentFile.save_to_disk()
 
@@ -107,30 +139,43 @@ func save_all_files():
 
 # Remember where the user was focused
 func save_focus():
-	currentFile.set_focus_line(get_text_editor().cursor_get_line())
-	currentFile.set_focus_col(get_text_editor().cursor_get_column())
+	if currentFile:
+		currentFile.set_focus_line(get_text_editor().cursor_get_line())
+		currentFile.set_focus_col(get_text_editor().cursor_get_column())
 
 
 """ GETTERS """
 
 func get_target_name():
-	return $LeftBar/GridContainer/TargetName
+	return $LeftBar/EntityName/TargetName
 
 
 func get_target_type_label():
-	return $LeftBar/GridContainer/Type
+	return $LeftBar/EntityType/Type
+
+
+func get_target_class_label():
+	return $LeftBar/EntityClass/Class
 
 
 func get_text_editor():
 	return $TextEditor
 
 
-func get_output_text_edit():
-	return $OutputArea/Output
+func get_output_text_node():
+	return $OutputArea/OutputText
+
+
+func get_output_label():
+	return $OutputArea/OutputLabel
 
 
 func get_file_list():
 	return $LeftBar/FileList
+
+
+func get_file_tree():
+	return $LeftBar/FileTree
 
 
 func get_files_in_directory(fileDirectory):
@@ -167,10 +212,20 @@ func get_files_in_directory(fileDirectory):
 
 func set_target_name(text: String):
 	get_target_name().text = text
+	
+	set_output_label_text(text)
+
+
+func set_output_label_text(text: String):
+	get_output_label().text = "Output: " + text
 
 
 func set_target_type(type: String):
 	get_target_type_label().text = type
+
+
+func set_target_class(_class: String):
+	get_target_class_label().text = _class
 
 
 func set_focus():
@@ -213,6 +268,9 @@ func _on_RecompileButton_pressed():
 
 func _on_CloseButton_pressed():
 	toggle_visibility()
+	
+	# Emit closing signal
+	emit_signal("closing")
 
 
 func _on_save_all_files():
@@ -233,7 +291,8 @@ func _on_TextEditor_text_changed():
 		save_focus()
 		
 		# Emit the dirtied signal
-		emit_signal("file_dirtied", currentIndex)
+		print(currentFilePath)
+		emit_signal("file_dirtied", currentFilePath)
 	# Otherwise, undo whatever just happened...
 	else:
 		# Don't let the user write invalid code
@@ -250,10 +309,17 @@ func _on_SaveButton_pressed():
 	save_file()
 
 
-func _on_FileList_item_selected(index):
-	file_selected(index)
-
-
-func _on_TargetName_text_changed(new_text):
+func _on_TargetName_text_changed(newText):
 	# Set the inspected entity's name with the new text
-	Player.set_inspected_entity_name(new_text)
+	Player.set_inspected_entity_name(newText)
+	
+	# Set the output label name
+	set_output_label_text(newText)
+
+
+func _on_TargetEntity_class_changed(newClass):
+	set_target_class(newClass)
+
+
+func _on_FileTree_item_selected():
+	file_selected()

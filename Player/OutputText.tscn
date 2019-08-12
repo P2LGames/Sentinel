@@ -1,0 +1,51 @@
+[gd_scene load_steps=3 format=2]
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends TextEdit
+
+
+func add_output(printMessage):
+	# Add the text to the text edit
+	insert_text_at_cursor(printMessage.message)
+	
+	# Move the cursor to the end, this will move the viewport down
+	cursor_set_line(get_line_count())
+	
+	# TODO: Color the text depending on the type
+
+
+func set_output(output: Array):
+	# Clear the current text
+	text = \"\"
+	
+	# Loop through each message in the output and add it to the text edit
+	for message in output:
+		add_output(message)
+
+
+\"\"\" SIGNALS \"\"\"
+
+func _on_TargetEntity_print_message(printMessage):
+	add_output(printMessage)
+
+
+
+"
+
+[node name="OutputText" type="TextEdit"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -0.958984
+margin_top = 21.612
+margin_right = -0.958984
+margin_bottom = 1.612
+custom_styles/read_only = SubResource( 1 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+text = "This is a test"
+readonly = true
+highlight_all_occurrences = true
+smooth_scrolling = true
+hiding_enabled = 1
+script = SubResource( 2 )

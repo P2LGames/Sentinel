@@ -143,24 +143,36 @@ func file_update_handler(responseData: PoolByteArray):
 	"""Handles file update responses"""
 	# If the first byte is a 1, then the command was successful
 	if responseData[0] == 1:
-		# Parse out the placeholder and entity id
-		var entityIdArray = PoolByteArray(Util.slice_array(responseData, 2, 6))
-		var commandIdArray = PoolByteArray(Util.slice_array(responseData, 6, 10))
-		
 		# Parse the command and entity id out of the arrays
-		var entityId = Util.bytes2int(entityIdArray)
-		var commandId = Util.bytes2int(commandIdArray)
+		var entityId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 2, 6)))
+		var commandId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 6, 10)))
+		
+		# Get the class name length
+		var classNameLength = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 10, 14)))
+		
+		# Get the class name
+		var classPackage := PoolByteArray(Util.slice_array(responseData, 14, 14 + classNameLength)).get_string_from_ascii()
+		var classPackageSplit = classPackage.split(".")
+		var className = classPackageSplit[classPackageSplit.size() - 1]
 		
 		# Print a messsage
-		entityMap[str(entityId)].print_message("Recompile Successful!\n", 
+		entityMap[str(entityId)].print_message("Recompile Successful, class swapped to " + className + "!\n", 
 			Constants.MESSAGE_TYPE.NORMAL)
+		
+		# Change the entity's current class
+		entityMap[str(entityId)].set_current_class(className)
 	else:
 		# Get the entity and command id from the failed register request
 		var entityId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 2, 6)))
 		var commandId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 6, 10)))
 		
+		# Get the class name length
+		var classNameLength = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 10, 14)))
+		# Get the class name
+		#var className = PoolByteArray(Util.slice_array(responseData, 14, 14 + classNameLength))
+		
 		# Slice off the first two values and the two ints, they are the failure short, etc
-		var stringData = PoolByteArray(Util.slice_array(responseData, 10))
+		var stringData = PoolByteArray(Util.slice_array(responseData, 14 + classNameLength))
 		
 		# Turn the error data into a string and print it
 		var errorString = "File Update Error: " + stringData.get_string_from_ascii() + "\n"
