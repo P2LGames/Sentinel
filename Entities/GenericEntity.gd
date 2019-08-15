@@ -1,9 +1,6 @@
-extends KinematicBody2D
+extends KinematicBody
 
-var reprogrammableComponent = null
 var isReprogrammable = false
-
-signal display_name_changed(newDisplayName)
 
 func _ready():
 	# Setup the reprogrammable

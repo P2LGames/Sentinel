@@ -1,6 +1,4 @@
-extends Node2D
-
-export (PackedScene) var OutputPopup
+extends Spatial
 
 var camera
 
@@ -11,6 +9,8 @@ var inspectedEntity
 var isSelectingMultiple = false
 
 var outputRepopup = false
+
+var clickRayLength = 1000
 
 func _ready():
 	pass
@@ -95,17 +95,23 @@ func handle_mouse_inputs():
 
 
 func get_clicked_entity():
-	# Get the mouse position
-	var mousePosition = camera.get_global_mouse_position()
+	# Get the physics world
+	var physicsSpace = get_world().direct_space_state
 	
-	# Check if anything is intersecting my mouse position
-	var result = get_world_2d().get_direct_space_state().intersect_point(mousePosition, 1, [],
-		Constants.NAME_TO_BIT_MASK[Constants.LAYER.UNITS])
-	print(result)
+	# Get the mouse position
+	var mousePosition = get_viewport().get_mouse_position()
+	
+	# Get the camera origin and target
+	var from = camera.project_ray_origin(mousePosition)
+	var to = from + camera.project_ray_normal(mousePosition) * clickRayLength
+	
+	# Cast a ray
+	var result = physicsSpace.intersect_ray(from, to)
+	
 	# If we intersected something
 	if result:
-		return result[0].collider
-	else:
+		return result.collider
+	else: 
 		return null
 
 

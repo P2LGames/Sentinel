@@ -30,11 +30,7 @@ var possibleOrders = {}
 
 var orders = []
 
-var movement = Vector2.ZERO
-var move = 0
-var rotate = 0
-var prevMove = 0
-var prevRotate = 0
+var movement = Vector3.ZERO
 var hasProcessed = false
 
 
@@ -69,7 +65,10 @@ func _process(delta):
 
 func _physics_process(delta):
 	
-	var motion = move_and_slide(movement)
+	if movement != Vector3.ZERO:
+		print(movement)
+		print(global_transform.origin)
+		move_and_slide(movement)
 
 
 """ INPUT """
@@ -85,6 +84,7 @@ func _deselect():
 
 
 func send_key_input(code: int, pressed: int):
+	print("Sending key input")
 	var bytes: PoolByteArray = []
 	
 	# Attach the position that the input is coming from
@@ -104,11 +104,11 @@ func send_key_input(code: int, pressed: int):
 """ GETTERS """
 
 func get_selection_indicator():
-	return $SpriteContainer/SelectionIndicator
+	return $SelectionIndicator
 
 
 func get_attachment_container():
-	return $SpriteContainer/AttachmentContainer
+	return $AttachmentContainer
 
 
 func get_attachment_positions():
@@ -121,7 +121,7 @@ func _get_display_name() -> String:
 
 """ SETTERS """
 
-func set_movement(movement: Vector2):
+func set_movement(movement: Vector3):
 	self.movement = movement
 
 
