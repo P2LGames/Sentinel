@@ -110,6 +110,9 @@ func handle_movement():
 
 
 func handle_rotation(delta: float):
+	# If the type of rotation is -1, stop
+	if currOrders.rotate[0] == -1:
+		return
 	
 	if currOrders.rotate[0] == ORDER_TYPES.ROTATE_BY:
 		# Get how much we want to rotate
@@ -119,14 +122,14 @@ func handle_rotation(delta: float):
 		var rotationDirection = rotateAmount / abs(rotateAmount)
 		
 		# Rotate in that direction
-		var rotationValue = rotateInDirection(delta, rotationDirection)
+		var rotationValue = rotateInDirection(delta, rotationDirection, rotateAmount)
 		
 		# Add our rotation value to our current turn amount
 		currentTurnAmount += abs(rotationValue)
 		
 		# If we have rotated enough, stop ourselves and reset our values
 		if currentTurnAmount >= abs(rotateAmount):
-			currOrders.rotate[0] = ""
+			currOrders.rotate[0] = -1
 			currentTurnAmount = 0.0
 	# If the order it to rotate to...
 	elif currOrders.rotate[0] == ORDER_TYPES.ROTATE_TO:
@@ -139,9 +142,23 @@ func handle_rotation(delta: float):
 		rotateInDirection(delta, -1)
 
 
-func rotateInDirection(delta: float, direction: int):
+func rotateInDirection(delta: float, direction: int, rotateAmount: float = -1):
 	# Get the rotation value
 	var rotationValue = delta * turnSpeed * direction
+	
+	# If we received a rotate amount
+	if rotateAmount != -1:
+		# Get the amount we still have to rotate
+		var turnAmount = abs(rotateAmount - currentTurnAmount * direction) * direction
+		
+		# If we are turning right and the turn amount is less than rotation value
+		if direction == -1 and turnAmount > rotationValue:
+			# Set rotation value to turnAmout
+			rotationValue = turnAmount
+		# Otherwise, if we are turning left and the turn amount is greater than rotation value
+		if direction == 1 and turnAmount < rotationValue:
+			# Set rotation value to turnAmout
+			rotationValue = turnAmount
 	
 	# Rotate ourselves
 	robot.rotate_y(rotationValue)

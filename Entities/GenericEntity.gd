@@ -1,6 +1,10 @@
 extends KinematicBody
 
+export var displayName = ""
+
 var isReprogrammable = false
+
+signal display_name_changed(newName)
 
 func _ready():
 	# Setup the reprogrammable
@@ -83,8 +87,8 @@ func _deselect():
 
 ##### INSPECTION #####
 
-func _get_display_name() -> String:
-	return ""
+func get_display_name() -> String:
+	return displayName
 
 
 func get_type() -> String:
@@ -97,8 +101,12 @@ func get_type() -> String:
 	return ""
 
 
-func _set_display_name(displayName: String):
-	pass
+func set_display_name(displayName: String):
+	# Update the display name
+	self.displayName = displayName
+	
+	# Emit a signal saying the name was changed
+	emit_signal("display_name_changed", displayName)
 
 
 func _set_inspect_items(inspectUI: PopupMenu):

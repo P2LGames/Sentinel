@@ -46,7 +46,6 @@ func get_path_from_item(item: TreeItem):
 
 
 func get_tree_item_from_path(itemPath):
-	print("Looking for: ", itemPath)
 	# Split the path
 	var splitPath = itemPath.split("/")
 	
@@ -60,7 +59,6 @@ func get_tree_item_from_path(itemPath):
 	for x in splitPath.size() - 1:
 		# Get the part
 		var part = splitPath[x]
-		print("Part: ", part)
 		
 		# If the part is empty, skip it
 		if part == "":

@@ -12,8 +12,11 @@ var outputRepopup = false
 
 var clickRayLength = 1000
 
+var ide
+
 func _ready():
-	pass
+	
+	ide = get_ide()
 
 
 func _process(delta):
@@ -48,7 +51,6 @@ func _unhandled_key_input(event):
 
 
 func handle_key_input(code: int, pressed: int):
-	print(str(code) + " " + str(pressed))
 	# Loop through all of hte selected entities
 	for entity in selectedEntities:
 		# If we can send them the key input, then send it
@@ -57,12 +59,13 @@ func handle_key_input(code: int, pressed: int):
 
 
 func handle_input():
-
-	# Show editor if escape is pressed
-	if Input.is_action_just_pressed("ui_focus_next"):
-		
-		if not get_ide().visible:
-			get_ide().toggle_visibility()
+	# Show editor if tab is pressed
+	if not get_ide().visible and Input.is_action_just_pressed("show_ide"):
+		show_ide()
+	if (not get_ide().visible 
+		and not get_output_popup().visible 
+		and Input.is_action_just_pressed("show_output")):
+		show_output()
 	
 	# If we want to select multiple people we can
 	isSelectingMultiple = Input.is_action_pressed("select_multiple")
@@ -70,7 +73,7 @@ func handle_input():
 
 func handle_mouse_inputs():
 	# Handle user mouse events
-	if not get_ide().visible and Input.is_action_just_pressed("left_click"):
+	if Input.is_action_just_pressed("left_click"):
 		# Get the clicked entity
 		var clickedEntity = get_clicked_entity()
 		
@@ -78,7 +81,7 @@ func handle_mouse_inputs():
 		if clickedEntity != null and clickedEntity.has_method("_select"):
 			# Then we left clicked on an entity, select it
 			left_clicked_on_entity(clickedEntity)
-		elif clickedEntity == null:
+		else:
 			deselect()
 	# Right Click
 	elif Input.is_action_just_pressed("right_click"):
@@ -143,6 +146,10 @@ func left_clicked_on_entity(clickedEntity):
 	
 		# Add the entity to my list of selected entities
 		selectedEntities.append(clickedEntity)
+		
+		# If there is only one entity in selected entities, make him our inspected entity
+		if selectedEntities.size() == 1:
+			set_inspected_entity(clickedEntity)
 
 
 func inspect_entity(clickedEntity):
@@ -160,83 +167,20 @@ func inspect_entity(clickedEntity):
 		
 		# Set the inspectUI items from the clicked entity
 		clickedEntity._set_inspect_items(inspectUI)
-		
-		# Setup the ide for the clicked entity
-		setup_ide_for_entity(clickedEntity)
 	else:
 		return
+	
+	# Set the inspected entity to this one
+	set_inspected_entity(clickedEntity)
 	
 	# Move the UI to the mouse and pop it up
 	inspectUI.rect_position = mousePosition
 	inspectUI.popup()
 
 
-func setup_ide_for_entity(targetEntity):
-	# Get the ide
-	var ide = get_ide()
-	
-	# Get the output text edit
-	var outputTextEdit = ide.get_output_text_node()
-	
-	# If we already have an inspected entity
-	if inspectedEntity:
-		# Disconnect him from the print message in the output text
-		inspectedEntity.get_node("Reprogrammable").disconnect("message_printed", 
-				outputTextEdit, "_on_TargetEntity_print_message")
-		
-		# Disconnect the class changed from the ide
-		inspectedEntity.get_node("Reprogrammable").disconnect("class_changed", 
-				ide, "_on_TargetEntity_class_changed")
-	
-	# Set our inspectedEntity
-	inspectedEntity = targetEntity
-	
-	# Set the IDE target name and type
-	ide.set_target_name(inspectedEntity._get_display_name())
-	ide.set_target_type(inspectedEntity.get_type())
-	ide.set_target_class(inspectedEntity.get_current_class())
-	
-	# Get the output text
-	var outputText = inspectedEntity.get_node("Reprogrammable").get_current_output_text()
-	
-	# Pass the current output to the text edit
-	outputTextEdit.set_output(outputText)
-	
-	# Connect the new messages to the text edit
-	inspectedEntity.get_node("Reprogrammable").connect("message_printed", outputTextEdit, "_on_TargetEntity_print_message")
-	
-	# Connect the class changed to the output label
-	inspectedEntity.get_node("Reprogrammable").connect("class_changed", ide, "_on_TargetEntity_class_changed")
-
-
-func create_output_for_inspected_entity():
-#	# Create a new popup
-#	var popup = OutputPopup.instance()
-#
-#	# Add the popup to the canvas
-#	get_output_popup_layer().add_child(popup)
-	
+func show_output():
 	# Get the output popup
 	var popup = get_output_popup()
-	
-	# Get the output text edit
-	var outputTextNode = popup.get_output_text_node()
-	
-	# Get the output text
-	var outputText = inspectedEntity.get_reprogrammable_component().get_current_output_text()
-	
-	# Pass the current output to the text edit
-	outputTextNode.set_output(outputText)
-	
-	# Connect the new messages to the popup
-	inspectedEntity.get_node("Reprogrammable").connect("message_printed", 
-		popup.get_output_text_node(), "_on_TargetEntity_print_message")
-	
-	# Connect the name change to the popup
-	inspectedEntity.connect("display_name_changed", popup, "_on_TargetEntity_name_changed")
-	
-	# Set the popup's window name
-	popup.set_window_title(inspectedEntity._get_display_name())
 	
 	# Get the mouse position
 	var mousePosition = get_viewport().get_mouse_position()
@@ -248,10 +192,28 @@ func create_output_for_inspected_entity():
 	popup.popup()
 
 
+func show_ide():
+	# Show the IDE
+	ide.popup()
+	
+	# Hide the output popup and track if it is visible
+	outputRepopup = get_output_popup().visible
+	get_output_popup().hide()
+
+
+func hide_ide():
+	# If we want to show our popup, do so
+	if outputRepopup:
+		get_output_popup().popup()
+	
+	# Set output visible to false
+	outputRepopup = false
+
+
 """ GETTERS """
 
 func get_inspect_ui():
-	return $CanvasLayer/Inspect
+	return $OutputPopupLayer/Inspect
 
 
 func get_inspected_entity():
@@ -259,9 +221,9 @@ func get_inspected_entity():
 
 
 func get_inspected_entity_id():
-	return int(inspectedEntity.get_node("Reprogrammable").entityId)
+	return inspectedEntity.get_reprogrammable_id()
 
-
+ 
 func get_ide():
 	return $CanvasLayer/IDE
 
@@ -277,12 +239,80 @@ func get_output_popup():
 """ SETTERS """
 
 func set_inspected_entity(entity):
+	# If the entity is the inspected entity already, stop
+	if entity == inspectedEntity:
+		return
+	
+	# Get the output text edit
+	var ideOutputText = ide.get_output_text_node()
+	
+	# Get the output popup
+	var popup = get_output_popup()
+	
+	# Get the output text edit
+	var popupOutputText = popup.get_output_text_node()
+	
+	# If we already have an inspected entity
+	if inspectedEntity:
+		# Get the reprogrammable component
+		var reprogrammableComponent = inspectedEntity.get_reprogrammable_component()
+		
+		# Disconnect him from the print message in the output text
+		reprogrammableComponent.disconnect("message_printed", 
+				ideOutputText, "_on_TargetEntity_print_message")
+		
+		# Disconnect the class changed from the ide
+		reprogrammableComponent.disconnect("class_changed", 
+				ide, "_on_TargetEntity_class_changed")
+		
+		# Disconnect the output stuff from the output text edit as well
+		reprogrammableComponent.disconnect("message_printed", 
+				popupOutputText, "_on_TargetEntity_print_message")
+		
+		# Disconnect the display name change from the popup
+		inspectedEntity.disconnect("display_name_changed", 
+				popup, "_on_TargetEntity_name_changed")
+	
+	# Set the entity
 	inspectedEntity = entity
+	
+	# Get the reprogrammable component
+	var reprogrammableComponent = inspectedEntity.get_reprogrammable_component()
+	
+	# Set the IDE target name and type
+	ide.set_target_name(inspectedEntity.get_display_name())
+	ide.set_target_type(inspectedEntity.get_type())
+	ide.set_target_class(inspectedEntity.get_current_class())
+	
+	# Get the output text
+	var outputText = reprogrammableComponent.get_current_output_text()
+	
+	# Pass the current output to the text edit
+	ideOutputText.set_output(outputText)
+	
+	# Connect the new messages to the text edit
+	reprogrammableComponent.connect("message_printed", ideOutputText, "_on_TargetEntity_print_message")
+	
+	# Connect the class changed to the output label
+	reprogrammableComponent.connect("class_changed", ide, "_on_TargetEntity_class_changed")
+	
+	# Pass the current output to the text edit
+	popupOutputText.set_output(outputText)
+	
+	# Connect the new messages to the popup
+	reprogrammableComponent.connect("message_printed", 
+		popupOutputText, "_on_TargetEntity_print_message")
+	
+	# Connect the name change to the popup
+	inspectedEntity.connect("display_name_changed", popup, "_on_TargetEntity_name_changed")
+	
+	# Set the popup's window name
+	popup.set_window_title(inspectedEntity.get_display_name())
 
 
 func set_inspected_entity_name(text: String):
-	if inspectedEntity and inspectedEntity.has_method("_set_display_name"):
-		inspectedEntity._set_display_name(text)
+	if inspectedEntity and inspectedEntity.has_method("set_display_name"):
+		inspectedEntity.set_display_name(text)
 
 
 """ SIGNALS """
@@ -290,22 +320,12 @@ func set_inspected_entity_name(text: String):
 func _on_Inspect_id_pressed(ID):
 	# Edit was clicked
 	if ID == Constants.INSPECT_ITEMS.EDIT_CODE:
-		# Show the IDE
-		get_ide().toggle_visibility()
-		
-		# Hide the output popup and track if it is visible
-		outputRepopup = get_output_popup().visible
-		get_output_popup().hide()
+		show_ide()
 		
 	# Popup ID was clicked
 	elif ID == Constants.INSPECT_ITEMS.VIEW_OUTPUT:
-		create_output_for_inspected_entity()
+		show_output()
 
 
 func _on_IDE_closing():
-#	get_output_popup_container().visible = true
-	if outputRepopup:
-		get_output_popup().popup()
-	
-	# Set output visible to false
-	outputRepopup = false
+	hide_ide()

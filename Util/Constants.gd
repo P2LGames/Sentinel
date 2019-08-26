@@ -5,6 +5,15 @@ const PLAYER_CODE_DIR = "user://Code/"
 
 const LEVEL_1_CODE_DIR = "res://Scenes/Level_1/Level_1_Code/"
 
+const HIDE_ROWS = "// HIDE ROWS:" # Put number at end to hide that many rows
+const DO_NOT_EDIT_START = '// DO NOT EDIT BELOW THIS LINE'
+const DO_NOT_EDIT_END = '// DO NOT EDIT ABOVE THIS LINE'
+const PERMISSIONS_TAG = "//// *PERMISSION"
+const PERMISSIONS_TAG_END = "*END_PERMISSION"
+const READ_ONLY = "r"
+const WRITE = "w"
+const NO_ACCESS = "n"
+
 const TYPE_TO_TYPE_ID = {
 	Robot = 0
 }

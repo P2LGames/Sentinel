@@ -2,10 +2,18 @@
 const RequestType = {
 	ENTITY_SETUP = 0,
 	ENTITY_REGISTER = 1,
-	COMMAND = 2,
-	ENTITY_UPDATE = 3,
-	FILE_GET = 4,
-	FILE_UPDATE = 5
+	ENTITY_UPDATE = 2,
+	
+	COMMAND = 10,
+	COMMAND_ERROR = 11,
+
+	FILE_GET = 20,
+	FILE_UPDATE = 21,
+	UNRECOGNIZED = -1
+}
+
+const CommandError = {
+	TIMEOUT = 0
 }
 
 const GetFileType = {
@@ -52,7 +60,7 @@ static func create_entity_setup_request():
 	
 	# Compile all the bytes into one pool array
 	var bytes = PoolByteArray()
-	bytes = Util.padWithBytes(bytes, 1)
+	bytes = Util.pad_with_bytes(bytes, 1)
 	bytes.append(RequestType.ENTITY_SETUP)
 	bytes += dataLengthInBytes
 	bytes += setupBytes
@@ -71,7 +79,7 @@ static func create_entity_register_request(entityType: int, placeholderId: int):
 	
 	# Compile all the bytes into one pool array
 	var bytes = PoolByteArray()
-	bytes = Util.padWithBytes(bytes, 1)
+	bytes = Util.pad_with_bytes(bytes, 1)
 	bytes.append(RequestType.ENTITY_REGISTER)
 	bytes += dataLengthInBytes
 	bytes += registerBytes
@@ -90,7 +98,7 @@ static func create_command_request(entityId: int, commandId: int, hasParameter: 
 		# Add on a byte saying we do
 		commandBytes.append(1)
 		# Add on a 0 to make it a short, but keep the range of the byte (0...255)
-		commandBytes = Util.padWithBytes(commandBytes, 1)
+		commandBytes = Util.pad_with_bytes(commandBytes, 1)
 		# Add on the parameter bytes
 		commandBytes += parameter
 	else:
@@ -102,7 +110,7 @@ static func create_command_request(entityId: int, commandId: int, hasParameter: 
 	
 	# Compile all the bytes into one pool array
 	var bytes = PoolByteArray()
-	bytes = Util.padWithBytes(bytes, 1)
+	bytes = Util.pad_with_bytes(bytes, 1)
 	bytes.append(RequestType.COMMAND)
 	bytes += dataLengthInBytes
 	bytes += commandBytes
@@ -131,7 +139,7 @@ static func create_file_update_request(entityId: int, commandId: int, className:
 	
 	# Compile all the bytes into one pool array
 	var bytes = PoolByteArray()
-	bytes = Util.padWithBytes(bytes, 1)
+	bytes = Util.pad_with_bytes(bytes, 1)
 	bytes.append(RequestType.FILE_UPDATE)
 	bytes += dataLengthInBytes
 	bytes += fileUpdateBytes

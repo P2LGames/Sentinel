@@ -22,8 +22,6 @@ const ORDER_TYPES = {
 	PRINT = 0, # PRINT:
 }
 
-var displayName = "Robot 1"
-
 var attachments = []
 var positionToAttachment = {}
 var possibleOrders = {}
@@ -31,8 +29,7 @@ var possibleOrders = {}
 var orders = []
 
 var movement = Vector3.ZERO
-var hasProcessed = false
-
+var processing = false
 
 func _ready():
 	# Super call to ready
@@ -57,8 +54,8 @@ func _process(delta):
 			orders.remove(0)
 	
 	# If we are ready to send stuff, and we haven't processed, process!
-	if is_reprogrammable_ready() and not hasProcessed:
-		hasProcessed = true
+	if is_reprogrammable_ready() and not processing:
+		processing = true
 		
 		CommunicationManager.command(get_reprogrammable_id(), COMMAND_ID_PROCESS, false, [])
 
@@ -84,7 +81,6 @@ func _deselect():
 
 
 func send_key_input(code: int, pressed: int):
-	print("Sending key input")
 	var bytes: PoolByteArray = []
 	
 	# Attach the position that the input is coming from
@@ -115,23 +111,10 @@ func get_attachment_positions():
 	return get_attachment_container().get_children()
 
 
-func _get_display_name() -> String:
-	return displayName
-
-
 """ SETTERS """
 
 func set_movement(movement: Vector3):
 	self.movement = movement
-
-
-func set_input(code: int, action: int):
-	# Send the input command to the server
-	send_key_input(code, action)
-
-
-func _set_display_name(displayName: String):
-	self.displayName = displayName
 
 
 func _set_inspect_items(inspectUI: PopupMenu):
@@ -140,6 +123,10 @@ func _set_inspect_items(inspectUI: PopupMenu):
 	
 	# Call the super method
 	._set_inspect_items(inspectUI)
+
+
+func set_processing(value: bool):
+	processing = value
 
 
 """ ATTACHMENTS """
@@ -200,7 +187,7 @@ func _handle_command(commandId: int, value: PoolByteArray):
 			orderBytes = PoolByteArray(Util.slice_array(orderBytes, 12 + messageLength))
 		
 		# We have indeed processed
-		hasProcessed = false
+		processing = false
 	# Input command
 	elif commandId == COMMAND_ID_INPUT:
 		pass

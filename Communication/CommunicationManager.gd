@@ -41,6 +41,8 @@ func route_response(responseType: int, responseData: PoolByteArray):
 		entity_register_handler(responseData)
 	elif responseType == FrameworkModels.RequestType.COMMAND:
 		command_handler(responseData)
+	elif responseType == FrameworkModels.RequestType.COMMAND_ERROR:
+		command_error_handler(responseData)
 	elif responseType == FrameworkModels.RequestType.FILE_UPDATE:
 		file_update_handler(responseData)
 
@@ -138,6 +140,35 @@ func command_handler(responseData: PoolByteArray):
 		entityMap[str(entityId)].print_message(errorString, 
 			Constants.MESSAGE_TYPE.ERROR)
 
+
+func command_error_handler(responseData: PoolByteArray):
+	"""Handles all command error responses"""
+	# Get the type of command error
+	var errorType = int(responseData[0])
+	
+	# Parse out the placeholder and entity id
+	var entityIdArray = PoolByteArray(Util.slice_array(responseData, 2, 6))
+	var commandIdArray = PoolByteArray(Util.slice_array(responseData, 6, 10))
+	
+	# Parse the command and entity id out of the arrays
+	var entityId = Util.bytes2int(entityIdArray)
+	var commandId = Util.bytes2int(commandIdArray)
+	
+	# Get the command's return value
+	var errorMessageData = PoolByteArray(Util.slice_array(responseData, 10))
+	var errorMessage = "Timeout: " + errorMessageData.get_string_from_ascii() + "\n"
+	
+	# Get the entity from the placeholder map, have it save its new id
+	var entity = entityMap[str(entityId)]
+	
+	# Pass the error to the entity
+	entityMap[str(entityId)].print_message(errorMessage, 
+		Constants.MESSAGE_TYPE.ERROR)
+	
+	# It is no longer processing, all threads were closed in the framework
+	if entity.has_method("set_processing"):
+		entity.set_processing(false)
+	
 
 func file_update_handler(responseData: PoolByteArray):
 	"""Handles file update responses"""

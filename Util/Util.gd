@@ -80,7 +80,7 @@ func bytes2string(bytes: PoolByteArray) -> String:
 	return bytes2var(stringHeader + bytes)
 
 
-func padWithBytes(bytes: PoolByteArray, padding: int) -> PoolByteArray:
+func pad_with_bytes(bytes: PoolByteArray, padding: int) -> PoolByteArray:
 	var paddedBytes := bytes
 	for i in range(padding):
 		paddedBytes.append(0)

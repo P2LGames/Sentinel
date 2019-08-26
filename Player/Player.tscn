@@ -11,10 +11,7 @@ script = ExtResource( 1 )
 layer = 2
 
 [node name="IDE" parent="CanvasLayer" instance=ExtResource( 2 )]
-
-[node name="Inspect" type="PopupMenu" parent="CanvasLayer"]
-margin_right = 228.0
-margin_bottom = 20.0
+mouse_filter = 1
 
 [node name="InspectUI" type="Control" parent="CanvasLayer"]
 editor/display_folded = true
@@ -38,5 +35,9 @@ text = "Edit Code"
 [node name="OutputPopupLayer" type="CanvasLayer" parent="."]
 
 [node name="OutputPopup" parent="OutputPopupLayer" instance=ExtResource( 3 )]
-[connection signal="closing" from="CanvasLayer/IDE" to="." method="_on_IDE_closing"]
-[connection signal="id_pressed" from="CanvasLayer/Inspect" to="." method="_on_Inspect_id_pressed"]
+
+[node name="Inspect" type="PopupMenu" parent="OutputPopupLayer"]
+margin_right = 228.0
+margin_bottom = 20.0
+[connection signal="popup_hide" from="CanvasLayer/IDE" to="." method="_on_IDE_closing"]
+[connection signal="id_pressed" from="OutputPopupLayer/Inspect" to="." method="_on_Inspect_id_pressed"]

@@ -1,4 +1,4 @@
-extends Panel
+extends WindowDialog
 
 var IDEFile = load("res://Player/CodeEditor/IDEFile.gd")
 
@@ -9,7 +9,6 @@ var files = []
 var itemPathToFile: Dictionary = {}
 
 signal file_dirtied(filePath)
-signal closing()
 
 func _ready():
 	# Setup the root of the file tree
@@ -24,23 +23,30 @@ func _ready():
 	# Select the first file
 	get_file_tree().get_root().get_children().get_children().select(0)
 	#file_selected(1)
+
+
+#func _process(delta):
+#
+#
+#
+
+
+func _unhandled_key_input(event):
+	if visible:
+		accept_event()
+	else:
+		return
 	
-	# Process
-	set_process(true)
-
-
-func _process(delta):
 	# If there is no file, then stop
 	if currentFile == null:
 		return
 	
 	if Input.is_action_just_pressed("ide_save"):
 		save_file()
-
-
-func _unhandled_key_input(event):
-	if visible:
-		accept_event()
+	elif Input.is_action_just_pressed("ide_recompile"):
+		recompile()
+	elif Input.is_action_just_pressed("hide_window"):
+		hide()
 
 
 # Revert to default code and reset focus
@@ -52,7 +58,7 @@ func reset_code():
 	currentFile.reset_code()
 	
 	# Set the editor text
-	get_text_editor().text = currentFile.get_display_text()
+	get_text_editor().set_text(currentFile.get_display_text())
 	
 	# Set the focus line and column
 	currentFile.set_focus_line(0)
@@ -108,21 +114,7 @@ func file_selected():
 		currentFilePath = itemPath
 		
 		# Set the text to the current file
-		get_text_editor().text = currentFile.get_display_text()
-
-
-# Show or hide the code editor
-func toggle_visibility():
-	# If we are visible, and going to hide, save the current focus
-	if visible:
-		save_focus()
-	
-	# Hide or show
-	visible = !visible
-	
-	# If we are now visible, set the focus
-	if visible:
-		set_focus()
+		get_text_editor().set_text(currentFile.get_display_text())
 
 
 func save_file():
@@ -137,7 +129,25 @@ func save_all_files():
 	pass
 
 
-# Remember where the user was focused
+func recompile():
+	# Save the current file
+	save_file()
+	
+	# Get the entity id
+	var targetEntityId = Player.get_inspected_entity_id()
+	
+	# Get the class name
+	var className = currentFile.get_class_name()
+	
+	# Get the file text
+	var fileText = get_text_editor().text
+	
+	# If the inspected entity exists and we have a class name
+	if targetEntityId != null and className != null:
+		# Recompile his code with this one
+		CommunicationManager.file_update(targetEntityId, -1, className, fileText)
+
+
 func save_focus():
 	if currentFile:
 		currentFile.set_focus_line(get_text_editor().cursor_get_line())
@@ -147,15 +157,15 @@ func save_focus():
 """ GETTERS """
 
 func get_target_name():
-	return $LeftBar/EntityName/TargetName
+	return $LeftBar/EntityData/EntityName/TargetName
 
 
 func get_target_type_label():
-	return $LeftBar/EntityType/Type
+	return $LeftBar/EntityData/EntityType/Type
 
 
 func get_target_class_label():
-	return $LeftBar/EntityClass/Class
+	return $LeftBar/EntityData/EntityClass/Class
 
 
 func get_text_editor():
@@ -168,10 +178,6 @@ func get_output_text_node():
 
 func get_output_label():
 	return $OutputArea/OutputLabel
-
-
-func get_file_list():
-	return $LeftBar/FileList
 
 
 func get_file_tree():
@@ -241,6 +247,20 @@ func set_focus():
 	get_text_editor().set_focus(line, col)
 
 
+# Show or hide the code editor
+func set_visible(value: bool):
+	# If we are visible, and going to hide, save the current focus
+	if visible:
+		save_focus()
+	
+	# Hide or show
+	visible = value
+	
+	# If we are now visible, set the focus
+	if visible:
+		set_focus()
+
+
 """ SIGNALS """
 
 func _on_ResetButton_pressed():
@@ -248,29 +268,11 @@ func _on_ResetButton_pressed():
 
 
 func _on_RecompileButton_pressed():
-	# Save the current file
-	save_file()
-	
-	# Get the entity id
-	var targetEntityId = Player.get_inspected_entity_id()
-	
-	# Get the class name
-	var className = currentFile.get_class_name()
-	
-	# Get the file text
-	var fileText = currentFile.get_text()
-	
-	# If the inspected entity exists and we have a class name
-	if targetEntityId != null and className != null:
-		# Recompile his code with this one
-		CommunicationManager.file_update(targetEntityId, -1, className, fileText)
+	recompile()
 
 
 func _on_CloseButton_pressed():
-	toggle_visibility()
-	
-	# Emit closing signal
-	emit_signal("closing")
+	hide()
 
 
 func _on_save_all_files():
@@ -291,7 +293,6 @@ func _on_TextEditor_text_changed():
 		save_focus()
 		
 		# Emit the dirtied signal
-		print(currentFilePath)
 		emit_signal("file_dirtied", currentFilePath)
 	# Otherwise, undo whatever just happened...
 	else:
