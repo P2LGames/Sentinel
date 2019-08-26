@@ -5,6 +5,17 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends WindowDialog
 
+
+func _unhandled_key_input(event):
+	if visible:
+		accept_event()
+	else:
+		return
+	
+	if visible and Input.is_action_just_pressed(\"hide_window\"):
+		hide()
+
+
 \"\"\" GETTERS \"\"\"
 
 func get_output_text_node():
@@ -14,7 +25,7 @@ func get_output_text_node():
 \"\"\" SETTERS \"\"\"
 
 func set_window_title(newTitle: String):
-	window_title = \"Output: \" + newTitle
+	window_title = newTitle
 
 
 \"\"\" SIGNALS \"\"\"

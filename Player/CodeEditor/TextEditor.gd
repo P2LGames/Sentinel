@@ -1,5 +1,68 @@
 extends TextEdit
 
+
+func hide_rows():
+	
+	var startLine = 0
+	var startColumn = 0
+	
+	var previouslyFound = []
+	
+	# Loop until we get 0, 0
+	while true:
+		
+		# Find the hide rows tags
+		var colAndLine = search(Constants.HIDE_ROWS, SEARCH_MATCH_CASE, startLine, startColumn)
+		
+		# If we found nothing, break out of the loop
+		if colAndLine.size() == 0:
+			break
+		
+		# Update the start line and column
+		startColumn = colAndLine[0]
+		startLine = colAndLine[1]
+		
+		# Make the unique id for what we found
+		var found = str(startLine) + "-" + str(startColumn)
+		
+		# If this is the first search and the start col and line are 0, break out of the loop
+		if found in previouslyFound:
+			break
+		
+		# Add the found to previously found
+		previouslyFound.append(found)
+		
+		# hide the rows using the tag line and start
+		hide_rows_with_tag(startLine, startColumn)
+		
+		# Increment the column and set the start column to 0
+		startColumn = 0
+		startLine += 1
+
+
+func hide_rows_with_tag(tagLine: int, tagStart: int):
+	# Get the text at the line
+	var line = get_line(tagLine)
+	
+	# Scrape off the characters until the tag start
+	var tag = line.substr(tagStart, line.length() - tagStart)
+	
+	# Get the number at the end of the tag
+	var rowsToHide = int(tag.replace(Constants.HIDE_ROWS, ''))
+	
+	# Hide the rows, starting with the tagLine
+	for x in range(tagLine, tagLine + rowsToHide):
+		# If the line contains a do not edit tag
+		var xLine = get_line(x)
+		if (Constants.DO_NOT_EDIT_START in xLine or
+			Constants.DO_NOT_EDIT_END in xLine):
+			# Continue, we don't want to hide it
+			continue
+		# Otherwise hide the line
+		else:
+			set_line_as_hidden(x, true)
+
+
 func _ready():
 	
 #	set_line_as_hidden(10, true)
@@ -70,12 +133,23 @@ func _ready():
 	add_keyword_color("continue", reservedWordColor)
 	add_keyword_color(";", reservedWordColor)
 	
+#	add_keyword_color(Constants.DO_NOT_EDIT_START, Color(1, 0, 0))
+#	add_keyword_color(Constants.DO_NOT_EDIT_END, Color(1, 0, 0))
+	
 	# Comments
 	add_color_region("//", "\n", Color.darkgray, true)
 	add_color_region("/*", "*/", Color(0.38, 0.59, 0.33))
 	
 	# Strings
 	add_color_region("\"", "\"", Color(0.416, 0.53, 0.35))
+
+
+""" SETTERS """
+
+func set_text(newText: String):
+	text = newText
+	
+	hide_rows()
 
 
 # Move cursor to where it was last time the editor closed
@@ -85,3 +159,9 @@ func set_focus(line: int, column: int):
 	
 	cursor_set_line(line)
 	cursor_set_column(column)
+
+
+""" SIGNALS """
+
+func _on_TextEditor_text_changed():
+	hide_rows()

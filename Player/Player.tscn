@@ -1,21 +1,17 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Player/Player.gd" type="Script" id=1]
-[ext_resource path="res://Player/OutputPopup.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Player/CodeEditor/IDE.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Player/CodeEditor/IDE.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Player/OutputPopup.tscn" type="PackedScene" id=3]
 
-[node name="Player" type="Node2D"]
+[node name="Player" type="Spatial"]
 script = ExtResource( 1 )
-OutputPopup = ExtResource( 2 )
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = 2
 
-[node name="IDE" parent="CanvasLayer" instance=ExtResource( 3 )]
-
-[node name="Inspect" type="PopupMenu" parent="CanvasLayer"]
-margin_right = 228.0
-margin_bottom = 20.0
+[node name="IDE" parent="CanvasLayer" instance=ExtResource( 2 )]
+mouse_filter = 1
 
 [node name="InspectUI" type="Control" parent="CanvasLayer"]
 editor/display_folded = true
@@ -38,6 +34,10 @@ text = "Edit Code"
 
 [node name="OutputPopupLayer" type="CanvasLayer" parent="."]
 
-[node name="OutputPopup" parent="OutputPopupLayer" instance=ExtResource( 2 )]
-[connection signal="closing" from="CanvasLayer/IDE" to="." method="_on_IDE_closing"]
-[connection signal="id_pressed" from="CanvasLayer/Inspect" to="." method="_on_Inspect_id_pressed"]
+[node name="OutputPopup" parent="OutputPopupLayer" instance=ExtResource( 3 )]
+
+[node name="Inspect" type="PopupMenu" parent="OutputPopupLayer"]
+margin_right = 228.0
+margin_bottom = 20.0
+[connection signal="popup_hide" from="CanvasLayer/IDE" to="." method="_on_IDE_closing"]
+[connection signal="id_pressed" from="OutputPopupLayer/Inspect" to="." method="_on_Inspect_id_pressed"]

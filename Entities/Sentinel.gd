@@ -22,21 +22,14 @@ const ORDER_TYPES = {
 	PRINT = 0, # PRINT:
 }
 
-var displayName = "Robot 1"
-
 var attachments = []
 var positionToAttachment = {}
 var possibleOrders = {}
 
 var orders = []
 
-var movement = Vector2.ZERO
-var move = 0
-var rotate = 0
-var prevMove = 0
-var prevRotate = 0
-var hasProcessed = false
-
+var movement = Vector3.ZERO
+var processing = false
 
 func _ready():
 	# Super call to ready
@@ -61,15 +54,18 @@ func _process(delta):
 			orders.remove(0)
 	
 	# If we are ready to send stuff, and we haven't processed, process!
-	if is_reprogrammable_ready() and not hasProcessed:
-		hasProcessed = true
+	if is_reprogrammable_ready() and not processing:
+		processing = true
 		
 		CommunicationManager.command(get_reprogrammable_id(), COMMAND_ID_PROCESS, false, [])
 
 
 func _physics_process(delta):
 	
-	var motion = move_and_slide(movement)
+	if movement != Vector3.ZERO:
+		print(movement)
+		print(global_transform.origin)
+		move_and_slide(movement)
 
 
 """ INPUT """
@@ -104,34 +100,21 @@ func send_key_input(code: int, pressed: int):
 """ GETTERS """
 
 func get_selection_indicator():
-	return $SpriteContainer/SelectionIndicator
+	return $SelectionIndicator
 
 
 func get_attachment_container():
-	return $SpriteContainer/AttachmentContainer
+	return $AttachmentContainer
 
 
 func get_attachment_positions():
 	return get_attachment_container().get_children()
 
 
-func _get_display_name() -> String:
-	return displayName
-
-
 """ SETTERS """
 
-func set_movement(movement: Vector2):
+func set_movement(movement: Vector3):
 	self.movement = movement
-
-
-func set_input(code: int, action: int):
-	# Send the input command to the server
-	send_key_input(code, action)
-
-
-func _set_display_name(displayName: String):
-	self.displayName = displayName
 
 
 func _set_inspect_items(inspectUI: PopupMenu):
@@ -140,6 +123,10 @@ func _set_inspect_items(inspectUI: PopupMenu):
 	
 	# Call the super method
 	._set_inspect_items(inspectUI)
+
+
+func set_processing(value: bool):
+	processing = value
 
 
 """ ATTACHMENTS """
@@ -200,7 +187,7 @@ func _handle_command(commandId: int, value: PoolByteArray):
 			orderBytes = PoolByteArray(Util.slice_array(orderBytes, 12 + messageLength))
 		
 		# We have indeed processed
-		hasProcessed = false
+		processing = false
 	# Input command
 	elif commandId == COMMAND_ID_INPUT:
 		pass

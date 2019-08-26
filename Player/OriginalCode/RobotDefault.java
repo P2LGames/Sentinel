@@ -1,4 +1,4 @@
-//// *NOACCESS
+//// *PERMISSION n,0 *END_PERMISSION
 package command;
 
 import annotations.Command;
@@ -10,13 +10,11 @@ import util.ByteManager;
 
 import java.nio.ByteBuffer;
 
-//// *READONLY
+//// *PERMISSION r,0 *END_PERMISSION
 
 public class RobotDefault {
 
-    //// *READWRITE
-
-    int w = 0;
+    //// *PERMISSION w,0 *END_PERMISSION
 
     /**
      * Called when you have this robot selected, and you press a key.
@@ -24,43 +22,22 @@ public class RobotDefault {
      * @param pressed Whether or not you pressed or released the key. 1 is pressed, 0 is released.
      */
     public void playerKeyPressed(int code, int pressed) {
-        print(code + " " + pressed + "\n");
-
-        if (code == 87) {
-            this.w = pressed;
+        if (code == 87 && pressed == 1) {
+            print("Default\n");
         }
-
     }
 
     /**
-     * Fill this in to give the robot his orders. Right now he can only move forward when w is pressed.
-     * Can you help him do more things?
+     * Fill this in to give the robot his orders.
+     * Can you help him move around? We gotta get to the finish!
      */
     public void giveOrders() {
 
-        if (this.w > 0) {
-            moveForward();
-        }
-
     }
 
-    //// *READONLY
+    //// *PERMISSION n,0 *END_PERMISSION
 
-    // moveForward()
-    // moveBackward()
-    // stopMoving()
-    // turnLeft()
-    // turnRight()
-    // stopTurning()
-    // print(String)
-
-    //// *NOACCESS
-
-    private Robot robot;
-
-    public boolean isActionPressed(int pressed) {
-        return pressed == 1;
-    }
+    protected Robot robot = null;
 
     @Command(commandName = "process", id = 0)
     public byte[] process() {
@@ -76,6 +53,7 @@ public class RobotDefault {
 
     @Command(commandName = "input", id = 1)
     public byte[] input(byte[] bytes) {
+        System.out.println("Default");
         // Turn the bytes into a stream
         int position = ByteBuffer.wrap(bytes, 0, 4).getInt();
         int type = ByteBuffer.wrap(bytes, 4, 4).getInt();
@@ -104,10 +82,7 @@ public class RobotDefault {
         return new byte[0];
     }
 
-    @SetEntity
-    public void setRobot(GenericEntity robot) {
-        this.robot = (Robot)robot;
-    }
+
 
     public void moveForward() {
         int position = Robot.AttachmentPosition.BASE.getNumVal();
@@ -151,14 +126,20 @@ public class RobotDefault {
         this.robot.addOrder(position, orderType, new byte[0]);
     }
 
+    public void turnRight90() {
+        int position = Robot.AttachmentPosition.BASE.getNumVal();
+        int orderType = Base.OrderTypes.ROTATE_BY.getNumVal();
+
+        this.robot.addOrder(position, orderType, ByteManager.convertFloatToByteArray((float)(Math.PI / 2.0)));
+    }
+
     public void print(String message) {
         robot.printMessage(message);
     }
 
     public Robot getRobot() { return robot; }
 
-    //// *READONLY
+    //// *PERMISSION r,0 *END_PERMISSION
 
 }
-
 

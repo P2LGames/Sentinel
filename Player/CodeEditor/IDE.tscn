@@ -1,140 +1,202 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Player/CodeEditor/IDE.gd" type="Script" id=1]
-[ext_resource path="res://Player/CodeEditor/FileTree.gd" type="Script" id=2]
-[ext_resource path="res://Player/CodeEditor/TextEditor.gd" type="Script" id=3]
-[ext_resource path="res://Assets/Fonts/NunitoBody.tres" type="DynamicFont" id=4]
-[ext_resource path="res://Player/OutputText.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Assets/Fonts/NunitoBodyBold.tres" type="DynamicFont" id=2]
+[ext_resource path="res://Player/CodeEditor/FileTree.gd" type="Script" id=3]
+[ext_resource path="res://Player/CodeEditor/TextEditor.gd" type="Script" id=4]
+[ext_resource path="res://Assets/Fonts/NunitoBody.tres" type="DynamicFont" id=5]
+[ext_resource path="res://Player/OutputText.tscn" type="PackedScene" id=6]
 
-[node name="IDE" type="Panel" groups=[
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends TextEdit
+
+
+func add_output(printMessage):
+	# Add the text to the text edit
+	insert_text_at_cursor(printMessage.message)
+	
+	# Move the cursor to the end, this will move the viewport down
+	cursor_set_line(get_line_count())
+	
+	# TODO: Color the text depending on the type
+
+
+func set_output(output: Array):
+	# Clear the current text
+	text = \"\"
+	
+	# Loop through each message in the output and add it to the text edit
+	for message in output:
+		add_output(message)
+
+
+\"\"\" SIGNALS \"\"\"
+
+func _on_TargetEntity_print_message(printMessage):
+	add_output(printMessage)
+
+
+
+"
+
+[node name="IDE" type="WindowDialog" groups=[
 "CodePanel",
 ]]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_left = 919.0
+margin_top = 35.0
+margin_right = -20.0
+margin_bottom = -446.0
+popup_exclusive = true
+window_title = "Editor"
+resizable = true
 script = ExtResource( 1 )
 
-[node name="LeftBar" type="VBoxContainer" parent="."]
-margin_right = 190.0
-margin_bottom = 40.0
+[node name="LeftBar" type="Control" parent="."]
+anchor_bottom = 1.0
+margin_right = 170.0
 
-[node name="EntityName" type="Control" parent="LeftBar"]
+[node name="EntityData" type="VBoxContainer" parent="LeftBar"]
 margin_left = 2.0
 margin_right = 190.0
-margin_bottom = 25.0
+margin_bottom = 101.0
+
+[node name="EntityData" type="Label" parent="LeftBar/EntityData"]
+margin_right = 188.0
+margin_bottom = 23.0
+custom_fonts/font = ExtResource( 2 )
+text = "Entity Information"
+
+[node name="EntityName" type="Control" parent="LeftBar/EntityData"]
+margin_top = 27.0
+margin_right = 188.0
+margin_bottom = 52.0
 rect_min_size = Vector2( 0, 25 )
 
-[node name="NameLabel" type="Label" parent="LeftBar/EntityName"]
+[node name="NameLabel" type="Label" parent="LeftBar/EntityData/EntityName"]
 anchor_top = 0.5
 anchor_bottom = 0.5
+margin_left = -0.509499
 margin_top = -7.0
-margin_right = 82.0
+margin_right = 81.4905
 margin_bottom = 7.0
-text = "Entity Name:"
+text = "Name:"
 
-[node name="TargetName" type="LineEdit" parent="LeftBar/EntityName"]
+[node name="TargetName" type="LineEdit" parent="LeftBar/EntityData/EntityName"]
 anchor_top = 0.5
 anchor_bottom = 0.5
-margin_left = 170.0
-margin_top = -12.0
-margin_right = 100.0
-margin_bottom = 12.0
+margin_left = 44.0
+margin_top = -11.5
+margin_right = 165.0
+margin_bottom = 12.5
 grow_horizontal = 2
 grow_vertical = 2
 rect_min_size = Vector2( 100, 0 )
 text = "None"
 max_length = 20
 expand_to_text_length = true
+caret_blink = true
+caret_blink_speed = 0.5
 
-[node name="EntityType" type="Control" parent="LeftBar"]
-margin_left = 2.0
-margin_top = 29.0
-margin_right = 190.0
-margin_bottom = 54.0
+[node name="EntityType" type="Control" parent="LeftBar/EntityData"]
+margin_top = 56.0
+margin_right = 188.0
+margin_bottom = 81.0
 rect_min_size = Vector2( 0, 25 )
 
-[node name="TypeLabel" type="Label" parent="LeftBar/EntityType"]
+[node name="TypeLabel" type="Label" parent="LeftBar/EntityData/EntityType"]
 anchor_top = 0.5
 anchor_bottom = 0.5
-margin_top = -7.0
-margin_right = 77.0
-margin_bottom = 7.0
-text = "Entity Type:"
+margin_top = -6.5
+margin_right = 40.0
+margin_bottom = 7.5
+text = "Type:"
 
-[node name="Type" type="Label" parent="LeftBar/EntityType"]
+[node name="Type" type="Label" parent="LeftBar/EntityData/EntityType"]
 anchor_top = 0.5
 anchor_bottom = 0.5
-margin_left = 90.0
-margin_top = -6.11897
-margin_right = 180.0
-margin_bottom = 7.88103
+margin_left = 42.0
+margin_top = -6.5
+margin_right = 190.0
+margin_bottom = 7.5
 rect_min_size = Vector2( 100, 0 )
 text = "None"
 
-[node name="EntityClass" type="Control" parent="LeftBar"]
-anchor_right = 1.0
-margin_left = 2.0
-margin_top = 58.0
-margin_bottom = 83.0
+[node name="EntityClass" type="Control" parent="LeftBar/EntityData"]
+margin_top = 85.0
+margin_right = 188.0
+margin_bottom = 110.0
 rect_min_size = Vector2( 0, 25 )
 
-[node name="ClassLabel" type="Label" parent="LeftBar/EntityClass"]
+[node name="ClassLabel" type="Label" parent="LeftBar/EntityData/EntityClass"]
 anchor_top = 0.5
 anchor_bottom = 0.5
 margin_top = -7.0
-margin_right = 77.0
+margin_right = 40.0
 margin_bottom = 7.0
-text = "Entity Class:"
+text = "Class:"
 
-[node name="Class" type="Label" parent="LeftBar/EntityClass"]
+[node name="Class" type="Label" parent="LeftBar/EntityData/EntityClass"]
 anchor_top = 0.5
 anchor_bottom = 0.5
-margin_left = 90.0
-margin_top = -7.0
-margin_right = 180.0
-margin_bottom = 7.0
+margin_left = 42.0
+margin_top = -6.96616
+margin_right = 190.0
+margin_bottom = 7.03384
 rect_min_size = Vector2( 90, 0 )
 text = "Robot Default"
 valign = 1
 clip_text = true
 
 [node name="FileTree" type="Tree" parent="LeftBar"]
-margin_top = 87.0
-margin_right = 190.0
-margin_bottom = 587.0
-rect_min_size = Vector2( 0, 500 )
-script = ExtResource( 2 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -1.0
+margin_top = 109.0
+margin_right = -1.0
+margin_bottom = -96.0
+script = ExtResource( 3 )
 
-[node name="ResetButton" type="Button" parent="LeftBar"]
-margin_top = 591.0
-margin_right = 190.0
-margin_bottom = 611.0
+[node name="Buttons" type="VBoxContainer" parent="LeftBar"]
+editor/display_folded = true
+anchor_left = 0.05
+anchor_top = 1.0
+anchor_right = 0.95
+anchor_bottom = 1.0
+margin_top = -94.0
+margin_bottom = -2.0
+
+[node name="ResetButton" type="Button" parent="LeftBar/Buttons"]
+margin_right = 153.0
+margin_bottom = 20.0
 text = "Reset"
 
-[node name="RecompileButton" type="Button" parent="LeftBar"]
-margin_top = 615.0
-margin_right = 190.0
-margin_bottom = 635.0
+[node name="RecompileButton" type="Button" parent="LeftBar/Buttons"]
+margin_top = 24.0
+margin_right = 153.0
+margin_bottom = 44.0
 text = "Recompile"
 
-[node name="SaveButton" type="Button" parent="LeftBar"]
-margin_top = 639.0
-margin_right = 190.0
-margin_bottom = 659.0
+[node name="SaveButton" type="Button" parent="LeftBar/Buttons"]
+margin_top = 48.0
+margin_right = 153.0
+margin_bottom = 68.0
 text = "Save"
 
-[node name="CloseButton" type="Button" parent="LeftBar"]
-margin_top = 663.0
-margin_right = 190.0
-margin_bottom = 683.0
+[node name="CloseButton" type="Button" parent="LeftBar/Buttons"]
+margin_top = 72.0
+margin_right = 153.0
+margin_bottom = 92.0
 text = "Close"
 
 [node name="TextEditor" type="TextEdit" parent="."]
 anchor_right = 1.0
 anchor_bottom = 0.8
-margin_left = 191.948
-margin_top = 1.612
-margin_right = 1.94763
-margin_bottom = 1.612
+margin_left = 170.713
+margin_right = -3.28748
 highlight_current_line = true
 syntax_highlighting = true
 show_line_numbers = true
@@ -142,28 +204,44 @@ breakpoint_gutter = true
 highlight_all_occurrences = true
 smooth_scrolling = true
 hiding_enabled = 1
-script = ExtResource( 3 )
+script = ExtResource( 4 )
 
 [node name="OutputArea" type="Control" parent="."]
 anchor_top = 0.8
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 190.0
+margin_left = 172.0
+margin_right = -2.0
 
 [node name="OutputLabel" type="Label" parent="OutputArea"]
 margin_left = -0.40918
 margin_right = 48.5908
 margin_bottom = 23.0
-custom_fonts/font = ExtResource( 4 )
+custom_fonts/font = ExtResource( 5 )
 text = "Output"
 
-[node name="OutputText" parent="OutputArea" instance=ExtResource( 5 )]
+[node name="OutputText" type="TextEdit" parent="OutputArea" instance=ExtResource( 6 )]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -0.958984
+margin_top = 21.612
+margin_right = -0.958984
+margin_bottom = 1.612
+custom_styles/read_only = SubResource( 1 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+text = "This is a test"
+readonly = true
+highlight_all_occurrences = true
+smooth_scrolling = true
+hiding_enabled = 1
+script = SubResource( 2 )
 [connection signal="file_dirtied" from="." to="LeftBar/FileTree" method="_on_IDE_file_dirtied"]
-[connection signal="text_changed" from="LeftBar/EntityName/TargetName" to="." method="_on_TargetName_text_changed"]
+[connection signal="text_changed" from="LeftBar/EntityData/EntityName/TargetName" to="." method="_on_TargetName_text_changed"]
 [connection signal="item_selected" from="LeftBar/FileTree" to="." method="_on_FileTree_item_selected"]
-[connection signal="pressed" from="LeftBar/ResetButton" to="." method="_on_ResetButton_pressed"]
-[connection signal="pressed" from="LeftBar/RecompileButton" to="." method="_on_RecompileButton_pressed"]
-[connection signal="pressed" from="LeftBar/SaveButton" to="." method="_on_SaveButton_pressed"]
-[connection signal="pressed" from="LeftBar/CloseButton" to="." method="_on_CloseButton_pressed"]
+[connection signal="pressed" from="LeftBar/Buttons/ResetButton" to="." method="_on_ResetButton_pressed"]
+[connection signal="pressed" from="LeftBar/Buttons/RecompileButton" to="." method="_on_RecompileButton_pressed"]
+[connection signal="pressed" from="LeftBar/Buttons/SaveButton" to="." method="_on_SaveButton_pressed"]
+[connection signal="pressed" from="LeftBar/Buttons/CloseButton" to="." method="_on_CloseButton_pressed"]
 [connection signal="cursor_changed" from="TextEditor" to="." method="_on_TextEditor_cursor_changed"]
 [connection signal="text_changed" from="TextEditor" to="." method="_on_TextEditor_text_changed"]
+[connection signal="text_changed" from="TextEditor" to="TextEditor" method="_on_TextEditor_text_changed"]
