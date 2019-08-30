@@ -8,9 +8,18 @@ var currentFilePath: String = ""
 var files = []
 var itemPathToFile: Dictionary = {}
 
+var loaded = false
+onready var savedPosition = rect_global_position
+
 signal file_dirtied(filePath)
 
+
 func _ready():
+	# Load in previous data
+	load_rect_information()
+	
+	loaded = true
+	
 	# Setup the root of the file tree
 	get_file_tree().create_item()
 	get_file_tree().set_hide_root(true)
@@ -25,10 +34,13 @@ func _ready():
 	#file_selected(1)
 
 
-#func _process(delta):
-#
-#
-#
+func _process(delta):
+	if visible:
+		if rect_global_position != savedPosition:
+			# Save it's position...
+			savedPosition = rect_global_position
+			
+			save_rect_information()
 
 
 func _unhandled_key_input(event):
@@ -152,6 +164,31 @@ func save_focus():
 	if currentFile:
 		currentFile.set_focus_line(get_text_editor().cursor_get_line())
 		currentFile.set_focus_col(get_text_editor().cursor_get_column())
+
+
+func save_rect_information():
+	# If we are loaded then save
+	if loaded:
+		SavingManager.save_ide_rect(Rect2(rect_global_position, rect_size))
+
+
+func save_metadata():
+	if loaded:
+		SavingManager.save_ide_metadata()
+
+
+func load_rect_information():
+	# Load in the rect info from the manager
+	var newRect = SavingManager.load_ide_rect()
+	
+	# If it is null, stop
+	if newRect == null:
+		return
+	
+	# Otherwise, set our position and size from the rect
+	rect_global_position = newRect.position
+	savedPosition = newRect.position
+	rect_size = newRect.size
 
 
 """ GETTERS """
@@ -324,3 +361,7 @@ func _on_TargetEntity_class_changed(newClass):
 
 func _on_FileTree_item_selected():
 	file_selected()
+
+
+func _on_IDE_resized():
+	save_rect_information()

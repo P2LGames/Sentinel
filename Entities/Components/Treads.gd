@@ -189,3 +189,33 @@ func pass_order(orderType: int, orderBytes: PoolByteArray):
 #	print("Order Type: ", orderType)
 	var order = Models.Order(orderType, orderBytes)
 	orders.append(order)
+
+
+""" PERSISTENCE """
+
+func save():
+	# Save the data required to make this component function
+	var saveData = {
+		"filename": get_filename(),
+		"parent": get_parent().get_path(),
+		"orders": orders,
+		"currOrders": currOrders,
+		"currTurnAmount": currentTurnAmount,
+		"startPosX": startPosition.x,
+		"startPosY": startPosition.y,
+		"startPosZ": startPosition.z
+	}
+	
+	return saveData
+
+
+func load_from_data(data: Dictionary):
+	# Load in the same data that was saved
+	orders = data["order"]
+	currOrders = data["currOrders"]
+	currentTurnAmount = data["currTurnAmount"]
+	
+	var x = data["startPosX"]
+	var y = data["startPosY"]
+	var z = data["startPosZ"]
+	startPosition = Vector3(x, y, z)

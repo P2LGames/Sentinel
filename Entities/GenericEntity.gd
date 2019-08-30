@@ -75,7 +75,42 @@ func get_default_class():
 	return null
 
 
-##### ENTITY INTERACTION #####
+""" ENTITY PERSISTENCE """
+
+func save():
+	var saveData = {
+		"filename": get_filename(),
+		"parent": get_parent().get_path(),
+		"name": name,
+		"displayName": get_display_name(),
+		"posX": global_transform.origin.x,
+		"posY": global_transform.origin.y,
+		"posZ": global_transform.origin.z,
+		"basisX": global_transform.basis.x,
+		"basisY": global_transform.basis.y,
+		"basisZ": global_transform.basis.z,
+	}
+	
+	return saveData
+
+
+func load_from_data(data: Dictionary):
+	name = data["name"]
+	displayName = data["displayName"]
+	
+	global_transform.origin = Vector3(data["posX"], data["posY"], data["posZ"])
+	global_transform.basis = Vector3(data["basisX"], data["basisY"], data["basisZ"])
+#		"name": name,
+#		"displayName": get_display_name(),
+#		"posX": global_transform.origin.x,
+#		"posY": global_transform.origin.y,
+#		"posZ": global_transform.origin.z,
+#		"basisX": global_transform.basis.x,
+#		"basisY": global_transform.basis.y,
+#		"basisZ": global_transform.basis.z,
+
+
+""" ENTITY INTERACTION """
 
 func _select():
 	pass
@@ -85,7 +120,7 @@ func _deselect():
 	pass
 
 
-##### INSPECTION #####
+""" INSPECTION """
 
 func get_display_name() -> String:
 	return displayName

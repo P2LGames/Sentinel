@@ -22,9 +22,7 @@ const ORDER_TYPES = {
 	PRINT = 0, # PRINT:
 }
 
-var attachments = []
 var positionToAttachment = {}
-var possibleOrders = {}
 
 var orders = []
 
@@ -38,9 +36,6 @@ func _ready():
 	# Our default class is RobotDefault
 	get_reprogrammable_component().defaultClass = "RobotDefault"
 	get_reprogrammable_component().currentClass = "RobotDefault"
-	
-	# Setup my possible orders
-	possibleOrders[self] = ORDER_TYPES.values()
 	
 	# Setup my attachments
 	setup_attachments()
@@ -133,7 +128,6 @@ func set_processing(value: bool):
 
 func setup_attachments():
 	# Clear our list of attachments and our dictionary
-	attachments = []
 	positionToAttachment = {}
 	
 	# Add the robot
@@ -154,7 +148,6 @@ func setup_attachments():
 
 func add_attachment(position: int, attachment):
 	# Add the attachment to our list of attachments
-	attachments.append(attachment)
 	positionToAttachment[position] = attachment
 	
 	# Set the attachment's robot to be myself
@@ -215,6 +208,53 @@ func print_error(error: int, message: String):
 	
 	# Print the error
 	print_message(mess, Constants.MESSAGE_TYPE.ERROR)
+
+
+""" PERSISTENCE """
+
+func save():
+	# Save our data
+	var saveData = .save()
+	
+	# Save the reprogrammable stuff
+	saveData["reprogrammableData"] = get_reprogrammable_component().save()
+	
+	# Save the orders in each component
+	saveData["attachmentData"] = {}
+	for pos in positionToAttachment.keys():
+		saveData["attachmentData"][pos] = positionToAttachment[pos].save()
+	
+	# Return the save data
+	return saveData
+
+
+func load_from_data(data: Dictionary):
+	# Load in the parent data
+	.load_from_data(data)
+	
+	# Clear the current information
+	positionToAttachment = {}
+	
+	# Load the reprogrammable stuff
+	get_reprogrammable_component().load_from_data(data["reprogrammableData"])
+	
+	# Load component orders
+	var attachmentData = data["attachmentData"]
+	for pos in attachmentData.keys():
+		# Create a new attachment using the name and path
+		var attachment = load(attachmentData[pos]["filename"]).instance()
+		get_node(attachmentData[pos]["parent"]).add_child(attachment)
+		
+		# Pass the attachment its load data
+		attachment.load_from_data(attachmentData[pos])
+		
+		# Add the attachment to the position to attachment dict
+		positionToAttachment[pos] = attachment
+		
+		# If they have the set robot, set them to be ourselves
+		if attachment.has_method("set_robot"):
+			attachment.set_robot(self)
+			
 
 
 """ SIGNALS """

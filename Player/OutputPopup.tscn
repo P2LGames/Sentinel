@@ -5,6 +5,23 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends WindowDialog
 
+var loaded = false
+onready var savedPosition = rect_global_position
+
+func _ready():
+	load_rect_information()
+	
+	loaded = true
+
+
+func _process(delta):
+	if visible:
+		if rect_global_position != savedPosition:
+			# Save it's position...
+			savedPosition = rect_global_position
+			
+			save_rect_information()
+
 
 func _unhandled_key_input(event):
 	if visible:
@@ -14,6 +31,26 @@ func _unhandled_key_input(event):
 	
 	if visible and Input.is_action_just_pressed(\"hide_window\"):
 		hide()
+
+
+func save_rect_information():
+	# If we are loaded then save
+	if loaded:
+		SavingManager.save_output_rect(Rect2(rect_global_position, rect_size))
+
+
+func load_rect_information():
+	# Load in the rect info from the manager
+	var newRect = SavingManager.load_output_rect()
+	
+	# If it is null, stop
+	if newRect == null:
+		return
+	
+	# Otherwise, set our position and size from the rect
+	rect_global_position = newRect.position
+	savedPosition = newRect.position
+	rect_size = newRect.size
 
 
 \"\"\" GETTERS \"\"\"
@@ -33,6 +70,11 @@ func set_window_title(newTitle: String):
 func _on_TargetEntity_name_changed(newName: String):
 	set_window_title(newName)
 
+
+func _on_OutputPopup_resized():
+	# If we are loaded, save
+	if loaded:
+		save_rect_information()
 "
 
 [node name="OutputPopup" type="WindowDialog"]
@@ -50,3 +92,4 @@ margin_left = 0.0
 margin_top = 0.0
 margin_right = 0.0
 margin_bottom = 0.0
+[connection signal="resized" from="." to="." method="_on_OutputPopup_resized"]

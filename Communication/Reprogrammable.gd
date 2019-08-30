@@ -44,6 +44,7 @@ func _process(delta: float):
 	else:
 		set_process(false)
 
+
 """ GETTERS """
 
 func get_current_output_text():
@@ -76,6 +77,19 @@ func set_current_class(_class: String):
 	# Emit a signal saying that the class changed
 	emit_signal("class_changed", _class)
 
+
+""" PERSISTENCE """
+
+func save():
+	var saveData = {
+		"currentClass": currentClass
+	}
+	
+	return saveData
+
+
+func load_from_data(data: Dictionary):
+	currentClass = data["currentClass"]
 
 
 

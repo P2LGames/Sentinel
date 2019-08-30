@@ -1,9 +1,7 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Entities/Sentinel.gd" type="Script" id=1]
 [ext_resource path="res://Communication/Reprogrammable.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Entities/Components3d/Treads.tscn" type="PackedScene" id=3]
-[ext_resource path="res://Entities/Components3d/Sensor.tscn" type="PackedScene" id=4]
 
 [sub_resource type="ArrayMesh" id=1]
 surfaces/0 = {
@@ -42,7 +40,9 @@ func get_attachment():
 	
 	return null"
 
-[node name="Sentinel" type="KinematicBody"]
+[node name="Sentinel" type="KinematicBody" groups=[
+"Persist",
+]]
 transform = Transform( 0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0 )
 collision_mask = 513
 collision/safe_margin = 0.08
@@ -70,11 +70,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0 )
 script = SubResource( 5 )
 attachmentPosition = 2
 
-[node name="TreadBase" parent="AttachmentContainer/Base" instance=ExtResource( 3 )]
-
 [node name="Head" type="Spatial" parent="AttachmentContainer"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0 )
 script = SubResource( 5 )
 attachmentPosition = 1
-
-[node name="SensorHead" parent="AttachmentContainer/Head" instance=ExtResource( 4 )]

@@ -1,35 +1,74 @@
 extends Spatial
 
-var camera
+# Current camera
+var camera = null
 
+# Entities
 var pressedKeys = []
 var selectedEntities = []
 var inspectedEntity
-
 var isSelectingMultiple = false
 
+# ide and output
 var outputRepopup = false
-
-var clickRayLength = 1000
-
 var ide
 
+var shouldProcessInput = false
+
+var viewStack = []
+
+signal game_pause()
+signal game_resume()
+signal game_save()
+signal game_quit()
+
 func _ready():
-	
+	# Get the ide
 	ide = get_ide()
+	
+	# Connect myself to the scene manager so I know when a game has started
+	SceneManager.connect("game_start", self, "_on_game_start")
 
 
-func _process(delta):
-	handle_input()
+func game_pause():
+	# Emit the pause game signals
+	emit_signal("game_pause")
+	
+	# Show the menus container
+	get_menu_container().visible = true
+	
+	# Hide the ingame UI, show the pause menu
+	push_view_to_stack(get_pause_menu())
 
 
-func _physics_process(delta):
-	handle_mouse_inputs()
+func game_resume():
+	# Emit the pause game signal
+	emit_signal("game_resume")
+	
+	# Hide the menus container
+	get_menu_container().visible = false
+	
+	# Hide the ingame UI, show the pause menu
+	pop_view_from_stack()
 
 
 """ INPUT """
 
+func _process(delta):
+	if shouldProcessInput:
+		handle_input()
+
+
+func _physics_process(delta):
+	if shouldProcessInput:
+		handle_mouse_inputs()
+
+
 func _unhandled_key_input(event):
+	# If we should process input
+	if not shouldProcessInput:
+		return
+	
 	# If we pressed the key
 	if event.pressed:
 		# And the input is not in our pressed keys
@@ -60,12 +99,18 @@ func handle_key_input(code: int, pressed: int):
 
 func handle_input():
 	# Show editor if tab is pressed
-	if not get_ide().visible and Input.is_action_just_pressed("show_ide"):
+	if not ide.visible and Input.is_action_just_pressed("show_ide"):
 		show_ide()
-	if (not get_ide().visible 
+	# Show the output if tilde is pressed
+	elif (not ide.visible 
 		and not get_output_popup().visible 
 		and Input.is_action_just_pressed("show_output")):
 		show_output()
+	# Pause the game if escape is pressed
+	elif (not ide.visible 
+		and not get_output_popup().visible 
+		and Input.is_action_just_pressed("hide_window")):
+		game_pause()
 	
 	# If we want to select multiple people we can
 	isSelectingMultiple = Input.is_action_pressed("select_multiple")
@@ -87,7 +132,7 @@ func handle_mouse_inputs():
 	elif Input.is_action_just_pressed("right_click"):
 		pass
 	# Q Pressed and IDE is invisible
-	elif not get_ide().visible and Input.is_action_just_pressed("inspect_entity"):
+	elif not ide.visible and Input.is_action_just_pressed("inspect_entity"):
 		# Get the clicked entity
 		var clickedEntity = get_clicked_entity()
 		
@@ -96,6 +141,8 @@ func handle_mouse_inputs():
 			# Then we left clicked on an entity, select it
 			inspect_entity(clickedEntity)
 
+
+""" ENTITY HANDLING """
 
 func get_clicked_entity():
 	# Get the physics world
@@ -106,7 +153,7 @@ func get_clicked_entity():
 	
 	# Get the camera origin and target
 	var from = camera.project_ray_origin(mousePosition)
-	var to = from + camera.project_ray_normal(mousePosition) * clickRayLength
+	var to = from + camera.project_ray_normal(mousePosition) * Constants.CLICK_RAY_LENGTH
 	
 	# Cast a ray
 	var result = physicsSpace.intersect_ray(from, to)
@@ -178,6 +225,8 @@ func inspect_entity(clickedEntity):
 	inspectUI.popup()
 
 
+""" UI HANDLING """
+
 func show_output():
 	# Get the output popup
 	var popup = get_output_popup()
@@ -210,6 +259,27 @@ func hide_ide():
 	outputRepopup = false
 
 
+func push_view_to_stack(view):
+	# Make the current view invisible
+	if viewStack.size() > 0:
+		viewStack[viewStack.size() - 1].visible = false
+	
+	# Add the view to the stack
+	viewStack.append(view)
+	
+	# Make the view visible
+	view.visible = true
+
+
+func pop_view_from_stack():
+	# Pop and hide the last view
+	viewStack.pop_back().visible = false
+	
+	# Set the last view in the stack to be visible
+	if viewStack.size() > 0:
+		viewStack[viewStack.size() - 1].visible = true
+
+
 """ GETTERS """
 
 func get_inspect_ui():
@@ -225,15 +295,35 @@ func get_inspected_entity_id():
 
  
 func get_ide():
-	return $CanvasLayer/IDE
+	return $IDE/IDE
 
 
 func get_ide_layer():
-	return $CanvasLayer
+	return $IDE
 
 
 func get_output_popup():
 	return $OutputPopupLayer/OutputPopup
+
+
+func get_game_ui():
+	return $Menus/GameUI
+
+
+func get_menu_container():
+	return $Menus/MenusContainer
+
+
+func get_pause_menu():
+	return $Menus/MenusContainer/PauseMenu
+
+
+func get_save_menu():
+	return $Menus/MenusContainer/SaveMenu
+
+
+func get_quit_menu():
+	return $Menus/MenusContainer/QuitMenu
 
 
 """ SETTERS """
@@ -317,6 +407,14 @@ func set_inspected_entity_name(text: String):
 
 """ SIGNALS """
 
+func _on_game_start():
+	# Add the game UI to the view
+	push_view_to_stack(get_game_ui())
+	
+	# We should now be processing input
+	shouldProcessInput = true
+
+
 func _on_Inspect_id_pressed(ID):
 	# Edit was clicked
 	if ID == Constants.INSPECT_ITEMS.EDIT_CODE:
@@ -329,3 +427,46 @@ func _on_Inspect_id_pressed(ID):
 
 func _on_IDE_closing():
 	hide_ide()
+
+
+func _on_PauseGame_pressed():
+	game_pause()
+
+
+func _on_Resume_pressed():
+	game_resume()
+
+
+func _on_SaveGame_pressed():
+	emit_signal("game_save")
+	# Change this to have a UI that lets them add the save game name
+
+
+func _on_QuitGame_pressed():
+	emit_signal("game_quit")
+	
+	# We should not process user input
+	shouldProcessInput = false
+	
+	# Hide the menus container
+	get_menu_container().visible = false
+	
+	# We should not have anything in our ui
+	for ui in viewStack:
+		ui.visible = false
+	viewStack.clear()
+	
+	# Change this to have a UI that prompts them for confirmation
+	SceneManager.go_to_main_menu()
+
+
+func _on_Back_pressed():
+	pop_view_from_stack()
+
+
+func _on_SaveGameMenu_pressed():
+	push_view_to_stack(get_save_menu())
+
+
+func _on_QuitGameMenu_pressed():
+	push_view_to_stack(get_quit_menu())

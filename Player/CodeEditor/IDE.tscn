@@ -220,22 +220,11 @@ margin_bottom = 23.0
 custom_fonts/font = ExtResource( 5 )
 text = "Output"
 
-[node name="OutputText" type="TextEdit" parent="OutputArea" instance=ExtResource( 6 )]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = -0.958984
-margin_top = 21.612
-margin_right = -0.958984
-margin_bottom = 1.612
+[node name="OutputText" parent="OutputArea" instance=ExtResource( 6 )]
 custom_styles/read_only = SubResource( 1 )
-custom_colors/font_color = Color( 1, 1, 1, 1 )
-text = "This is a test"
-readonly = true
-highlight_all_occurrences = true
-smooth_scrolling = true
-hiding_enabled = 1
 script = SubResource( 2 )
 [connection signal="file_dirtied" from="." to="LeftBar/FileTree" method="_on_IDE_file_dirtied"]
+[connection signal="resized" from="." to="." method="_on_IDE_resized"]
 [connection signal="text_changed" from="LeftBar/EntityData/EntityName/TargetName" to="." method="_on_TargetName_text_changed"]
 [connection signal="item_selected" from="LeftBar/FileTree" to="." method="_on_FileTree_item_selected"]
 [connection signal="pressed" from="LeftBar/Buttons/ResetButton" to="." method="_on_ResetButton_pressed"]

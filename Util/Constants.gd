@@ -1,5 +1,12 @@
 extends Node
 
+""" PLAYER """
+
+const CLICK_RAY_LENGTH = 1000
+
+
+""" IDE AND CODE """
+
 const GENERIC_CODE_DIR = "res://Player/OriginalCode/"
 const PLAYER_CODE_DIR = "user://Code/"
 
@@ -43,6 +50,21 @@ const INSPECT_ITEMS = {
 const ERROR_CODE = {
 	NO_ATTACHMENT = 1
 }
+
+""" SAVING INFORMATION/PATHS """
+
+const GAME_DATA = "user://game_data/"
+
+const IDE_DIRECTORY = GAME_DATA + "ide_metadata/"
+const PLAYER_SAVE_DIR = GAME_DATA + "saves/"
+
+const IDE_RECT_FILE = IDE_DIRECTORY + "ide_rect"
+const OUTPUT_RECT_FILE = IDE_DIRECTORY + "output_rect"
+const IDE_METADATA_FILE = IDE_DIRECTORY + "ide_metadata"
+
+const SAVE_FILE_TYPE = ".save"
+
+""" LAYERS """
 
 var MASK_BIT_TO_NAME = {}
 var NAME_TO_BIT_MASK = {}
