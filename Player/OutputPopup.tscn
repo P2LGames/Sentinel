@@ -11,22 +11,18 @@ onready var savedPosition = rect_global_position
 func _ready():
 	load_rect_information()
 	
-	loaded = true
+	set_process(false)
 
 
 func _process(delta):
-	if visible:
-		if rect_global_position != savedPosition:
-			# Save it's position...
-			savedPosition = rect_global_position
-			
-			save_rect_information()
-
-
-func _unhandled_key_input(event):
-	
-	if visible and Input.is_action_just_pressed(\"hide_window\"):
+	if Input.is_action_just_pressed(\"hide_window\"):
 		hide()
+	
+	if rect_global_position != savedPosition:
+		# Save it's position...
+		savedPosition = rect_global_position
+		
+		save_rect_information()
 
 
 func save_rect_information():
@@ -47,6 +43,8 @@ func load_rect_information():
 	rect_global_position = newRect.position
 	savedPosition = newRect.position
 	rect_size = newRect.size
+	
+	loaded = true
 
 
 \"\"\" GETTERS \"\"\"
@@ -71,6 +69,14 @@ func _on_OutputPopup_resized():
 	# If we are loaded, save
 	if loaded:
 		save_rect_information()
+
+
+func _on_OutputPopup_about_to_show():
+	set_process(true)
+
+
+func _on_OutputPopup_popup_hide():
+	set_process(false)
 "
 
 [node name="OutputPopup" type="WindowDialog"]

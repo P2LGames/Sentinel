@@ -17,8 +17,6 @@ func _ready():
 	# Load in previous data
 	load_rect_information()
 	
-	loaded = true
-	
 	# Setup the root of the file tree
 #	get_file_tree().create_item()
 	get_file_tree().set_hide_root(true)
@@ -26,29 +24,26 @@ func _ready():
 #	add_directory(Constants.GENERIC_CODE_DIR)
 	get_file_tree().set_root_to_path(Constants.PLAYER_CODE_DIR)
 	
-	# Set ourselves to be invisible
-	visible = false
-	
-	# Select the first file
-#	get_file_tree().get_root().get_children().get_children().select(0)
+	# No looping
+	set_process(false)
 
 
 func _process(delta):
-	# Only do stuff if we are visible
-	if visible:
-		# Input handling
-		if Input.is_action_just_pressed("ide_save"):
-			save_file()
-		elif Input.is_action_just_pressed("ide_recompile"):
-			recompile()
-		elif Input.is_action_just_pressed("hide_window"):
-			hide()
+	# Will only run when the IDE is visible
+	
+	# Input handling
+	if Input.is_action_just_pressed("ide_save"):
+		save_file()
+	elif Input.is_action_just_pressed("ide_recompile"):
+		recompile()
+	elif Input.is_action_just_pressed("hide_window"):
+		hide()
+	
+	if rect_global_position != savedPosition:
+		# Save it's position...
+		savedPosition = rect_global_position
 		
-		if rect_global_position != savedPosition:
-			# Save it's position...
-			savedPosition = rect_global_position
-			
-			save_rect_information()
+		save_rect_information()
 
 
 func _unhandled_key_input(event):
@@ -156,6 +151,8 @@ func load_rect_information():
 	rect_global_position = newRect.position
 	savedPosition = newRect.position
 	rect_size = newRect.size
+	
+	loaded = true
 
 
 """ GETTERS """
