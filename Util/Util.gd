@@ -1,15 +1,7 @@
 extends Node
 
-func get_file_name(filePath: String):
-	var splitPath = filePath.split("/")
-	
-	if splitPath[splitPath.size() - 1] == "" and splitPath.size() > 1:
-		return splitPath[splitPath.size() - 2]
-	else:
-		return splitPath[splitPath.size() - 1]
 
 func slice_array(array, start: int = 0, stop: int = -1):
-	
 	var newArray = []
 	
 	# Get the end

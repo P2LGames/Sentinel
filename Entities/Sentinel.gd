@@ -33,9 +33,16 @@ func _ready():
 	# Super call to ready
 	._ready()
 	
+	var reprogrammable = get_reprogrammable_component()
+	
 	# Our default class is RobotDefault
-	get_reprogrammable_component().defaultClass = "RobotDefault"
-	get_reprogrammable_component().currentClass = "RobotDefault"
+	reprogrammable.defaultClass = "RobotDefault"
+	reprogrammable.currentClass = "RobotDefault"
+	
+	# Setup the default path
+	var defaultPath = FileManager.join(Constants.PLAYER_CODE_DIR, "OriginalCode/RobotDefault.java")
+	reprogrammable.defaultClassPath = defaultPath
+	reprogrammable.currentClassPath = defaultPath
 	
 	# Setup my attachments
 	setup_attachments()
@@ -222,6 +229,9 @@ func save():
 	# Save the orders in each component
 	saveData["attachmentData"] = {}
 	for pos in positionToAttachment.keys():
+		if pos == ATTACHMENT_POSITIONS.SELF or positionToAttachment[pos] == null:
+			continue
+		
 		saveData["attachmentData"][pos] = positionToAttachment[pos].save()
 	
 	# Return the save data
@@ -240,6 +250,7 @@ func load_from_data(data: Dictionary):
 	
 	# Load component orders
 	var attachmentData = data["attachmentData"]
+	print(attachmentData)
 	for pos in attachmentData.keys():
 		# Create a new attachment using the name and path
 		var attachment = load(attachmentData[pos]["filename"]).instance()
@@ -249,7 +260,7 @@ func load_from_data(data: Dictionary):
 		attachment.load_from_data(attachmentData[pos])
 		
 		# Add the attachment to the position to attachment dict
-		positionToAttachment[pos] = attachment
+		positionToAttachment[int(pos)] = attachment
 		
 		# If they have the set robot, set them to be ourselves
 		if attachment.has_method("set_robot"):

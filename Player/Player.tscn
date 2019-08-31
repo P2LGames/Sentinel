@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Player/Player.gd" type="Script" id=1]
 [ext_resource path="res://Player/CodeEditor/IDE.tscn" type="PackedScene" id=2]
@@ -6,6 +6,45 @@
 [ext_resource path="res://Util/Darkening.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Assets/Fonts/NunitoTitle.tres" type="DynamicFont" id=5]
 [ext_resource path="res://Assets/Fonts/NunitoBodyBold.tres" type="DynamicFont" id=6]
+[ext_resource path="res://Scenes/Shared/SaveGameList.tscn" type="PackedScene" id=7]
+[ext_resource path="res://Player/ConfirmOverwritePopup.gd" type="Script" id=8]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends LineEdit
+
+signal game_save(fileName)
+
+
+func _on_SaveGameList_file_selected(fileName, fileNameActual, filePath):
+	# Set the text of the line
+	set_text(fileName)
+	
+	emit_signal(\"text_changed\", fileName)
+
+
+func _on_Back_pressed():
+	set_text(\"\")
+	
+	emit_signal(\"text_changed\", \"\")
+"
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends Button
+
+var fileName = \"\"
+
+
+func _on_LineEdit_text_changed(newText):
+	# Update the text
+	fileName = newText
+	
+	# If it is empty, disable ourselves
+	if fileName == \"\":
+		disabled = true
+	# Otherwise, enable
+	else:
+		disabled = false
+"
 
 [node name="Player" type="Spatial"]
 script = ExtResource( 1 )
@@ -219,7 +258,6 @@ custom_fonts/font = ExtResource( 6 )
 text = "Back"
 
 [node name="SaveMenu" type="Panel" parent="Menus/MenusContainer"]
-editor/display_folded = true
 visible = false
 anchor_left = 0.5
 anchor_right = 0.5
@@ -235,55 +273,104 @@ margin_left = 50.0
 margin_top = 20.0
 margin_right = -50.0
 
-[node name="Title" type="Label" parent="Menus/MenusContainer/SaveMenu/VBoxContainer"]
+[node name="Spacer" type="Control" parent="Menus/MenusContainer/SaveMenu/VBoxContainer"]
 margin_right = 500.0
-margin_bottom = 66.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 0, 40 )
+
+[node name="Title" type="Label" parent="Menus/MenusContainer/SaveMenu"]
+margin_left = 50.0
+margin_top = 20.0
+margin_right = 550.0
+margin_bottom = 86.0
 custom_fonts/font = ExtResource( 5 )
 text = "Save Game"
 align = 1
 valign = 1
 
-[node name="Spacer" type="Control" parent="Menus/MenusContainer/SaveMenu/VBoxContainer"]
-margin_top = 70.0
-margin_right = 500.0
-margin_bottom = 110.0
-rect_min_size = Vector2( 0, 40 )
+[node name="SaveGameList" parent="Menus/MenusContainer/SaveMenu" instance=ExtResource( 7 )]
+margin_left = 20.0
+margin_top = 96.0
+margin_right = -20.0
+margin_bottom = -105.0
 
-[node name="Spacer2" type="Control" parent="Menus/MenusContainer/SaveMenu/VBoxContainer"]
-margin_top = 114.0
-margin_right = 500.0
-margin_bottom = 134.0
-rect_min_size = Vector2( 0, 20 )
+[node name="LineEditContainer" type="HBoxContainer" parent="Menus/MenusContainer/SaveMenu"]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 20.0
+margin_top = -100.0
+margin_right = -20.0
+margin_bottom = -80.0
 
-[node name="SaveContainer" type="Control" parent="Menus/MenusContainer/SaveMenu/VBoxContainer"]
-margin_top = 138.0
-margin_right = 500.0
-margin_bottom = 188.0
+[node name="Label" type="Label" parent="Menus/MenusContainer/SaveMenu/LineEditContainer"]
+margin_right = 88.0
+margin_bottom = 23.0
+custom_fonts/font = ExtResource( 6 )
+text = "Save Name:"
+
+[node name="LineEdit" type="LineEdit" parent="Menus/MenusContainer/SaveMenu/LineEditContainer"]
+margin_left = 92.0
+margin_right = 560.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+script = SubResource( 1 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Menus/MenusContainer/SaveMenu"]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 20.0
+margin_top = -70.0
+margin_right = -20.0
+margin_bottom = -20.0
+
+[node name="BackContainer" type="Control" parent="Menus/MenusContainer/SaveMenu/HBoxContainer"]
+editor/display_folded = true
+margin_right = 266.0
+margin_bottom = 50.0
 rect_min_size = Vector2( 0, 50 )
+size_flags_horizontal = 3
 
-[node name="SaveGame" type="Button" parent="Menus/MenusContainer/SaveMenu/VBoxContainer/SaveContainer"]
+[node name="Back" type="Button" parent="Menus/MenusContainer/SaveMenu/HBoxContainer/BackContainer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 custom_fonts/font = ExtResource( 6 )
+text = "Back"
+
+[node name="Spacer3" type="Control" parent="Menus/MenusContainer/SaveMenu/HBoxContainer"]
+margin_left = 270.0
+margin_right = 290.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 20, 20 )
+
+[node name="SaveContainer" type="Control" parent="Menus/MenusContainer/SaveMenu/HBoxContainer"]
+margin_left = 294.0
+margin_right = 560.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 0, 50 )
+size_flags_horizontal = 3
+
+[node name="SaveGame" type="Button" parent="Menus/MenusContainer/SaveMenu/HBoxContainer/SaveContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_fonts/font = ExtResource( 6 )
+disabled = true
 text = "Save Game"
+script = SubResource( 2 )
 
-[node name="Spacer3" type="Control" parent="Menus/MenusContainer/SaveMenu/VBoxContainer"]
-margin_top = 192.0
-margin_right = 500.0
-margin_bottom = 212.0
-rect_min_size = Vector2( 0, 20 )
-
-[node name="BackContainer" type="Control" parent="Menus/MenusContainer/SaveMenu/VBoxContainer"]
-margin_top = 216.0
-margin_right = 500.0
-margin_bottom = 266.0
-rect_min_size = Vector2( 0, 50 )
-
-[node name="Back" type="Button" parent="Menus/MenusContainer/SaveMenu/VBoxContainer/BackContainer"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-custom_fonts/font = ExtResource( 6 )
-text = "Resume"
+[node name="ConfirmOverwritePopup" type="ConfirmationDialog" parent="Menus"]
+anchor_left = 0.5
+anchor_top = 0.4
+anchor_right = 0.5
+anchor_bottom = 0.6
+margin_left = -200.0
+margin_top = -100.0
+margin_right = 200.0
+margin_bottom = -168.0
+script = ExtResource( 8 )
+[connection signal="about_to_show" from="IDE/IDE" to="IDE/IDE" method="_on_IDE_about_to_show"]
+[connection signal="popup_hide" from="IDE/IDE" to="IDE/IDE" method="_on_IDE_popup_hide"]
 [connection signal="popup_hide" from="IDE/IDE" to="." method="_on_IDE_closing"]
 [connection signal="id_pressed" from="OutputPopupLayer/Inspect" to="." method="_on_Inspect_id_pressed"]
 [connection signal="pressed" from="Menus/GameUI/PauseGame" to="." method="_on_PauseGame_pressed"]
@@ -292,5 +379,11 @@ text = "Resume"
 [connection signal="pressed" from="Menus/MenusContainer/PauseMenu/VBoxContainer/ResumeContainer/Resume" to="." method="_on_Resume_pressed"]
 [connection signal="pressed" from="Menus/MenusContainer/QuitMenu/VBoxContainer/QuitContainer/QuitGame" to="." method="_on_QuitGame_pressed"]
 [connection signal="pressed" from="Menus/MenusContainer/QuitMenu/VBoxContainer/BackContainer/Back" to="." method="_on_Back_pressed"]
-[connection signal="pressed" from="Menus/MenusContainer/SaveMenu/VBoxContainer/SaveContainer/SaveGame" to="." method="_on_SaveGame_pressed"]
-[connection signal="pressed" from="Menus/MenusContainer/SaveMenu/VBoxContainer/BackContainer/Back" to="." method="_on_Back_pressed"]
+[connection signal="file_selected" from="Menus/MenusContainer/SaveMenu/SaveGameList" to="Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit" method="_on_SaveGameList_file_selected"]
+[connection signal="game_save" from="Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit" to="." method="_on_game_save"]
+[connection signal="text_changed" from="Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit" to="Menus/MenusContainer/SaveMenu/HBoxContainer/SaveContainer/SaveGame" method="_on_LineEdit_text_changed"]
+[connection signal="pressed" from="Menus/MenusContainer/SaveMenu/HBoxContainer/BackContainer/Back" to="Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit" method="_on_Back_pressed"]
+[connection signal="pressed" from="Menus/MenusContainer/SaveMenu/HBoxContainer/BackContainer/Back" to="." method="_on_Back_pressed"]
+[connection signal="pressed" from="Menus/MenusContainer/SaveMenu/HBoxContainer/SaveContainer/SaveGame" to="." method="_on_game_save"]
+[connection signal="confirmed" from="Menus/ConfirmOverwritePopup" to="Menus/ConfirmOverwritePopup" method="_on_ConfirmOverwritePopup_confirmed"]
+[connection signal="confirmed" from="Menus/ConfirmOverwritePopup" to="." method="_on_game_save_overwrite"]

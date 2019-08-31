@@ -1,5 +1,11 @@
 extends Tree
 
+var IDEFile = load("res://Player/CodeEditor/IDEFile.gd")
+
+var itemToFile: Dictionary = {}
+var rootPath := ""
+
+signal file_selected(file, filePath)
 
 # If a file has been changed, append an asterisk to its name
 func file_dirtied(filePath: String):
@@ -27,6 +33,58 @@ func file_saved(filePath: String):
 		treeItem.set_text(0, oldText.substr(0, oldText.length() - 1))
 
 
+func add_directory(root: TreeItem, dirPath: String, createNew: bool = true):
+	# Create the folder item
+	var folder = root
+	if createNew:
+		folder = create_item(root)
+	
+	# Set the folder to the file name
+	var folderName = FileManager.get_file_name(dirPath)
+	folder.set_text(0, folderName)
+	
+	# Create a new directory to list out files in the folders
+	var dir = Directory.new()
+	dir.open(dirPath)
+	
+	# Begin listing the files in the directory
+	dir.list_dir_begin(true, true)
+	
+	# While true...
+	while true:
+		# Get the next file
+		var file = dir.get_next()
+		
+		# If it was empty, stop
+		if file == "":
+			break
+		
+		# Get the file path
+		var filePath = FileManager.join(dirPath, file)
+		
+		# If the file is a directory
+		if dir.dir_exists(filePath):
+			# Then recurse through it as well
+			add_directory(folder, filePath)
+		# Otherwise, it's a file, add it as a file and get the file name
+		else:
+			# Get the file name
+			var fileName = file.split(".")[0]
+			
+			# Create a tree item with it, with folder as the parent
+			var treeItem = create_item(folder)
+			treeItem.set_text(0, fileName)
+			
+			# Create a new ide file
+			var newIDEFile = IDEFile.new(filePath, fileName)
+	
+			# Save it to our dictionary
+			itemToFile[treeItem] = newIDEFile
+	
+	# End the listing
+	dir.list_dir_end()
+
+
 """ GETTERS """
 
 func get_path_from_item(item: TreeItem):
@@ -42,10 +100,17 @@ func get_path_from_item(item: TreeItem):
 		loopItem = loopItem.get_parent()
 	
 	# Return the file path
-	return filePath
+	return FileManager.join(rootPath, filePath)
 
 
-func get_tree_item_from_path(itemPath):
+func get_tree_item_from_path(itemPath: String):
+	# Replace the root with nothing
+	itemPath = itemPath.replace(rootPath, "")
+	
+	# If the item path is a slash, return root
+	if itemPath == "/":
+		return get_root()
+	
 	# Split the path
 	var splitPath = itemPath.split("/")
 	
@@ -78,8 +143,42 @@ func get_tree_item_from_path(itemPath):
 	return child
 
 
+func get_file_from_path(filePath: String):
+	# Get the item
+	var item = get_tree_item_from_path(filePath)
+	
+	# Use the item to get the file, it it's there
+	if item in itemToFile.keys():
+		return itemToFile[item]
+	else:
+		return null
+
+
+""" SETTERS """
+
+func set_root_to_path(dirPath: String):
+	rootPath = dirPath
+	
+	create_item()
+	
+	add_directory(get_root(), dirPath, false)
+
+
 """ SIGNALS """
 
 
 func _on_IDE_file_dirtied(filePath):
 	file_dirtied(filePath)
+
+
+func _on_FileTree_item_selected():
+	# Get the selected item
+	var selectedItem = get_selected()
+	
+	# Get the item path
+	var filePath = get_path_from_item(selectedItem)
+	
+	# If the item to file dictionary has the selected item
+	if selectedItem in itemToFile.keys():
+		# Emit the file selected signal with the given item
+		emit_signal("file_selected", itemToFile[selectedItem], filePath)

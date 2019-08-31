@@ -2,10 +2,15 @@ extends Spatial
 
 var viewStack = []
 
+var selectedFile = ""
+var selectedFilePath = ""
 
 func _ready():
 	# Add the main menu to the stack
 	viewStack.append(get_main_menu())
+	
+	# Copy the generic code over
+	FileManager.copy_dir(Constants.GENERIC_CODE_DIR, Constants.PLAYER_CODE_DIR)
 
 
 func start_new_game():
@@ -45,19 +50,20 @@ func get_load_level():
 	return $Menus/LoadLevel
 
 
+func get_save_game_list():
+	return $Menus/LoadLevel/SaveGameList
+
+
 """ SIGNALS """
 
 func _on_NewGame_pressed():
 	start_new_game()
 
 
-func _on_PlayLevel_pressed():
-	pass # Replace with function body.
-
-
-func _on_LoadGame_pressed():
-	# Load the selected game
-	pass # Replace with function body.
+func _on_load_game():
+	print(selectedFilePath)
+	if selectedFilePath != "":
+		SavingManager.load_game(selectedFilePath)
 
 
 func _on_LevelSelect_pressed():
@@ -75,3 +81,13 @@ func _on_QuitGame_pressed():
 
 func _on_Back_pressed():
 	pop_view_from_stack()
+
+
+func _on_SaveGameList_file_selected(fileName, fileNameActual, filePath):
+	selectedFilePath = filePath
+
+
+func _on_Delete_pressed():
+	# Delete the currently selected file, if it's there
+	if selectedFilePath != "":
+		SavingManager.delete_saved_game(selectedFilePath)

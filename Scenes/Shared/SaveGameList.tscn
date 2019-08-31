@@ -1,0 +1,84 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends ItemList
+
+var saveGameFiles: Dictionary
+var currentSelection = -1
+
+signal file_selected(fileName, fileNameActual, filePath)
+signal file_chosen()
+
+
+func _ready():
+	update()
+	
+	# Link the saving manager signals to ourself
+	SavingManager.connect(\"save_added\", self, \"_on_save_added\")
+	SavingManager.connect(\"save_deleted\", self, \"_on_save_deleted\")
+
+
+func update():
+	print(\"Got here\")
+	# Load the saved games
+	saveGameFiles = SavingManager.get_saved_games()
+	
+	# Remove all the current items
+	clear()
+	
+	# Add each one to our list
+	for file in saveGameFiles.keys():
+		# If the file is a save file
+		if file.get_extension() == Constants.SAVE_FILE_TYPE:
+			add_item(file.get_basename())
+	
+	# If there are no more items
+	if get_item_count() == 0:
+		# Reset current selection
+		currentSelection = -1
+	# Otherwise, if we have a current select, select the item we had selected previously
+	elif currentSelection != -1:
+		# Be sure to bound the current selection to the last item if we had something after that
+		if currentSelection >= get_item_count():
+			currentSelection = get_item_count() - 1
+		
+		# Select the item
+		select(currentSelection)
+
+
+\"\"\" SIGNALS \"\"\"
+
+func _on_save_added(saveName: String, savePath: String):
+	update()
+	
+	#TODO, make this more efficient, use the save name and path
+
+
+func _on_save_deleted(saveName: String):
+	update()
+	
+	# TODO, make this more efficient, remove the save name only, don't brute force it
+
+
+func _on_SaveGameList_item_selected(index):
+	# Set our current selection
+	currentSelection = index
+	
+	# Get the file name
+	var fileName = get_item_text(index)
+	var fileNameActual = fileName + Constants.SAVE_FILE_EXTENSION
+	
+	# Emit the signal with it
+	emit_signal(\"file_selected\", fileName, fileNameActual, saveGameFiles[fileNameActual])
+
+
+func _on_SaveGameList_item_activated(index):
+	emit_signal(\"file_chosen\")
+"
+
+[node name="SaveGameList" type="ItemList"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = SubResource( 1 )
+[connection signal="item_activated" from="." to="." method="_on_SaveGameList_item_activated"]
+[connection signal="item_selected" from="." to="." method="_on_SaveGameList_item_selected"]

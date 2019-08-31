@@ -16,6 +16,7 @@ const PORT = 6789
 var client = StreamPeerTCP.new()
 
 var serverSetup = false
+var running = false
 
 # A list of messages to send to the server
 var toSend = []
@@ -35,9 +36,15 @@ func _ready():
 ##### MESSAGE ROUTING #####
 
 func route_response(responseType: int, responseData: PoolByteArray):
+	# Run the entity setup no matter what
 	if responseType == FrameworkModels.RequestType.ENTITY_SETUP:
 		entity_setup_handler(responseData)
-	elif responseType == FrameworkModels.RequestType.ENTITY_REGISTER:
+	
+	# If we aren't running, don't route other responses
+	if not running:
+		return
+	
+	if responseType == FrameworkModels.RequestType.ENTITY_REGISTER:
 		entity_register_handler(responseData)
 	elif responseType == FrameworkModels.RequestType.COMMAND:
 		command_handler(responseData)
@@ -51,7 +58,6 @@ func entity_setup_handler(responseData: PoolByteArray):
 	"""Handles all setup responses"""
 	# If the first byte is a 1, then the setup was successful
 	if responseData[0] == 1:
-		print('Server is set up!')
 		serverSetup = true
 	else:
 		# Slice off the first two values of the byte array
@@ -198,12 +204,10 @@ func file_update_handler(responseData: PoolByteArray):
 		var commandId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 6, 10)))
 		
 		# Get the class name length
-		var classNameLength = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 10, 14)))
-		# Get the class name
-		#var className = PoolByteArray(Util.slice_array(responseData, 14, 14 + classNameLength))
+		var errorStringLength = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 10, 14)))
 		
 		# Slice off the first two values and the two ints, they are the failure short, etc
-		var stringData = PoolByteArray(Util.slice_array(responseData, 14 + classNameLength))
+		var stringData = PoolByteArray(Util.slice_array(responseData, 14 + errorStringLength))
 		
 		# Turn the error data into a string and print it
 		var errorString = "File Update Error: " + stringData.get_string_from_ascii() + "\n"
@@ -319,3 +323,15 @@ func _notification(what):
 		client.disconnect_from_host()
 		
 		get_tree().quit()
+
+
+func stop_running():
+	# Not running
+	running = false
+	
+	# Clear to send
+	toSend.clear()
+	
+	# Clear the maps
+	entityMap = {}
+	entityPlaceholderMap = {}

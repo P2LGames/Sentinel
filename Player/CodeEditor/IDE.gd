@@ -5,7 +5,6 @@ var IDEFile = load("res://Player/CodeEditor/IDEFile.gd")
 var currentFile = null
 var currentFilePath: String = ""
 
-var files = []
 var itemPathToFile: Dictionary = {}
 
 var loaded = false
@@ -21,21 +20,30 @@ func _ready():
 	loaded = true
 	
 	# Setup the root of the file tree
-	get_file_tree().create_item()
+#	get_file_tree().create_item()
 	get_file_tree().set_hide_root(true)
 	
-	add_directory(Constants.GENERIC_CODE_DIR)
+#	add_directory(Constants.GENERIC_CODE_DIR)
+	get_file_tree().set_root_to_path(Constants.PLAYER_CODE_DIR)
 	
 	# Set ourselves to be invisible
 	visible = false
 	
 	# Select the first file
-	get_file_tree().get_root().get_children().get_children().select(0)
-	#file_selected(1)
+#	get_file_tree().get_root().get_children().get_children().select(0)
 
 
 func _process(delta):
+	# Only do stuff if we are visible
 	if visible:
+		# Input handling
+		if Input.is_action_just_pressed("ide_save"):
+			save_file()
+		elif Input.is_action_just_pressed("ide_recompile"):
+			recompile()
+		elif Input.is_action_just_pressed("hide_window"):
+			hide()
+		
 		if rect_global_position != savedPosition:
 			# Save it's position...
 			savedPosition = rect_global_position
@@ -53,83 +61,13 @@ func _unhandled_key_input(event):
 	if currentFile == null:
 		return
 	
-	if Input.is_action_just_pressed("ide_save"):
-		save_file()
-	elif Input.is_action_just_pressed("ide_recompile"):
-		recompile()
-	elif Input.is_action_just_pressed("hide_window"):
-		hide()
-
-
-# Revert to default code and reset focus
-func reset_code():
-	# If our current file is null, do nothing
-	if currentFile == null:
-		return
 	
-	currentFile.reset_code()
-	
-	# Set the editor text
-	get_text_editor().set_text(currentFile.get_display_text())
-	
-	# Set the focus line and column
-	currentFile.set_focus_line(0)
-	currentFile.set_focus_col(0)
-	
-	# Set the focus in the new text
-	set_focus()
-
-
-func add_directory(dir: String):
-	# Create the folder item
-	var fileTree = get_file_tree()
-	var folder = fileTree.create_item(fileTree.get_root())
-	
-	# Set the folder to the file name
-	var folderName = Util.get_file_name(dir)
-	folder.set_text(0, folderName)
-	
-	# Get the files in the original code
-	var files = get_files_in_directory(dir)
-	
-	# Add each file to our list
-	for file in files:
-		# Get the file name
-		var fileName = file.split(".")[0]
-		
-		# Create a new ide file
-		var newIDEFile = IDEFile.new(dir, file, fileName)
-		
-		# Create a tree item with it, with folder as the parent
-		var treeItem = fileTree.create_item(folder)
-		treeItem.set_text(0, fileName)
-		
-		# Create the item's path
-		var itemPath = fileTree.get_path_from_item(treeItem)
-		
-		# Save it to our dictionary
-		itemPathToFile[itemPath] = newIDEFile
-
-
-# When a file is selected, code editor should load it
-func file_selected():
-	# Get the selected item
-	var selectedItem = get_file_tree().get_selected()
-	
-	# Get the item path
-	var itemPath = get_file_tree().get_path_from_item(selectedItem)
-	
-	# Set the current file and the item path to it
-	if itemPath in itemPathToFile.keys():
-		# Set the current file and the file path
-		currentFile = itemPathToFile[itemPath]
-		currentFilePath = itemPath
-		
-		# Set the text to the current file
-		get_text_editor().set_text(currentFile.get_display_text())
 
 
 func save_file():
+	if currentFile == null:
+		return
+	
 	save_focus()
 	
 	get_file_tree().file_saved(currentFilePath)
@@ -142,6 +80,9 @@ func save_all_files():
 
 
 func recompile():
+	if currentFile == null:
+		return
+	
 	# Save the current file
 	save_file()
 	
@@ -158,6 +99,32 @@ func recompile():
 	if targetEntityId != null and className != null:
 		# Recompile his code with this one
 		CommunicationManager.file_update(targetEntityId, -1, className, fileText)
+		
+		# Set the current class folder
+		Player.get_inspected_entity().get_reprogrammable_component().currentClassPath = currentFilePath
+
+
+func recompile_entity_from_file(entity, entityId, filePath):
+	# Get the ide file
+	var ideFile = get_file_tree().get_file_from_path(filePath)
+	
+	# If the ide file is null, stop
+	if ideFile == null:
+		return
+	
+	# Get the class name
+	var className = ideFile.get_class_name()
+	
+	# Get the file text
+	var fileText = ideFile.get_text()
+	
+	# If the inspected entity exists and we have a class name
+	if className != null:
+		# Recompile his code with this one
+		CommunicationManager.file_update(entityId, -1, className, fileText)
+		
+		# Set the class folder
+		entity.get_reprogrammable_component().currentClassPath = filePath
 
 
 func save_focus():
@@ -221,36 +188,6 @@ func get_file_tree():
 	return $LeftBar/FileTree
 
 
-func get_files_in_directory(fileDirectory):
-	var files = []
-	var dir = Directory.new()
-	
-	# Open new directory
-	dir.open(fileDirectory)
-	
-	# Begin listing the files in the directory
-	dir.list_dir_begin()
-	
-	# While there are still files, 
-	while true:
-		# Get the next file
-		var file = dir.get_next()
-		
-		# If it was empty, stop
-		if file == "":
-			break
-		
-		# As long as the file doesn't start with a period, add it
-		elif not file.begins_with("."):
-			files.append(file)
-	
-	# End the listing
-	dir.list_dir_end()
-	
-	# Return all files in the directory
-	return files
-
-
 """ SETTERS """
 
 func set_target_name(text: String):
@@ -300,10 +237,6 @@ func set_visible(value: bool):
 
 """ SIGNALS """
 
-func _on_ResetButton_pressed():
-	reset_code()
-
-
 func _on_RecompileButton_pressed():
 	recompile()
 
@@ -313,11 +246,14 @@ func _on_CloseButton_pressed():
 
 
 func _on_save_all_files():
-	for file in files:
+	for file in itemPathToFile.values():
 		file.save_to_disk()
 
 
 func _on_TextEditor_text_changed():
+	if not currentFile:
+		return
+	
 	# Get the new text
 	var newText = get_text_editor().text
 	
@@ -339,6 +275,9 @@ func _on_TextEditor_text_changed():
 
 
 func _on_TextEditor_cursor_changed():
+	if not currentFile:
+		return
+	
 	currentFile.set_focus_line(get_text_editor().cursor_get_line())
 	currentFile.set_focus_col(get_text_editor().cursor_get_column())
 
@@ -359,9 +298,23 @@ func _on_TargetEntity_class_changed(newClass):
 	set_target_class(newClass)
 
 
-func _on_FileTree_item_selected():
-	file_selected()
-
-
 func _on_IDE_resized():
 	save_rect_information()
+
+
+func _on_FileTree_file_selected(file, filePath):
+	# Update the current file and path
+	currentFile = file
+	currentFilePath = filePath
+	
+	# Set the text to the current file
+	get_text_editor().set_text(currentFile.get_display_text())
+
+
+func _on_IDE_about_to_show():
+	# Should process
+	set_process(true)
+
+
+func _on_IDE_popup_hide():
+	set_process(false)

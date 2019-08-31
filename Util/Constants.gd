@@ -1,5 +1,11 @@
 extends Node
 
+""" STRINGS """
+
+const CONFIRM_OVERWRITE_TEXT = """You are about to overwrite the file: {file}.
+Are you certain you want to overwrite this file?"""
+
+
 """ PLAYER """
 
 const CLICK_RAY_LENGTH = 1000
@@ -8,9 +14,9 @@ const CLICK_RAY_LENGTH = 1000
 """ IDE AND CODE """
 
 const GENERIC_CODE_DIR = "res://Player/OriginalCode/"
-const PLAYER_CODE_DIR = "user://Code/"
-
 const LEVEL_1_CODE_DIR = "res://Scenes/Level_1/Level_1_Code/"
+
+const PLAYER_CODE_DIR = "user://Code/"
 
 const HIDE_ROWS = "// HIDE ROWS:" # Put number at end to hide that many rows
 const DO_NOT_EDIT_START = '// DO NOT EDIT BELOW THIS LINE'
@@ -62,7 +68,8 @@ const IDE_RECT_FILE = IDE_DIRECTORY + "ide_rect"
 const OUTPUT_RECT_FILE = IDE_DIRECTORY + "output_rect"
 const IDE_METADATA_FILE = IDE_DIRECTORY + "ide_metadata"
 
-const SAVE_FILE_TYPE = ".save"
+const SAVE_FILE_TYPE = "save"
+const SAVE_FILE_EXTENSION = "." + SAVE_FILE_TYPE
 
 """ LAYERS """
 

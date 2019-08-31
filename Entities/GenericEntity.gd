@@ -1,5 +1,6 @@
 extends KinematicBody
 
+export var notReprogrammable = false
 export var displayName = ""
 
 var isReprogrammable = false
@@ -28,6 +29,8 @@ func print_message(message: String, type: int):
 func get_reprogrammable_component():
 	if isReprogrammable:
 		return get_node("Reprogrammable")
+	
+	return null
 
 
 func get_reprogrammable_id():

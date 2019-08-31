@@ -24,10 +24,6 @@ func _process(delta):
 
 
 func _unhandled_key_input(event):
-	if visible:
-		accept_event()
-	else:
-		return
 	
 	if visible and Input.is_action_just_pressed(\"hide_window\"):
 		hide()

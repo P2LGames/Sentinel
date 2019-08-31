@@ -4,11 +4,14 @@ export (String, "Robot") var entityType = "Robot"
 
 var entityId: String = ""
 var ready: bool = false
+var hasLoaded: bool = true
 var registerMessageSent: bool = false
 
 var currentOutput := Array()
 
 # Default and current classes
+var defaultClassPath: String = ""
+var currentClassPath: String = ""
 var defaultClass: String = ""
 var currentClass: String = ""
 
@@ -17,8 +20,9 @@ signal class_changed(newClass)
 
 
 func _ready():
-	# We are processing
-	set_process(true)
+	if get_parent().notReprogrammable:
+		# We are processing
+		set_process(false)
 
 
 func print_message(message: String, type: int):
@@ -40,8 +44,15 @@ func _process(delta: float):
 	# If we have not sent our register message, keep trying to send it
 	if not registerMessageSent:
 		registerMessageSent = CommunicationManager.register_entity(get_parent(), Constants.TYPE_TO_TYPE_ID[entityType])
+	# Otherwise, see if we need loading, if we do, wait until we are ready
+	elif not hasLoaded and ready:
+		# Try to recompile his code
+		Player.get_ide().recompile_entity_from_file(get_parent(), 
+			int(entityId), currentClassPath)
+		
+		hasLoaded = true
 	# Otherwise, meaning we sent the message, stop trying to send it, and turn process off
-	else:
+	elif hasLoaded:
 		set_process(false)
 
 
@@ -82,7 +93,8 @@ func set_current_class(_class: String):
 
 func save():
 	var saveData = {
-		"currentClass": currentClass
+		"currentClass": currentClass,
+		"currentClassPath": currentClassPath
 	}
 	
 	return saveData
@@ -90,7 +102,15 @@ func save():
 
 func load_from_data(data: Dictionary):
 	currentClass = data["currentClass"]
-
+	currentClassPath = data["currentClassPath"]
+	
+	# If the current class path is not equal to the default
+	if currentClassPath == defaultClassPath:
+		# We have not yet completed our load in
+		hasLoaded = false
+		
+		# Set process to true
+		set_process(true)
 
 
 

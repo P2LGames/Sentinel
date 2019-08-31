@@ -211,7 +211,7 @@ func save():
 
 func load_from_data(data: Dictionary):
 	# Load in the same data that was saved
-	orders = data["order"]
+	orders = data["orders"]
 	currOrders = data["currOrders"]
 	currentTurnAmount = data["currTurnAmount"]
 	

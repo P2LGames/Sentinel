@@ -13,8 +13,8 @@ var isSelectingMultiple = false
 var outputRepopup = false
 var ide
 
+# Input and views
 var shouldProcessInput = false
-
 var viewStack = []
 
 signal game_pause()
@@ -50,6 +50,21 @@ func game_resume():
 	
 	# Hide the ingame UI, show the pause menu
 	pop_view_from_stack()
+
+
+func game_save(fileName):
+	# Save the game
+	SavingManager.save_game(fileName)
+	
+	# Remove the text from the line edit
+	get_save_game_line_edit().text = ""
+	get_save_game_line_edit().emit_signal("text_changed", "")
+	
+	# Go back to the pause menu
+	pop_view_from_stack()
+	
+	# Update the save game list
+	get_save_game_list().update()
 
 
 """ INPUT """
@@ -109,8 +124,12 @@ func handle_input():
 	# Pause the game if escape is pressed
 	elif (not ide.visible 
 		and not get_output_popup().visible 
+		and not get_pause_menu().visible
 		and Input.is_action_just_pressed("hide_window")):
 		game_pause()
+	elif (get_pause_menu().visible
+		and Input.is_action_just_pressed("hide_window")):
+		game_resume()
 	
 	# If we want to select multiple people we can
 	isSelectingMultiple = Input.is_action_pressed("select_multiple")
@@ -326,6 +345,18 @@ func get_quit_menu():
 	return $Menus/MenusContainer/QuitMenu
 
 
+func get_confirmation_dialog():
+	return $Menus/ConfirmOverwritePopup
+
+
+func get_save_game_line_edit():
+	return $Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit
+
+
+func get_save_game_list():
+	return $Menus/MenusContainer/SaveMenu/SaveGameList
+
+
 """ SETTERS """
 
 func set_inspected_entity(entity):
@@ -415,6 +446,34 @@ func _on_game_start():
 	shouldProcessInput = true
 
 
+func _on_game_save():
+	var fileName = get_save_game_line_edit().text
+	var fileNameActual = fileName + Constants.SAVE_FILE_EXTENSION
+	
+	# Check to see if we can save the game
+	var savedGames = SavingManager.get_saved_games()
+	
+	# If the file name is in the saved games keys
+	if fileNameActual in savedGames.keys():
+		# Then the player is trying to overwrite a save, ensure they want to do this
+		get_confirmation_dialog().set_file_name(fileName)
+		get_confirmation_dialog().popup()
+		
+		# Stop here
+		return
+	
+	# Save the game
+	game_save(fileName)
+
+
+func _on_game_save_overwrite():
+	# Get the file name
+	var fileName = get_save_game_line_edit().text
+	
+	# Save the game
+	game_save(fileName)
+
+
 func _on_Inspect_id_pressed(ID):
 	# Edit was clicked
 	if ID == Constants.INSPECT_ITEMS.EDIT_CODE:
@@ -437,13 +496,13 @@ func _on_Resume_pressed():
 	game_resume()
 
 
-func _on_SaveGame_pressed():
-	emit_signal("game_save")
-	# Change this to have a UI that lets them add the save game name
-
-
 func _on_QuitGame_pressed():
 	emit_signal("game_quit")
+	
+	# clear all the current variables
+	inspectedEntity = null
+	selectedEntities.clear()
+	pressedKeys.clear()
 	
 	# We should not process user input
 	shouldProcessInput = false

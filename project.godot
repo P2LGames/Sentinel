@@ -35,10 +35,11 @@ config/icon="res://icon.png"
 Util="*res://Util/Util.gd"
 Constants="*res://Util/Constants.gd"
 Models="*res://Util/Models.gd"
+SavingManager="*res://Util/SavingManager.gd"
+FileManager="*res://Util/FileManager.gd"
+SceneManager="*res://Scenes/SceneManager.gd"
 CommunicationManager="*res://Communication/CommunicationManager.tscn"
 Player="*res://Player/Player.tscn"
-SavingManager="*res://Util/SavingManager.gd"
-SceneManager="*res://Scenes/SceneManager.gd"
 
 [debug]
 

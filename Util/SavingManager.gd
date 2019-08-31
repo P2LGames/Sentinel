@@ -1,18 +1,22 @@
 extends Node
 
+signal save_deleted(saveName)
+signal save_added(saveName, savePath)
+
 """ GAME """
 
 func save_game(saveName: String):
 	# Make sure the save directory exists
 	var dir := Directory.new()
 	if not dir.dir_exists(Constants.PLAYER_SAVE_DIR):
-		dir.make_dir(Constants.PLAYER_SAVE_DIR)
+		dir.make_dir_recursive(Constants.PLAYER_SAVE_DIR)
 	
 	# Create a save file
 	var saveFile = File.new()
 	
 	# Open the save file
-	saveFile.open(Constants.PLAYER_SAVE_DIR + saveName + Constants.SAVE_FILE_TYPE, File.WRITE)
+	saveFile.open(Constants.PLAYER_SAVE_DIR + saveName + Constants.SAVE_FILE_EXTENSION, File.WRITE)
+	print(Constants.PLAYER_SAVE_DIR + saveName + Constants.SAVE_FILE_EXTENSION)
 	
 	# Save the map
 	var map = get_tree().get_nodes_in_group("PersistMap")[0]
@@ -28,36 +32,55 @@ func save_game(saveName: String):
 	
 	# Close the file
 	saveFile.close()
+	
+	# A save was added
+	emit_signal("save_added", saveName + Constants.SAVE_FILE_EXTENSION, 
+		Constants.PLAYER_SAVE_DIR + saveName + Constants.SAVE_FILE_EXTENSION)
 
 
 func load_game(savePath: String):
+	print("Loading: ", savePath)
 	var saveFile = File.new()
 	if not saveFile.file_exists(savePath):
+		print("Couldn't load game")
 		return # Error! We don't have a save to load.
 	
-	# We need to revert the game state so we're not cloning objects
-	# during loading. This will vary wildly depending on the needs of a
-	# project, so take care with this step.
-	# For our example, we will accomplish this by deleting saveable objects.
-	var saveNodes = get_tree().get_nodes_in_group("Persist")
-	for i in saveNodes:
-		i.queue_free()
-	
-	# Load the file line by line and process that dictionary to restore
-	# the object it represents.
+	# Open the file
 	saveFile.open(savePath, File.READ)
+	
+	# Swap to the map
+	var mapPath = saveFile.get_line()
+	
+	# Track load data
+	var loadData = []
+	
+	# While we have not reached the end of the file
 	while not saveFile.eof_reached():
+		# Get the object data
 		var objectData = parse_json(saveFile.get_line())
-		# Firstly, we need to create the object and add it to the tree and set its position.
-		var newObject = load(objectData["filename"]).instance()
-		get_node(objectData["parent"]).add_child(newObject)
 		
-		# If the object has the method load_from_data, call it with the remaining data
-		if newObject.has_method("load_from_data"):
-			newObject.load_from_data(objectData)
+		# Add it to our load data, if it isn't null
+		if objectData != null:
+			loadData.append(objectData)
 	
 	# Close the file
 	saveFile.close()
+	
+	# Go to the scene
+	SceneManager.load_scene_with_data(mapPath, loadData)
+
+
+func get_saved_games():
+	var savedGamesList = FileManager.get_dir_contents(Constants.PLAYER_SAVE_DIR)
+	
+	return savedGamesList
+
+
+func delete_saved_game(filePath):
+	FileManager.delete(filePath)
+	
+	# Emit a save deleted signal
+	emit_signal("save_deleted", FileManager.get_file_name(filePath))
 
 
 """ IDE """

@@ -1,6 +1,5 @@
 class_name IDEFile
 
-var _origPath
 var _currPath
 var _className
 var _focusLine
@@ -18,9 +17,8 @@ var requiredWhole = ""
 var permissionsLevel = 0
 
 
-func _init(originalPath, fileName, className):
-	self._origPath = originalPath + fileName
-	self._currPath = Constants.PLAYER_CODE_DIR + fileName
+func _init(filePath: String, className: String):
+	self._currPath = filePath
 	self._className = className
 	self._focusLine = 0
 	self._focusCol = 0
@@ -32,25 +30,16 @@ func _init(originalPath, fileName, className):
 	if not currentCodePath.dir_exists(Constants.PLAYER_CODE_DIR):
 		currentCodePath.make_dir(Constants.PLAYER_CODE_DIR)
 	
-	# Create new file readers and writers
+	# Create new file reader
 	var fileReader = File.new()
-	var fileWriter = File.new()
 	
-	# If the files doesn't exist, make it
-	# If we haven't edited/created this file before, the current code is the same as the original code
-	if not fileWriter.file_exists(self._currPath):
-		fileWriter.open(self._currPath, File.WRITE)
-		fileReader.open(self._origPath, File.READ)
-		self._text = fileReader.get_as_text()
-		
-		fileWriter.store_line(self._text)
-	# Otherwise, set the unsaved text to the current code
-	else:
-		fileReader.open(self._currPath, File.READ)
-		self._text = fileReader.get_as_text()
+	# Open it up
+	fileReader.open(self._currPath, File.READ)
+	
+	# Get the text of the file
+	self._text = fileReader.get_as_text()
 	
 	# Close our file streams
-	fileWriter.close()
 	fileReader.close()
 	
 	# Setup display text
@@ -371,39 +360,15 @@ func is_valid_code(text: String):
 	# is what we expect so we don't fail to regenerate code if the user typed it themselves
 
 
-# Overwrite current code with original code
-func reset_code():
-	# Create a reader and a writer
-	var fileReader = File.new()
-	var fileWriter = File.new()
-	
-	# Open both files to the current and original path
-	fileReader.open(_origPath, File.READ)
-	fileWriter.open(_currPath, File.WRITE)
-	
-	# Set the text to the read file
-	self._text = fileReader.get_as_text()
-	
-	# Setup the display text
-	setup_display_text()
-	
-	# Store the new text
-	fileWriter.store_line(self._text)
-	
-	# Close the reader and writer
-	fileWriter.close()
-	fileReader.close()
-
-
 # Save the copy of the code currently loaded in the game
 func save_to_disk():
 	# Create the code from the display text
-	var toSave = create_code_from_display_text()
+	_text = create_code_from_display_text()
 	
 	# Write a new file with the text
 	var fileWriter = File.new()
 	fileWriter.open(self._currPath, File.WRITE)
-	fileWriter.store_line(toSave)
+	fileWriter.store_line(_text)
 
 
 # Split up the source code file in chunks based on what the user can do with each chunk. Determined by comments in the source file
@@ -467,10 +432,6 @@ func get_text():
 
 func get_display_text():
 	return self._displayText
-
-
-func get_orig_path():
-	return self._origPath
 
 
 func get_curr_path():

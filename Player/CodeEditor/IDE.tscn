@@ -57,9 +57,11 @@ script = ExtResource( 1 )
 
 [node name="LeftBar" type="Control" parent="."]
 anchor_bottom = 1.0
-margin_right = 170.0
+margin_left = 0.373535
+margin_right = 170.374
 
 [node name="EntityData" type="VBoxContainer" parent="LeftBar"]
+editor/display_folded = true
 margin_left = 2.0
 margin_right = 190.0
 margin_bottom = 101.0
@@ -147,7 +149,7 @@ margin_top = -6.96616
 margin_right = 190.0
 margin_bottom = 7.03384
 rect_min_size = Vector2( 90, 0 )
-text = "Robot Default"
+text = "None"
 valign = 1
 clip_text = true
 
@@ -157,39 +159,40 @@ anchor_bottom = 1.0
 margin_left = -1.0
 margin_top = 109.0
 margin_right = -1.0
-margin_bottom = -96.0
+margin_bottom = -103.8
 script = ExtResource( 3 )
 
 [node name="Buttons" type="VBoxContainer" parent="LeftBar"]
-editor/display_folded = true
 anchor_left = 0.05
 anchor_top = 1.0
 anchor_right = 0.95
 anchor_bottom = 1.0
-margin_top = -94.0
-margin_bottom = -2.0
-
-[node name="ResetButton" type="Button" parent="LeftBar/Buttons"]
-margin_right = 153.0
-margin_bottom = 20.0
-text = "Reset"
+margin_left = 0.5
+margin_top = -99.0
+margin_right = 0.5
+margin_bottom = -5.0
 
 [node name="RecompileButton" type="Button" parent="LeftBar/Buttons"]
-margin_top = 24.0
 margin_right = 153.0
-margin_bottom = 44.0
+margin_bottom = 28.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "Recompile"
 
 [node name="SaveButton" type="Button" parent="LeftBar/Buttons"]
-margin_top = 48.0
+margin_top = 32.0
 margin_right = 153.0
-margin_bottom = 68.0
+margin_bottom = 60.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "Save"
 
 [node name="CloseButton" type="Button" parent="LeftBar/Buttons"]
-margin_top = 72.0
+margin_top = 64.0
 margin_right = 153.0
-margin_bottom = 92.0
+margin_bottom = 94.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "Close"
 
 [node name="TextEditor" type="TextEdit" parent="."]
@@ -226,8 +229,8 @@ script = SubResource( 2 )
 [connection signal="file_dirtied" from="." to="LeftBar/FileTree" method="_on_IDE_file_dirtied"]
 [connection signal="resized" from="." to="." method="_on_IDE_resized"]
 [connection signal="text_changed" from="LeftBar/EntityData/EntityName/TargetName" to="." method="_on_TargetName_text_changed"]
-[connection signal="item_selected" from="LeftBar/FileTree" to="." method="_on_FileTree_item_selected"]
-[connection signal="pressed" from="LeftBar/Buttons/ResetButton" to="." method="_on_ResetButton_pressed"]
+[connection signal="file_selected" from="LeftBar/FileTree" to="." method="_on_FileTree_file_selected"]
+[connection signal="item_selected" from="LeftBar/FileTree" to="LeftBar/FileTree" method="_on_FileTree_item_selected"]
 [connection signal="pressed" from="LeftBar/Buttons/RecompileButton" to="." method="_on_RecompileButton_pressed"]
 [connection signal="pressed" from="LeftBar/Buttons/SaveButton" to="." method="_on_SaveButton_pressed"]
 [connection signal="pressed" from="LeftBar/Buttons/CloseButton" to="." method="_on_CloseButton_pressed"]
