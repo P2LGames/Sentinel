@@ -81,6 +81,7 @@ func get_default_class():
 """ ENTITY PERSISTENCE """
 
 func save():
+	var basisQuat = Quat(transform.basis)
 	var saveData = {
 		"filename": get_filename(),
 		"parent": get_parent().get_path(),
@@ -89,9 +90,10 @@ func save():
 		"posX": global_transform.origin.x,
 		"posY": global_transform.origin.y,
 		"posZ": global_transform.origin.z,
-		"basisX": global_transform.basis.x,
-		"basisY": global_transform.basis.y,
-		"basisZ": global_transform.basis.z,
+		"basisX": basisQuat.x,
+		"basisY": basisQuat.y,
+		"basisZ": basisQuat.z,
+		"basisW": basisQuat.w
 	}
 	
 	return saveData
@@ -102,7 +104,8 @@ func load_from_data(data: Dictionary):
 	displayName = data["displayName"]
 	
 	global_transform.origin = Vector3(data["posX"], data["posY"], data["posZ"])
-	global_transform.basis = Vector3(data["basisX"], data["basisY"], data["basisZ"])
+	transform.basis = Basis(Quat(data["basisX"], data["basisY"], data["basisZ"], data["basisW"]))
+	
 #		"name": name,
 #		"displayName": get_display_name(),
 #		"posX": global_transform.origin.x,

@@ -101,11 +101,9 @@ func save():
 func load_from_data(data: Dictionary):
 	currentClass = data["currentClass"]
 	currentClassPath = data["currentClassPath"]
-	print("Loaded class: ", currentClassPath)
 	
 	# If the current class path is not equal to the default
 	if currentClassPath != defaultClassPath:
-		print("Loading different class path")
 		# We have not yet completed our load in
 		hasLoaded = false
 		
