@@ -81,8 +81,6 @@ func set_id(newId: String):
 
 
 func set_current_class(_class: String):
-	print("Setting new class: " + _class)
-	
 	currentClass = _class
 	
 	# Emit a signal saying that the class changed
@@ -103,9 +101,11 @@ func save():
 func load_from_data(data: Dictionary):
 	currentClass = data["currentClass"]
 	currentClassPath = data["currentClassPath"]
+	print("Loaded class: ", currentClassPath)
 	
 	# If the current class path is not equal to the default
-	if currentClassPath == defaultClassPath:
+	if currentClassPath != defaultClassPath:
+		print("Loading different class path")
 		# We have not yet completed our load in
 		hasLoaded = false
 		

@@ -61,7 +61,6 @@ func _on_NewGame_pressed():
 
 
 func _on_load_game():
-	print(selectedFilePath)
 	if selectedFilePath != "":
 		SavingManager.load_game(selectedFilePath)
 

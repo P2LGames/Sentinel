@@ -52,7 +52,6 @@ func _process(delta):
 	# We can print
 	if orders.size() > 0:
 		if ORDER_TYPES.PRINT in orders[0]:
-			print(orders[0].split(":")[1])
 			orders.remove(0)
 	
 	# If we are ready to send stuff, and we haven't processed, process!
@@ -63,10 +62,7 @@ func _process(delta):
 
 
 func _physics_process(delta):
-	
 	if movement != Vector3.ZERO:
-		print(movement)
-		print(global_transform.origin)
 		move_and_slide(movement)
 
 
@@ -232,6 +228,7 @@ func save():
 		if pos == ATTACHMENT_POSITIONS.SELF or positionToAttachment[pos] == null:
 			continue
 		
+		print("Position: ", pos)
 		saveData["attachmentData"][pos] = positionToAttachment[pos].save()
 	
 	# Return the save data
@@ -242,30 +239,34 @@ func load_from_data(data: Dictionary):
 	# Load in the parent data
 	.load_from_data(data)
 	
-	# Clear the current information
-	positionToAttachment = {}
-	
 	# Load the reprogrammable stuff
 	get_reprogrammable_component().load_from_data(data["reprogrammableData"])
 	
+	# Clear the current attachment information
+	positionToAttachment.clear()
+	
+	# Add the robot
+	add_attachment(ATTACHMENT_POSITIONS.SELF, self)
+	
 	# Load component orders
 	var attachmentData = data["attachmentData"]
-	print(attachmentData)
+	
 	for pos in attachmentData.keys():
+
+		# Get the parent path
+		var parentPath = FileManager.join(str(get_path()), attachmentData[pos]["parent"])
+		print("Parent: ", parentPath)
+		
 		# Create a new attachment using the name and path
 		var attachment = load(attachmentData[pos]["filename"]).instance()
-		get_node(attachmentData[pos]["parent"]).add_child(attachment)
+		get_node(parentPath).add_child(attachment)
+		
+		
+		# Add the attachment
+		add_attachment(int(pos), attachment)
 		
 		# Pass the attachment its load data
 		attachment.load_from_data(attachmentData[pos])
-		
-		# Add the attachment to the position to attachment dict
-		positionToAttachment[int(pos)] = attachment
-		
-		# If they have the set robot, set them to be ourselves
-		if attachment.has_method("set_robot"):
-			attachment.set_robot(self)
-			
 
 
 """ SIGNALS """

@@ -73,7 +73,6 @@ func parse_orders():
 			# If there are more than 4 bytes, then its a string
 			if orders[0].parameter.size() > 4:
 				rotateParam = orders[0].parameter.get_string_from_ascii()
-				print(rotateParam)
 			# Otherwise, it's a float defining the angle wa 
 			else:
 				rotateParam = Util.bytes2float(orders[0].parameter)
@@ -194,10 +193,12 @@ func pass_order(orderType: int, orderBytes: PoolByteArray):
 """ PERSISTENCE """
 
 func save():
+	var localPath = str(get_parent().get_path()).replace(str(robot.get_path()), "")
+	
 	# Save the data required to make this component function
 	var saveData = {
 		"filename": get_filename(),
-		"parent": get_parent().get_path(),
+		"parent": localPath,
 		"orders": orders,
 		"currOrders": currOrders,
 		"currTurnAmount": currentTurnAmount,

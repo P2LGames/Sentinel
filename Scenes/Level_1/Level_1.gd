@@ -7,8 +7,6 @@ func _ready():
 	# Add the level 1 code directory to the file tree
 #	Player.get_ide().add_directory(Constants.LEVEL_1_CODE_DIR)
 	FileManager.copy_dir(Constants.LEVEL_1_CODE_DIR, Constants.PLAYER_CODE_DIR)
-	
-	print(FileManager.get_files_in_directory(Constants.PLAYER_CODE_DIR))
 
 
 """ SIGNALS """

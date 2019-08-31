@@ -23,7 +23,12 @@ script/source = "extends Button
 
 
 func _on_SaveGameList_file_selected(fileName, fileNameActual, filePath):
-	disabled = false"
+	disabled = false
+
+
+func _on_SaveGameList_list_empty():
+	disabled = true
+"
 
 [sub_resource type="GDScript" id=2]
 script/source = "extends Button
@@ -31,6 +36,10 @@ script/source = "extends Button
 
 func _on_SaveGameList_file_selected(fileName, fileNameActual, filePath):
 	disabled = false
+
+
+func _on_SaveGameList_list_empty():
+	disabled = true
 "
 
 [node name="MainMenu" type="Spatial"]
@@ -284,9 +293,11 @@ script = SubResource( 2 )
 [connection signal="pressed" from="Menus/LevelSelect/ScrollContainer/VBoxContainer/LevelContainer/Play" to="Menus/LevelSelect/ScrollContainer/VBoxContainer/LevelContainer/Play" method="_on_Play_pressed"]
 [connection signal="pressed" from="Menus/LevelSelect/Back" to="." method="_on_Back_pressed"]
 [connection signal="file_chosen" from="Menus/LoadLevel/SaveGameList" to="." method="_on_load_game"]
-[connection signal="file_selected" from="Menus/LoadLevel/SaveGameList" to="." method="_on_SaveGameList_file_selected"]
 [connection signal="file_selected" from="Menus/LoadLevel/SaveGameList" to="Menus/LoadLevel/HBoxContainer/Delete" method="_on_SaveGameList_file_selected"]
 [connection signal="file_selected" from="Menus/LoadLevel/SaveGameList" to="Menus/LoadLevel/HBoxContainer/LoadLevel" method="_on_SaveGameList_file_selected"]
+[connection signal="file_selected" from="Menus/LoadLevel/SaveGameList" to="." method="_on_SaveGameList_file_selected"]
+[connection signal="list_empty" from="Menus/LoadLevel/SaveGameList" to="Menus/LoadLevel/HBoxContainer/Delete" method="_on_SaveGameList_list_empty"]
+[connection signal="list_empty" from="Menus/LoadLevel/SaveGameList" to="Menus/LoadLevel/HBoxContainer/LoadLevel" method="_on_SaveGameList_list_empty"]
 [connection signal="pressed" from="Menus/LoadLevel/HBoxContainer/Back" to="." method="_on_Back_pressed"]
 [connection signal="pressed" from="Menus/LoadLevel/HBoxContainer/Delete" to="." method="_on_Delete_pressed"]
 [connection signal="pressed" from="Menus/LoadLevel/HBoxContainer/LoadLevel" to="." method="_on_load_game"]

@@ -8,6 +8,7 @@ var currentSelection = -1
 
 signal file_selected(fileName, fileNameActual, filePath)
 signal file_chosen()
+signal list_empty()
 
 
 func _ready():
@@ -19,7 +20,6 @@ func _ready():
 
 
 func update():
-	print(\"Got here\")
 	# Load the saved games
 	saveGameFiles = SavingManager.get_saved_games()
 	
@@ -36,6 +36,9 @@ func update():
 	if get_item_count() == 0:
 		# Reset current selection
 		currentSelection = -1
+		
+		# List is empty
+		emit_signal(\"list_empty\")
 	# Otherwise, if we have a current select, select the item we had selected previously
 	elif currentSelection != -1:
 		# Be sure to bound the current selection to the last item if we had something after that
@@ -44,6 +47,7 @@ func update():
 		
 		# Select the item
 		select(currentSelection)
+		emit_signal(\"item_selected\", currentSelection)
 
 
 \"\"\" SIGNALS \"\"\"
