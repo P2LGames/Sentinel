@@ -13,8 +13,8 @@ const CLICK_RAY_LENGTH = 1000
 
 """ IDE AND CODE """
 
-const GENERIC_CODE_DIR = "res://Player/OriginalCode/"
-const LEVEL_1_CODE_DIR = "res://Scenes/Level_1/Level_1_Code/"
+const GENERIC_CODE_DIR = "res://Code/Default/"
+const LEVEL_1_CODE_DIR = "res://Code/Level_1/"
 
 const PLAYER_CODE_DIR = "user://Code/"
 

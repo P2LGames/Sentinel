@@ -11,7 +11,7 @@ var isSelectingMultiple = false
 
 # ide and output
 var outputRepopup = false
-var ide
+var ide = null
 
 # Input and views
 var shouldProcessInput = false
@@ -39,6 +39,9 @@ func game_pause():
 	
 	# Hide the ingame UI, show the pause menu
 	push_view_to_stack(get_pause_menu())
+	
+	# Pause the scene
+	get_tree().paused = true
 
 
 func game_resume():
@@ -50,6 +53,9 @@ func game_resume():
 	
 	# Hide the ingame UI, show the pause menu
 	pop_view_from_stack()
+	
+	# Unpause the scene
+	get_tree().paused = false
 
 
 func game_save(fileName):
@@ -115,12 +121,12 @@ func handle_key_input(code: int, pressed: int):
 func handle_input():
 	# Show editor if tab is pressed
 	if not ide.visible and Input.is_action_just_pressed("show_ide"):
-		show_ide()
+		ide_show()
 	# Show the output if tilde is pressed
 	elif (not ide.visible 
 		and not get_output_popup().visible 
 		and Input.is_action_just_pressed("show_output")):
-		show_output()
+		output_show()
 	# Pause the game if escape is pressed
 	elif (not ide.visible 
 		and not get_output_popup().visible 
@@ -246,7 +252,36 @@ func inspect_entity(clickedEntity):
 
 """ UI HANDLING """
 
-func show_output():
+
+func ide_show():
+	# Show the IDE
+	ide.popup()
+	
+	# Hide the output popup and track if it is visible
+	outputRepopup = get_output_popup().visible
+	get_output_popup().hide()
+	
+	# Update the pause button
+	update_pause_button()
+
+
+func ide_hide():
+	# If we want to show our popup, do so
+	if outputRepopup:
+		get_output_popup().popup()
+	
+	# Set output visible to false
+	outputRepopup = false
+	
+	# Update the pause button
+	update_pause_button()
+
+
+func ide_update_files():
+	ide.update_file_tree()
+
+
+func output_show():
 	# Get the output popup
 	var popup = get_output_popup()
 	
@@ -258,24 +293,14 @@ func show_output():
 	
 	# Show the popup
 	popup.popup()
-
-
-func show_ide():
-	# Show the IDE
-	ide.popup()
 	
-	# Hide the output popup and track if it is visible
-	outputRepopup = get_output_popup().visible
-	get_output_popup().hide()
+	# Update the pause button
+	update_pause_button()
 
 
-func hide_ide():
-	# If we want to show our popup, do so
-	if outputRepopup:
-		get_output_popup().popup()
-	
-	# Set output visible to false
-	outputRepopup = false
+func output_hide():
+	# Update the pause button
+	update_pause_button()
 
 
 func push_view_to_stack(view):
@@ -299,6 +324,15 @@ func pop_view_from_stack():
 		viewStack[viewStack.size() - 1].visible = true
 
 
+func update_pause_button():
+	# If the ide or output popup is visible, disable the pause button
+	if ide.visible or get_output_popup().visible:
+		get_pause_game_button().disabled = true
+	# Otherwise, enable the button
+	else:
+		get_pause_game_button().disabled = false
+
+
 """ GETTERS """
 
 func get_inspect_ui():
@@ -314,7 +348,10 @@ func get_inspected_entity_id():
 
  
 func get_ide():
-	return $IDE/IDE
+	if ide == null:
+		return $IDE/IDE
+	else:
+		return ide
 
 
 func get_ide_layer():
@@ -355,6 +392,10 @@ func get_save_game_line_edit():
 
 func get_save_game_list():
 	return $Menus/MenusContainer/SaveMenu/SaveGameList
+
+
+func get_pause_game_button():
+	return $Menus/GameUI/PauseGame
 
 
 """ SETTERS """
@@ -477,15 +518,19 @@ func _on_game_save_overwrite():
 func _on_Inspect_id_pressed(ID):
 	# Edit was clicked
 	if ID == Constants.INSPECT_ITEMS.EDIT_CODE:
-		show_ide()
+		ide_show()
 		
 	# Popup ID was clicked
 	elif ID == Constants.INSPECT_ITEMS.VIEW_OUTPUT:
-		show_output()
+		output_show()
 
 
 func _on_IDE_closing():
-	hide_ide()
+	ide_hide()
+
+
+func _on_OutputPopup_closing():
+	output_hide()
 
 
 func _on_PauseGame_pressed():
@@ -514,6 +559,9 @@ func _on_QuitGame_pressed():
 	for ui in viewStack:
 		ui.visible = false
 	viewStack.clear()
+	
+	# Unpause the game
+	get_tree().paused = false
 	
 	# Change this to have a UI that prompts them for confirmation
 	SceneManager.go_to_main_menu()

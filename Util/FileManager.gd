@@ -29,6 +29,7 @@ func copy_dir(from: String, to: String, overwrite: bool = false):
 				copy_dir(filePath, toFolder)
 			# Otherwise, if the file exists, and we want to copy the file
 			elif dir.file_exists(toFilePath) and overwrite:
+				print("Overwrite!")
 				# Copy it!
 				dir.copy(filePath, toFilePath)
 			# Otherwise, if the file does not exist, copy it
@@ -50,7 +51,21 @@ func delete(path: String):
 	dir.remove(path)
 
 
-func get_dir_contents(path):
+func find(fileName: String, recursive: bool = true):
+	pass
+
+
+func get_dir_contents(path: String):
+	"""
+	Gets the directory contents formatted in a dictionary with the file name
+	pointing to the file path.
+	
+	Parameters:
+		path (String): The path to the directory
+	
+	Return:
+		files (Dictionary): The fileName -> filePath formatted dictionary
+	"""
 	var files = {}
 	
 	# Create a new dir
@@ -78,12 +93,21 @@ func get_dir_contents(path):
 	return files
 
 
-func get_files_in_directory(fileDirectory):
+func get_files_in_directory(path: String):
+	"""
+	Gets the directory files as a list.
+	
+	Parameters:
+		path (String): The path to the directory
+	
+	Return:
+		files (Array): The list of files in this folder
+	"""
 	var files = []
 	var dir = Directory.new()
 	
 	# Open new directory
-	dir.open(fileDirectory)
+	dir.open(path)
 	
 	# Begin listing the files in the directory
 	dir.list_dir_begin()
@@ -120,6 +144,7 @@ func get_root_name(filePath: String):
 	var splitPath = filePath.split("/")
 	
 	return splitPath[0]
+
 
 func join(path1: String, path2: String) -> String:
 	if path1.ends_with("/") and path2.begins_with("/"):

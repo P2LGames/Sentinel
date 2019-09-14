@@ -2,6 +2,7 @@ class_name IDEFile
 
 var _currPath
 var _className
+var _fileType
 var _focusLine
 var _focusCol
 var _text = ""
@@ -17,9 +18,10 @@ var requiredWhole = ""
 var permissionsLevel = 0
 
 
-func _init(filePath: String, className: String):
+func _init(filePath: String, className: String, fileType: String):
 	self._currPath = filePath
 	self._className = className
+	self._fileType = fileType
 	self._focusLine = 0
 	self._focusCol = 0
 	

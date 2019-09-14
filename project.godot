@@ -12,7 +12,7 @@ _global_script_classes=[ {
 "base": "Reference",
 "class": "IDEFile",
 "language": "GDScript",
-"path": "res://Player/CodeEditor/IDEFile.gd"
+"path": "res://Player/Windows/IDE/IDEFile.gd"
 }, {
 "base": "Node",
 "class": "PrintMessage",
@@ -52,8 +52,7 @@ gdscript/warnings/integer_division=false
 
 [display]
 
-window/size/width=1600
-window/size/height=1000
+window/dpi/allow_hidpi=true
 
 [input]
 

@@ -2,7 +2,6 @@ extends Spatial
 
 var viewStack = []
 
-var selectedFile = ""
 var selectedFilePath = ""
 
 func _ready():
@@ -11,6 +10,38 @@ func _ready():
 	
 	# Copy the generic code over
 	FileManager.copy_dir(Constants.GENERIC_CODE_DIR, Constants.PLAYER_CODE_DIR)
+	
+	# Run the idle animation
+	run_idle()
+
+
+func run_idle():
+	# Get the tween
+	var tween = $Sentinel/Tween
+	var sensor = $Sentinel/AttachmentContainer/Head/SensorHead
+	
+	# Get the start and ending rotation
+	var startRot = sensor.rotation_degrees
+	var targetRot = Vector3.ZERO
+	
+	# Get the random rotation to get to
+	targetRot.y = randf() * 60 - 30
+	
+	# Define a max left and right for the head rotation
+	var maxLeft = -42.0
+	var maxRight = 23.0
+	
+	# Reflect the target if it goes past our maxes
+	if startRot.y + targetRot.y > maxRight or startRot.y + targetRot.y < maxLeft:
+		targetRot.y *= -1
+	
+	# Get the rotation time
+	var rotationTime = abs(targetRot.y) / 20
+	
+	# Setup the animation and run it
+	tween.interpolate_property(sensor, "rotation_degrees", startRot, startRot + targetRot, rotationTime,
+		Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	tween.start()
 
 
 func start_new_game():
@@ -90,3 +121,11 @@ func _on_Delete_pressed():
 	# Delete the currently selected file, if it's there
 	if selectedFilePath != "":
 		SavingManager.delete_saved_game(selectedFilePath)
+
+
+func _on_Tween_tween_completed(object, key):
+	$Sentinel/Timer.start()
+
+
+func _on_Timer_timeout():
+	run_idle()

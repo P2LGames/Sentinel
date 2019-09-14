@@ -81,7 +81,7 @@ func get_default_class():
 """ ENTITY PERSISTENCE """
 
 func save():
-	var basisQuat = Quat(transform.basis)
+	var basisQuat = transform.basis.get_rotation_quat()
 	var saveData = {
 		"filename": get_filename(),
 		"parent": get_parent().get_path(),
@@ -105,15 +105,6 @@ func load_from_data(data: Dictionary):
 	
 	global_transform.origin = Vector3(data["posX"], data["posY"], data["posZ"])
 	transform.basis = Basis(Quat(data["basisX"], data["basisY"], data["basisZ"], data["basisW"]))
-	
-#		"name": name,
-#		"displayName": get_display_name(),
-#		"posX": global_transform.origin.x,
-#		"posY": global_transform.origin.y,
-#		"posZ": global_transform.origin.z,
-#		"basisX": global_transform.basis.x,
-#		"basisY": global_transform.basis.y,
-#		"basisZ": global_transform.basis.z,
 
 
 """ ENTITY INTERACTION """

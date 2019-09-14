@@ -1,9 +1,12 @@
 [gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://Player/CodeEditor/Editor.gd" type="Script" id=1]
-[ext_resource path="res://Player/CodeEditor/TextEditor.gd" type="Script" id=2]
+[ext_resource path="res://Player/Windows/IDE/Editor.gd" type="Script" id=1]
+[ext_resource path="res://Player/Windows/IDE/TextEditor.gd" type="Script" id=2]
 [ext_resource path="res://Assets/Fonts/NunitoBody.tres" type="DynamicFont" id=3]
-[ext_resource path="res://Player/OutputText.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Player/Windows/Output/OutputText.tscn" type="PackedScene" id=4]
+
+
+
 
 [sub_resource type="StyleBoxEmpty" id=1]
 

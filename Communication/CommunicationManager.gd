@@ -11,8 +11,8 @@ var entityMap := Dictionary()
 var entityPlaceholderMap := Dictionary()
 
 # Client variables
-const HOST = "localhost"
-const PORT = 6789
+const HOST = "pgframework.westus.azurecontainer.io"  #"13.93.215.105" #"13.64.73.110"
+const PORT = 5545
 var client = StreamPeerTCP.new()
 
 var serverSetup = false
@@ -20,6 +20,9 @@ var running = false
 
 # A list of messages to send to the server
 var toSend = []
+
+signal setup_complete()
+signal failed_to_connect()
 
 
 func _ready():
@@ -38,6 +41,7 @@ func _ready():
 func route_response(responseType: int, responseData: PoolByteArray):
 	# Run the entity setup no matter what
 	if responseType == FrameworkModels.RequestType.ENTITY_SETUP:
+		print("Setting up server")
 		entity_setup_handler(responseData)
 	
 	# If we aren't running, don't route other responses
@@ -59,6 +63,10 @@ func entity_setup_handler(responseData: PoolByteArray):
 	# If the first byte is a 1, then the setup was successful
 	if responseData[0] == 1:
 		serverSetup = true
+		print("Server setup!")
+		
+		# Emit the server setup complete signal
+		emit_signal("setup_complete")
 	else:
 		# Slice off the first two values of the byte array
 		var stringData: PoolByteArray = []
@@ -283,6 +291,14 @@ func send_message(msg: PoolByteArray) -> bool:
 """ LOOPING """
             
 func _process(delta):
+	# Ensure the connection worked
+	if client.get_status() == StreamPeerTCP.STATUS_CONNECTING:
+		print("Attempting to connect")
+	elif client.get_status() == StreamPeerTCP.STATUS_ERROR:
+		print("Error connecting")
+	elif client.get_status() == StreamPeerTCP.STATUS_NONE:
+		print("Nothing to report")
+	
 	if client.get_status() == StreamPeerTCP.STATUS_CONNECTED:
 		# Loop through the things to send and send them
 		for msg in toSend:
@@ -296,25 +312,26 @@ func _process(delta):
 	
 		# Get the number of bytes we can read in
 		var bytesAvailable = client.get_available_bytes()
+		
 		# If we have bytes, get them and process them
 		if bytesAvailable > 0:
 			# Get the response type as a byte
 			var responseType = int(client.get_16())
 #			print(responseType)
-			
+
 			# Get the byte count
 			var byteCount = int(client.get_32())
 #			print(byteCount)
-			
+
 			# Read the number of bytes into a array
 			var responseArray = client.get_data(byteCount)
-			
+
 			# Get the error code if there was one
 			var errorCord = responseArray[0]
-			
+
 			# Store the bytes for use
 			var responseBytes = responseArray[1]
-			
+
 			route_response(responseType, responseBytes)
 
 
@@ -335,3 +352,11 @@ func stop_running():
 	# Clear the maps
 	entityMap = {}
 	entityPlaceholderMap = {}
+
+
+""" SIGNALS """
+
+func _on_ConnectionTimeout_timeout():
+	# Check to see if the client is connected
+	if client.get_status() != StreamPeerTCP.STATUS_CONNECTED:
+		emit_signal("failed_to_connect")

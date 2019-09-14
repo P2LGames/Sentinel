@@ -14,6 +14,11 @@ signal file_dirtied(filePath)
 
 
 func _ready():
+	# Ensure the user code dir is created
+	var dir = Directory.new()
+	if not dir.dir_exists(Constants.PLAYER_CODE_DIR):
+		dir.make_dir(Constants.PLAYER_CODE_DIR)
+	
 	# Load in previous data
 	load_rect_information()
 	
@@ -21,8 +26,7 @@ func _ready():
 #	get_file_tree().create_item()
 	get_file_tree().set_hide_root(true)
 	
-#	add_directory(Constants.GENERIC_CODE_DIR)
-	get_file_tree().set_root_to_path(Constants.PLAYER_CODE_DIR)
+	update_file_tree()
 	
 	# No looping
 	set_process(false)
@@ -44,19 +48,6 @@ func _process(delta):
 		savedPosition = rect_global_position
 		
 		save_rect_information()
-
-
-func _unhandled_key_input(event):
-	if visible:
-		accept_event()
-	else:
-		return
-	
-	# If there is no file, then stop
-	if currentFile == null:
-		return
-	
-	
 
 
 func save_file():
@@ -155,6 +146,10 @@ func load_rect_information():
 	loaded = true
 
 
+func update_file_tree():
+	get_file_tree().set_root_to_path(Constants.PLAYER_CODE_DIR)
+
+
 """ GETTERS """
 
 func get_target_name():
@@ -183,6 +178,10 @@ func get_output_label():
 
 func get_file_tree():
 	return $LeftBar/FileTree
+
+
+func get_recompile_button():
+	return $LeftBar/Buttons/RecompileButton
 
 
 """ SETTERS """
@@ -230,6 +229,11 @@ func set_visible(value: bool):
 	# If we are now visible, set the focus
 	if visible:
 		set_focus()
+
+
+func set_selected_file(path: String):
+	# Get the file tree and select the given item
+	get_file_tree().select_tree_item_with_path(path)
 
 
 """ SIGNALS """
@@ -303,6 +307,13 @@ func _on_FileTree_file_selected(file, filePath):
 	# Update the current file and path
 	currentFile = file
 	currentFilePath = filePath
+	
+	# If the file is not a .java, we can't recompile it
+	if file._fileType != "java":
+		get_recompile_button().disabled = true
+	# Otherwise, we can
+	else:
+		get_recompile_button().disabled = false
 	
 	# Set the text to the current file
 	get_text_editor().set_text(currentFile.get_display_text())

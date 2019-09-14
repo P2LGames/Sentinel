@@ -1,13 +1,17 @@
 [gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Player/Player.gd" type="Script" id=1]
-[ext_resource path="res://Player/CodeEditor/IDE.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Player/OutputPopup.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Player/Windows/IDE/IDE.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Player/Windows/Output/OutputPopup.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Util/Darkening.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Assets/Fonts/NunitoTitle.tres" type="DynamicFont" id=5]
 [ext_resource path="res://Assets/Fonts/NunitoBodyBold.tres" type="DynamicFont" id=6]
 [ext_resource path="res://Scenes/Shared/SaveGameList.tscn" type="PackedScene" id=7]
-[ext_resource path="res://Player/ConfirmOverwritePopup.gd" type="Script" id=8]
+[ext_resource path="res://Player/Windows/Menus/ConfirmOverwritePopup.gd" type="Script" id=8]
+
+
+
+
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends LineEdit
@@ -47,6 +51,7 @@ func _on_LineEdit_text_changed(newText):
 "
 
 [node name="Player" type="Spatial"]
+pause_mode = 2
 script = ExtResource( 1 )
 
 [node name="IDE" type="CanvasLayer" parent="."]
@@ -99,6 +104,7 @@ margin_bottom = 46.0
 text = "Pause"
 
 [node name="MenusContainer" type="Control" parent="Menus"]
+editor/display_folded = true
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -374,6 +380,7 @@ script = ExtResource( 8 )
 [connection signal="popup_hide" from="IDE/IDE" to="." method="_on_IDE_closing"]
 [connection signal="about_to_show" from="OutputPopupLayer/OutputPopup" to="OutputPopupLayer/OutputPopup" method="_on_OutputPopup_about_to_show"]
 [connection signal="popup_hide" from="OutputPopupLayer/OutputPopup" to="OutputPopupLayer/OutputPopup" method="_on_OutputPopup_popup_hide"]
+[connection signal="popup_hide" from="OutputPopupLayer/OutputPopup" to="." method="_on_OutputPopup_closing"]
 [connection signal="id_pressed" from="OutputPopupLayer/Inspect" to="." method="_on_Inspect_id_pressed"]
 [connection signal="pressed" from="Menus/GameUI/PauseGame" to="." method="_on_PauseGame_pressed"]
 [connection signal="pressed" from="Menus/MenusContainer/PauseMenu/VBoxContainer/QuitContainer/QuitGameMenu" to="." method="_on_QuitGameMenu_pressed"]

@@ -8,6 +8,7 @@ const ORDER_TYPES = {
 	ROTATE_RIGHT = 4,
 	STOP_ROTATION = 5,
 	STOP_MOVEMENT = 6,
+	CLEAR = 7
 }
 
 var robot

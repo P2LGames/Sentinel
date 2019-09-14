@@ -1,4 +1,4 @@
-extends GridMap
+extends Spatial
 
 func _ready():
 	# Set the player's camera

@@ -1,11 +1,11 @@
 [gd_scene load_steps=9 format=2]
 
-[ext_resource path="res://Player/CodeEditor/IDE.gd" type="Script" id=1]
+[ext_resource path="res://Player/Windows/IDE/IDE.gd" type="Script" id=1]
 [ext_resource path="res://Assets/Fonts/NunitoBodyBold.tres" type="DynamicFont" id=2]
-[ext_resource path="res://Player/CodeEditor/FileTree.gd" type="Script" id=3]
-[ext_resource path="res://Player/CodeEditor/TextEditor.gd" type="Script" id=4]
+[ext_resource path="res://Player/Windows/IDE/FileTree.gd" type="Script" id=3]
+[ext_resource path="res://Player/Windows/IDE/TextEditor.gd" type="Script" id=4]
 [ext_resource path="res://Assets/Fonts/NunitoBody.tres" type="DynamicFont" id=5]
-[ext_resource path="res://Player/OutputText.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Player/Windows/Output/OutputText.tscn" type="PackedScene" id=6]
 
 [sub_resource type="StyleBoxEmpty" id=1]
 
@@ -46,10 +46,10 @@ func _on_TargetEntity_print_message(printMessage):
 ]]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 919.0
-margin_top = 35.0
+margin_left = 20.0
+margin_top = 20.0
 margin_right = -20.0
-margin_bottom = -446.0
+margin_bottom = -20.0
 popup_exclusive = true
 window_title = "Editor"
 resizable = true

@@ -1,0 +1,16 @@
+//// *PERMISSION r,0 *END_PERMISSION
+This is the IDE (Integrated Development Environment) for Sentinel!
+
+In the top left is the robot you currently have selected. You can change his name whenever you would like.
+
+Beneath that are the files you have access to. RobotOverride will be the one you want to use.
+
+Further down are the recompile, save, and close buttons.
+- Recompile will attempt to recompile the code file you currently have selected onto the robot you have selected (His name is in the top left).
+- Save will save the current file. You can also press ctrl+s or command+s to save the current file.
+- Close, the "x" in the top right of the window, or pressing escape will close the IDE.
+
+At the bottom you will find the output. The output will be filled with the output of the robot that you currently have selected.
+The output will also give you details of compilation, letting you know if it was successful, or if there were errors.
+
+Good programming!

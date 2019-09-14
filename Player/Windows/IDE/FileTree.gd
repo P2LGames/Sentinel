@@ -1,6 +1,6 @@
 extends Tree
 
-var IDEFile = load("res://Player/CodeEditor/IDEFile.gd")
+var IDEFile = load("res://Player/Windows/IDE/IDEFile.gd")
 
 var itemToFile: Dictionary = {}
 var rootPath := ""
@@ -31,6 +31,14 @@ func file_saved(filePath: String):
 	# Strip off the asterisk
 	if oldText.ends_with('*'):
 		treeItem.set_text(0, oldText.substr(0, oldText.length() - 1))
+
+
+func select_tree_item_with_path(itemPath: String):
+	# Get the item from the path
+	var item = get_tree_item_from_path(itemPath)
+	
+	# Select it
+	item.select(0)
 
 
 func add_directory(root: TreeItem, dirPath: String, createNew: bool = true):
@@ -69,14 +77,16 @@ func add_directory(root: TreeItem, dirPath: String, createNew: bool = true):
 		# Otherwise, it's a file, add it as a file and get the file name
 		else:
 			# Get the file name
-			var fileName = file.split(".")[0]
+			var fileSplit = file.split(".")
+			var fileName = fileSplit[0]
+			print(fileSplit)
 			
 			# Create a tree item with it, with folder as the parent
 			var treeItem = create_item(folder)
 			treeItem.set_text(0, fileName)
 			
 			# Create a new ide file
-			var newIDEFile = IDEFile.new(filePath, fileName)
+			var newIDEFile = IDEFile.new(filePath, fileName, fileSplit[1])
 	
 			# Save it to our dictionary
 			itemToFile[treeItem] = newIDEFile
@@ -88,6 +98,17 @@ func add_directory(root: TreeItem, dirPath: String, createNew: bool = true):
 """ GETTERS """
 
 func get_path_from_item(item: TreeItem):
+	"""
+	Gets the path to a file given a specific item.
+	The root of the tree is represented by '/'.
+	But the path returned includes the 'rootPath' at the beginning.
+	
+	Parameters:
+		item (TreeItem): The item to get the path from
+	
+	return:
+		itemPath (String): The path to the given item (file)
+	"""
 	var filePath = ""
 	var loopItem = item
 	
@@ -104,15 +125,29 @@ func get_path_from_item(item: TreeItem):
 
 
 func get_tree_item_from_path(itemPath: String):
+	"""
+	Gets the item (file) using the given item (file) path.
+	The beginning of the path should match 'rootPath'.
+	It will be replaced with and empty string to get a root of '/'.
+	
+	Returns the root if the path is invalid.
+	
+	Parameters:
+		itemPath (String): The path to the item (file)
+	
+	return:
+		item (TreeItem): The item found from the given path
+	"""
 	# Replace the root with nothing
 	itemPath = itemPath.replace(rootPath, "")
 	
-	# If the item path is a slash, return root
-	if itemPath == "/":
+	# If the item path is a slash, or empty, return root
+	if itemPath == "/" or itemPath == "":
 		return get_root()
 	
 	# Split the path
 	var splitPath = itemPath.split("/")
+	print(splitPath)
 	
 	# Get the root's first child
 	var child = get_root().get_children()
@@ -121,7 +156,7 @@ func get_tree_item_from_path(itemPath: String):
 	var lastValidChild = child
 	
 	# Loop through each part in the path
-	for x in splitPath.size() - 1:
+	for x in range(splitPath.size()):
 		# Get the part
 		var part = splitPath[x]
 		
@@ -132,8 +167,12 @@ func get_tree_item_from_path(itemPath: String):
 		# While the child's text does not equal the part
 		while child.get_text(0) != part:
 			child = child.get_next()
+			
+			# If the child is null, return the root
+			if child == null:
+				return get_root()
 		
-		# If the child as a child, and we aren't at the end of the path
+		# If the child has a child, and we aren't at the end of the path
 		if child.get_children() and x != splitPath.size() - 1:
 			child = child.get_children()
 		else:
@@ -157,10 +196,16 @@ func get_file_from_path(filePath: String):
 """ SETTERS """
 
 func set_root_to_path(dirPath: String):
+	# Clear the current elements
+	clear()
+	
+	# Set the root path
 	rootPath = dirPath
 	
+	# Create a root item
 	create_item()
 	
+	# Add the first directory
 	add_directory(get_root(), dirPath, false)
 
 
