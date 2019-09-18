@@ -12,6 +12,9 @@ func file_dirtied(filePath: String):
 	# Get the item from the filePath
 	var treeItem = get_tree_item_from_path(filePath)
 	
+	if treeItem == get_root():
+		return
+	
 	# Get the old text
 	var oldText = treeItem.get_text(0)
 	
@@ -23,14 +26,16 @@ func file_dirtied(filePath: String):
 # If a file has been saved, remove the asterisk from its name
 func file_saved(filePath: String):
 	# Get the item from the filePath
-	var treeItem = get_tree_item_from_path(filePath)
+	var treeItem = get_tree_item_from_path(filePath + "*")
+	
+	# If we got the root, stop
+	if treeItem == get_root():
+		return
 	
 	# Get the old text
 	var oldText = treeItem.get_text(0)
 	
-	# Strip off the asterisk
-	if oldText.ends_with('*'):
-		treeItem.set_text(0, oldText.substr(0, oldText.length() - 1))
+	treeItem.set_text(0, oldText.substr(0, oldText.length() - 1))
 
 
 func select_tree_item_with_path(itemPath: String):
@@ -147,7 +152,6 @@ func get_tree_item_from_path(itemPath: String):
 	
 	# Split the path
 	var splitPath = itemPath.split("/")
-	print(splitPath)
 	
 	# Get the root's first child
 	var child = get_root().get_children()
@@ -163,6 +167,13 @@ func get_tree_item_from_path(itemPath: String):
 		# If the part is empty, skip it
 		if part == "":
 			continue
+		
+		# Get the child text and make sure it doesn't have an asterisk
+#		var childText = child.get_text(0)
+#		if childText.ends_with("*"):
+#			print("Got here")
+#			childText.replace("*", "")
+#		print(childText)
 		
 		# While the child's text does not equal the part
 		while child.get_text(0) != part:

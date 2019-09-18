@@ -3,21 +3,6 @@ extends "res://Entities/GenericEntity.gd"
 const COMMAND_ID_PROCESS = 0
 const COMMAND_ID_INPUT = 1
 
-const ATTACHMENT_POSITIONS = {
-	SELF = 0,
-	HEAD = 1,
-	BASE = 2,
-	LEFT = 3,
-	RIGHT = 4,
-	FRONT = 5,
-	BACK = 6
-}
-
-const INPUT_TYPES = {
-	PLAYER_KEY = 0,
-	PLAYER_MOUSE = 1
-}
-
 const ORDER_TYPES = {
 	PRINT = 0, # PRINT:
 }
@@ -82,16 +67,38 @@ func send_key_input(code: int, pressed: int):
 	var bytes: PoolByteArray = []
 	
 	# Attach the position that the input is coming from
-	bytes += Util.int2bytes(ATTACHMENT_POSITIONS.SELF)
+	bytes += Util.int2bytes(Constants.ATTACHMENT_POSITIONS.SELF)
 	
 	# Attach the type of input
-	bytes += Util.int2bytes(INPUT_TYPES.PLAYER_KEY)
+	bytes += Util.int2bytes(Constants.INPUT_TYPES.PLAYER_KEY)
 	
 	# Attach the input values, in this case, 0's
 	bytes += Util.int2bytes(code)
 	bytes += Util.int2bytes(pressed)
 	
 	# Send it all to the server
+	CommunicationManager.command(get_reprogrammable_id(), COMMAND_ID_INPUT, true, bytes)
+
+
+func send_click_input(x: float, y: float, pressed: int):
+	var bytes: PoolByteArray = []
+	
+	# Attach the position that the input is coming from
+	bytes += Util.int2bytes(Constants.ATTACHMENT_POSITIONS.SELF)
+	
+	# Attach the type of input
+	bytes += Util.int2bytes(Constants.INPUT_TYPES.PLAYER_MOUSE)
+	
+	# Attach the input values, in this case, 0's
+	bytes += Util.float2bytes(x)
+	bytes += Util.float2bytes(y)
+	bytes += Util.int2bytes(pressed)
+	
+	# Send it all to the server
+	CommunicationManager.command(get_reprogrammable_id(), COMMAND_ID_INPUT, true, bytes)
+
+
+func send_input(bytes: PoolByteArray):
 	CommunicationManager.command(get_reprogrammable_id(), COMMAND_ID_INPUT, true, bytes)
 
 
@@ -134,7 +141,7 @@ func setup_attachments():
 	positionToAttachment = {}
 	
 	# Add the robot
-	add_attachment(ATTACHMENT_POSITIONS.SELF, self)
+	add_attachment(Constants.ATTACHMENT_POSITIONS.SELF, self)
 	
 	# Get all of the attachment positions
 	var attachmentPositions = get_attachment_positions()
@@ -155,7 +162,7 @@ func add_attachment(position: int, attachment):
 	
 	# Set the attachment's robot to be myself
 	if attachment != null and attachment.has_method("set_robot"):
-		attachment.set_robot(self)
+		attachment.set_robot(self, position)
 
 
 """ ORDER HANDLING """
@@ -225,7 +232,7 @@ func save():
 	# Save the orders in each component
 	saveData["attachmentData"] = {}
 	for pos in positionToAttachment.keys():
-		if pos == ATTACHMENT_POSITIONS.SELF or positionToAttachment[pos] == null:
+		if pos == Constants.ATTACHMENT_POSITIONS.SELF or positionToAttachment[pos] == null:
 			continue
 		
 		print("Position: ", pos)
@@ -246,7 +253,7 @@ func load_from_data(data: Dictionary):
 	positionToAttachment.clear()
 	
 	# Add the robot
-	add_attachment(ATTACHMENT_POSITIONS.SELF, self)
+	add_attachment(Constants.ATTACHMENT_POSITIONS.SELF, self)
 	
 	# Load component orders
 	var attachmentData = data["attachmentData"]

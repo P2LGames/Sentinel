@@ -18,7 +18,7 @@ func _ready():
 func run_idle():
 	# Get the tween
 	var tween = $Sentinel/Tween
-	var sensor = $Sentinel/AttachmentContainer/Head/SensorHead
+	var sensor = $Sentinel/AttachmentContainer/Head/Sensor
 	
 	# Get the start and ending rotation
 	var startRot = sensor.rotation_degrees
@@ -70,19 +70,19 @@ func pop_view_from_stack():
 """ GETTERS """
 
 func get_main_menu():
-	return $Menus/MainMenu
+	return $Menus/MenuContainer/MainMenu
 
 
 func get_level_select():
-	return $Menus/LevelSelect
+	return $Menus/MenuContainer/LevelSelect
 
 
 func get_load_level():
-	return $Menus/LoadLevel
+	return $Menus/MenuContainer/LoadLevel
 
 
 func get_save_game_list():
-	return $Menus/LoadLevel/SaveGameList
+	return $Menus/MenuContainer/LoadLevel/SaveGameList
 
 
 """ SIGNALS """

@@ -94,37 +94,19 @@ func set_bounds(position: Vector2, areaSize: Vector2):
 		# Bind to x position
 		canMoveH = false
 		canMoveV = true
-		
-		# Set the position to the position of the area, excluding y
-		global_transform.origin = Vector3(position.x, global_transform.origin.y, global_transform.origin.y)
-		
-		# Offset the position to be the bottom left, with size being top right
-		position -= areaSize / 2
-		
-		# Set the bounds
-		bounds = Rect2(position, areaSize)
 	# Check to see if we should bind the y
 	elif areaSize.y <= 0.11:
 		# Bind to y position
 		canMoveH = true
 		canMoveV = false
-		
-		# Set the position to the position of the area, excluding y
-		global_transform.origin = Vector3(global_transform.origin.x, global_transform.origin.y, position.y)
-		
-		# Offset the position to be the bottom left, with size being top right
-		position -= areaSize / 2
-		
-		# Set the bounds
-		bounds = Rect2(position, areaSize)
 	# Otherwise, bind the camera to the area given
 	else:
 		# We can in fact move the camera
 		canMoveH = true
 		canMoveV = true
-		
-		# Offset the position to be the bottom left, with size being top right
-		position -= areaSize / 2
-		
-		# Set the bounds
-		bounds = Rect2(position, areaSize)
+	
+	# Offset the position to be the bottom left, with size being top right
+	position -= areaSize
+	
+	# Set the bounds
+	bounds = Rect2(position, areaSize * 2)

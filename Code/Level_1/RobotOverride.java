@@ -25,7 +25,7 @@ public class RobotOverride extends RobotDefault {
      */
     @Override
     public void playerKeyPressed(int code, int pressed) {
-        print("Default\n");
+        print("Override\n");
     }
 
     /**
@@ -34,6 +34,16 @@ public class RobotOverride extends RobotDefault {
      */
     @Override
     public void giveOrders() {
+
+    }
+
+    @Override
+    public void playerClicked(float x, float y, int pressed) {
+
+    }
+
+    @Override
+    public void treadsFinishedOrder() {
 
     }
 

@@ -1,5 +1,5 @@
-extends MeshInstance
-	
+extends "res://Entities/Components/Component.gd"
+
 const ORDER_TYPES = {
 	MOVE = 0, # MOVE:
 	ROTATE_BY = 1, # ROTATE_BY:
@@ -10,10 +10,6 @@ const ORDER_TYPES = {
 	STOP_MOVEMENT = 6,
 	CLEAR = 7
 }
-
-var robot
-
-var orders = []
 
 var currOrders = {
 	move = 0,
@@ -26,11 +22,10 @@ var turnSpeed = 4.5
 var currentTurnAmount = 0.0
 onready var startPosition = global_transform.origin
 
-func _ready():
-	set_process(true)
-
 
 func _process(delta):
+	if not robot:
+		return
 	
 	parse_orders()
 	
@@ -103,6 +98,9 @@ func handle_movement():
 		# If the distance is greater than the amount we wanted to move, stop
 		if startPosition.distance_to(global_transform.origin) > abs(currOrders.move):
 			currOrders.move = 0
+			
+			# We want to tell the cpu that we finished
+			send_action_finished_event()
 	
 	# Move ourselves
 #	robot.move_and_slide(movement)
@@ -167,57 +165,52 @@ func rotateInDirection(delta: float, direction: int, rotateAmount: float = -1):
 	return rotationValue
 
 
-##### GETTERS #####
+func send_action_finished_event():
+	var bytes: PoolByteArray = []
+	
+	# Attach the position that the input is coming from
+	bytes += Util.int2bytes(Constants.ATTACHMENT_POSITIONS.BASE)
+	
+	# Attach the type of input
+	bytes += Util.int2bytes(Constants.INPUT_TYPES.ACTION_FINISHED)
+	
+	# Send the bytes off
+	robot.send_input(bytes)
 
-func get_robot():
-	return robot
 
+""" GETTERS """
 
-func get_type():
+func _get_type():
 	return Constants.ATTACHMENT_TYPES.WHEELS
-
-
-##### SETTERS #####
-
-func set_robot(robot):
-	self.robot = robot
-
-
-##### ATTACHMENT FUNCTIONS #####
-
-func pass_order(orderType: int, orderBytes: PoolByteArray):
-#	print("Order Type: ", orderType)
-	var order = Models.Order(orderType, orderBytes)
-	orders.append(order)
 
 
 """ PERSISTENCE """
 
 func save():
-	var localPath = str(get_parent().get_path()).replace(str(robot.get_path()), "")
+	var saveData = .save()
 	
 	# Save the data required to make this component function
-	var saveData = {
-		"filename": get_filename(),
-		"parent": localPath,
-		"orders": orders,
-		"currOrders": currOrders,
-		"currTurnAmount": currentTurnAmount,
-		"startPosX": startPosition.x,
-		"startPosY": startPosition.y,
-		"startPosZ": startPosition.z
-	}
+	saveData["currOrders"] = currOrders
+	saveData["currTurnAmount"] = currentTurnAmount
+	saveData["startPosX"]  = startPosition.x
+	saveData["startPosY"] = startPosition.y
+	saveData["startPosZ"] = startPosition.z
 	
 	return saveData
 
 
 func load_from_data(data: Dictionary):
+	.load_from_data(data)
+	
 	# Load in the same data that was saved
-	orders = data["orders"]
 	currOrders = data["currOrders"]
 	currentTurnAmount = data["currTurnAmount"]
 	
+	# Set the start position for the order
 	var x = data["startPosX"]
 	var y = data["startPosY"]
 	var z = data["startPosZ"]
 	startPosition = Vector3(x, y, z)
+
+
+

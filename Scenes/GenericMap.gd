@@ -1,5 +1,7 @@
 extends Spatial
 
+var mapSize = Vector2(50, 50)
+
 func _ready():
 	# Set the player's camera
 	Player.camera = get_camera()
@@ -29,6 +31,10 @@ func load_from_data(data: Array):
 
 func get_camera():
 	return $Camera
+
+
+func get_map():
+	return $Map
 
 
 func is_map():

@@ -50,10 +50,6 @@ gdscript/warnings/unused_argument=false
 gdscript/warnings/return_value_discarded=false
 gdscript/warnings/integer_division=false
 
-[display]
-
-window/dpi/allow_hidpi=true
-
 [input]
 
 left_click={
@@ -127,7 +123,10 @@ show_output={
 [layer_names]
 
 2d_physics/layer_1="Units"
+3d_physics/layer_1="Units"
+3d_physics/layer_7="Trigger"
 2d_physics/layer_10="Terrain"
+3d_physics/layer_20="Map"
 
 [network]
 

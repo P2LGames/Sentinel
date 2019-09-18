@@ -1,6 +1,23 @@
 extends Node
 
 
+func tween_to_target_from_current(obj, tween: Tween, to: Vector3, speed: float):
+	# Get the distance between the current door position and the target
+	var distance = obj.translation - to
+	
+	# Use that to get our time
+	var animTime = distance.abs().length() / speed
+	
+	# Stop the previous animation
+	tween.stop(obj, "translation")
+	
+	# Define the animation for our tween and run it
+	tween.interpolate_property(obj, "translation", obj.translation, 
+		to, animTime, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	
+	tween.start()
+
+
 func slice_array(array, start: int = 0, stop: int = -1):
 	var newArray = []
 	
@@ -12,7 +29,6 @@ func slice_array(array, start: int = 0, stop: int = -1):
 		end = stop
 	
 	for i in range(start, end):
-#		print(array[i])
 		newArray.append(array[i])
 	
 	return newArray
@@ -43,17 +59,22 @@ func int2bytes(integer: int) -> PoolByteArray:
 
 
 func float2bytes(f: float) -> PoolByteArray:
-	# Get the bytes of the int, but trim off the ends, since it's 8 bytes
-	var dataLength = var2bytes(f)
+	"""Returns an 4 bytes of the float"""
+	var fString = String(f)
+	
+	# Get the bytes of the float, but trim off the ends, since it's 8 bytes
+	var data = var2bytes(float(fString))
 	
 	# Remove the first 4 bytes, they are padding
 	for x in range(4):
-		dataLength.remove(0)
+		data.remove(0)
 	
 	# Invert the data to be BIG_ENDIAN for java to understand
-	dataLength.invert()
+	data.invert()
 	
-	return dataLength
+	
+	
+	return data
 
 
 func bytes2float(bytes: PoolByteArray) -> float:

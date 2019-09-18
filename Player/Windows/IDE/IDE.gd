@@ -1,6 +1,6 @@
 extends WindowDialog
 
-var IDEFile = load("res://Player/CodeEditor/IDEFile.gd")
+var IDEFile = load("res://Player/Windows/IDE/IDEFile.gd")
 
 var currentFile = null
 var currentFilePath: String = ""
@@ -33,7 +33,7 @@ func _ready():
 
 
 func _process(delta):
-	# Will only run when the IDE is visible
+	"""Process will only run while the ide is visible"""
 	
 	# Input handling
 	if Input.is_action_just_pressed("ide_save"):
@@ -66,7 +66,7 @@ func save_all_files():
 
 
 func recompile():
-	if currentFile == null:
+	if currentFile == null or Player.get_inspected_entity() == null:
 		return
 	
 	# Save the current file

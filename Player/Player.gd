@@ -6,7 +6,7 @@ var camera = null
 # Entities
 var pressedKeys = []
 var selectedEntities = []
-var inspectedEntity
+var inspectedEntity = null
 var isSelectingMultiple = false
 
 # ide and output
@@ -154,8 +154,10 @@ func handle_mouse_inputs():
 		else:
 			deselect()
 	# Right Click
+	elif Input.is_action_just_released("right_click"):
+		right_click(0)
 	elif Input.is_action_just_pressed("right_click"):
-		pass
+		right_click(1)
 	# Q Pressed and IDE is invisible
 	elif not ide.visible and Input.is_action_just_pressed("inspect_entity"):
 		# Get the clicked entity
@@ -165,6 +167,42 @@ func handle_mouse_inputs():
 		if clickedEntity:
 			# Then we left clicked on an entity, select it
 			inspect_entity(clickedEntity)
+
+
+func right_click(pressed: int):
+	# Get the clicked point
+	var clickedPoint = get_clicked_point()
+	
+	# If it is null, stop
+	if clickedPoint == null:
+		return
+	
+	# Loop through all of hte selected entities
+	for entity in selectedEntities:
+		# If we can send them the click input, then send it
+		if entity.has_method("send_click_input"):
+			entity.send_click_input(clickedPoint.x, clickedPoint.z, pressed)
+
+
+func get_clicked_point():
+	# Get the physics world
+	var physicsSpace = get_world().direct_space_state
+	
+	# Get the mouse position
+	var mousePosition = get_viewport().get_mouse_position()
+	
+	# Get the camera origin and target
+	var from = camera.project_ray_origin(mousePosition)
+	var to = from + camera.project_ray_normal(mousePosition) * Constants.CLICK_RAY_LENGTH
+	
+	# Cast a ray
+	var result = physicsSpace.intersect_ray(from, to)
+	
+	# If we intersected something
+	if result:
+		return result.position
+	else: 
+		return null
 
 
 """ ENTITY HANDLING """

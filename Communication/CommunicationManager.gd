@@ -11,7 +11,8 @@ var entityMap := Dictionary()
 var entityPlaceholderMap := Dictionary()
 
 # Client variables
-const HOST = "pgframework.westus.azurecontainer.io"  #"13.93.215.105" #"13.64.73.110"
+const HOST = "localhost"
+#const HOST = "pgframework.westus.azurecontainer.io"
 const PORT = 5545
 var client = StreamPeerTCP.new()
 
@@ -201,7 +202,7 @@ func file_update_handler(responseData: PoolByteArray):
 		var className = classPackageSplit[classPackageSplit.size() - 1]
 		
 		# Print a messsage
-		entityMap[str(entityId)].print_message("Recompile Successful, class swapped to " + className + "!\n", 
+		entityMap[str(entityId)].print_message("\nRecompile Successful, class swapped to " + className + "!\n", 
 			Constants.MESSAGE_TYPE.NORMAL)
 		
 		# Change the entity's current class
@@ -292,20 +293,24 @@ func send_message(msg: PoolByteArray) -> bool:
             
 func _process(delta):
 	# Ensure the connection worked
-	if client.get_status() == StreamPeerTCP.STATUS_CONNECTING:
-		print("Attempting to connect")
-	elif client.get_status() == StreamPeerTCP.STATUS_ERROR:
-		print("Error connecting")
-	elif client.get_status() == StreamPeerTCP.STATUS_NONE:
-		print("Nothing to report")
+	if serverSetup and client.get_status() == StreamPeerTCP.STATUS_CONNECTING:
+		print("Server changed to CONNECTING")
+		serverSetup = false
+	elif serverSetup and client.get_status() == StreamPeerTCP.STATUS_ERROR:
+		print("Server changed to ERROR")
+		serverSetup = false
+	elif serverSetup and client.get_status() == StreamPeerTCP.STATUS_NONE:
+		print("Server changed to NONE")
+		serverSetup = false
 	
 	if client.get_status() == StreamPeerTCP.STATUS_CONNECTED:
 		# Loop through the things to send and send them
 		for msg in toSend:
 #			print("Sending Message: ", msg)
 			var error = client.put_data(msg)
+			
 			if error != 0:
-				print("Error: ", error)
+				print("Send Error: ", error)
 		
 		# Clear the messages for the next loop
 		toSend.clear()
@@ -317,21 +322,30 @@ func _process(delta):
 		if bytesAvailable > 0:
 			# Get the response type as a byte
 			var responseType = int(client.get_16())
-#			print(responseType)
-
+			if responseType != FrameworkModels.RequestType.COMMAND:
+				print("Response Type: ", responseType)
+			
 			# Get the byte count
 			var byteCount = int(client.get_32())
-#			print(byteCount)
-
+			if responseType != FrameworkModels.RequestType.COMMAND:
+				print("Byte Count: ", byteCount)
+			
+			# If the byte count is less or equal to 0
+			if byteCount <= 0:
+				# Continue, nothing to read
+				return
+			
 			# Read the number of bytes into a array
 			var responseArray = client.get_data(byteCount)
-
+			
 			# Get the error code if there was one
 			var errorCord = responseArray[0]
-
+			if errorCord != 0:
+				print(errorCord)
+			
 			# Store the bytes for use
 			var responseBytes = responseArray[1]
-
+			
 			route_response(responseType, responseBytes)
 
 
