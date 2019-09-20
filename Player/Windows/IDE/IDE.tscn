@@ -172,14 +172,18 @@ margin_top = -99.0
 margin_right = 0.5
 margin_bottom = -5.0
 
-[node name="RecompileButton" type="Button" parent="LeftBar/Buttons"]
+[node name="RecompileButton" type="Button" parent="LeftBar/Buttons" groups=[
+"Button",
+]]
 margin_right = 153.0
 margin_bottom = 28.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "Recompile"
+text = "Compile and Load"
 
-[node name="SaveButton" type="Button" parent="LeftBar/Buttons"]
+[node name="SaveButton" type="Button" parent="LeftBar/Buttons" groups=[
+"Button",
+]]
 margin_top = 32.0
 margin_right = 153.0
 margin_bottom = 60.0
@@ -187,7 +191,9 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "Save"
 
-[node name="CloseButton" type="Button" parent="LeftBar/Buttons"]
+[node name="CloseButton" type="Button" parent="LeftBar/Buttons" groups=[
+"Button",
+]]
 margin_top = 64.0
 margin_right = 153.0
 margin_bottom = 94.0
@@ -235,5 +241,5 @@ script = SubResource( 2 )
 [connection signal="pressed" from="LeftBar/Buttons/SaveButton" to="." method="_on_SaveButton_pressed"]
 [connection signal="pressed" from="LeftBar/Buttons/CloseButton" to="." method="_on_CloseButton_pressed"]
 [connection signal="cursor_changed" from="TextEditor" to="." method="_on_TextEditor_cursor_changed"]
-[connection signal="text_changed" from="TextEditor" to="." method="_on_TextEditor_text_changed"]
 [connection signal="text_changed" from="TextEditor" to="TextEditor" method="_on_TextEditor_text_changed"]
+[connection signal="text_changed" from="TextEditor" to="." method="_on_TextEditor_text_changed"]

@@ -28,6 +28,7 @@ func _ready():
 	
 	# Connect myself to the scene manager so I know when a game has started
 	SceneManager.connect("game_start", self, "_on_game_start")
+	SceneManager.connect("new_scene", self, "_on_new_scene")
 
 
 func game_pause():
@@ -251,6 +252,10 @@ func left_clicked_on_entity(clickedEntity):
 		selectedEntities.erase(clickedEntity)
 	# Otherwise, select the entity
 	else:
+		# If we are not selectable, stop
+		if not clickedEntity.is_selectable():
+			return
+		
 		# Call select on the entity (Highlights him)
 		clickedEntity._select()
 	
@@ -436,6 +441,10 @@ func get_pause_game_button():
 	return $Menus/GameUI/PauseGame
 
 
+func get_button_pressed_sound():
+	return $ButtonPressed
+
+
 """ SETTERS """
 
 func set_inspected_entity(entity):
@@ -615,3 +624,31 @@ func _on_SaveGameMenu_pressed():
 
 func _on_QuitGameMenu_pressed():
 	push_view_to_stack(get_quit_menu())
+
+
+func _on_AnyButton_pressed():
+	get_button_pressed_sound().play()
+
+
+func _on_new_scene(scene):
+	# Connect to the scene pause and resume if they are there
+	if scene.has_method("_on_game_pause"):
+		connect("game_pause", scene, "_on_game_pause")
+	if scene.has_method("_on_game_resume"):
+		connect("game_resume", scene, "_on_game_resume")
+	
+	# BUTTON SETUP
+	# Loop through all of the buttons
+	var buttons = get_tree().get_nodes_in_group("Button")
+	
+	for button in buttons:
+		# Make sure it isn't already connected to the sound
+		if "_on_AnyButton_pressed" in button.get_signal_connection_list("pressed"):
+			continue
+		
+		button.connect("pressed", self, "_on_AnyButton_pressed")
+
+
+
+
+

@@ -140,8 +140,9 @@ func _ready():
 	add_color_region("//", "\n", Color.darkgray, true)
 	add_color_region("/*", "*/", Color(0.38, 0.59, 0.33))
 	
-	# Strings
+	# Strings and Characters
 	add_color_region("\"", "\"", Color(0.416, 0.53, 0.35))
+	add_color_region("'", "'", Color(0.416, 0.53, 0.35))
 
 
 """ SETTERS """

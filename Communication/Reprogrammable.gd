@@ -2,7 +2,7 @@ extends Node
 
 export (String, "Robot") var entityType = "Robot"
 
-var entityId: String = ""
+var entityId: String = "-1"
 var ready: bool = false
 var hasLoaded: bool = true
 var registerMessageSent: bool = false

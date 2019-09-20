@@ -28,7 +28,7 @@ _global_script_class_icons={
 
 config/name="Sentinel"
 run/main_scene="res://Scenes/MainMenu/MainMenu.tscn"
-config/icon="res://icon.png"
+config/icon="res://SentinelIcon.png"
 
 [autoload]
 

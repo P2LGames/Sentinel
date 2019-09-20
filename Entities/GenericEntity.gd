@@ -1,6 +1,7 @@
 extends KinematicBody
 
 export var notReprogrammable = false
+export var selectable = true
 export var displayName = ""
 
 var isReprogrammable = false
@@ -108,6 +109,10 @@ func load_from_data(data: Dictionary):
 
 
 """ ENTITY INTERACTION """
+
+func is_selectable():
+	return selectable
+
 
 func _select():
 	pass

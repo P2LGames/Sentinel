@@ -9,8 +9,8 @@ var isToggled = false
 
 var currentBodies = []
 
-signal toggle_on()
-signal toggle_off()
+signal toggle_on(_self)
+signal toggle_off(_self)
 
 
 func toggle_on():
@@ -19,9 +19,8 @@ func toggle_on():
 		return
 	
 	isToggled = true
-	
-	# Emit our toggled signal
-	emit_signal("toggle_on")
+	get_press_sound().play()
+	emit_signal("toggle_on", self)
 	
 	# Tween from where the door is currently
 	Util.tween_to_target_from_current(self, get_tween(), origin + offset, speed)
@@ -33,9 +32,7 @@ func toggle_off():
 		return
 	
 	isToggled = false
-	
-	# Emit our toggled signal
-	emit_signal("toggle_off")
+	emit_signal("toggle_off", self)
 	
 	# Tween from where the door is currently
 	Util.tween_to_target_from_current(self, get_tween(), origin, speed)
@@ -55,6 +52,10 @@ func update_plate():
 
 func get_tween():
 	return $Tween
+
+
+func get_press_sound():
+	return $PressSound
 
 
 """ SIGNALS """

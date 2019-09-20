@@ -8,6 +8,7 @@ const LEVEL_1 = "res://Scenes/Level_1/Level_1.tscn"
 var loadData = null
 
 signal game_start()
+signal new_scene(scene)
 
 
 func _ready():
@@ -15,6 +16,8 @@ func _ready():
 	
 	# Get the first scene to be loaded
 	currentScene = root.get_child(root.get_child_count() - 1)
+	
+	emit_signal("new_scene", currentScene)
 
 
 func go_to_main_menu():
@@ -34,6 +37,10 @@ func load_scene_with_data(path, data):
 
 
 func go_to_scene(path):
+	
+	# Clear all data to read and to send
+	CommunicationManager.toSend.clear()
+	
 	# This function will usually be called from a signal callback,
 	# or some other function in the current scene.
 	# Deleting the current scene at this point is
@@ -64,6 +71,9 @@ func _deferred_go_to_scene(path):
 	
 	# Optionally, to make it compatible with the SceneTree.change_scene() API.
 	get_tree().set_current_scene(currentScene)
+	
+	# A new scene has begun
+	emit_signal("new_scene", currentScene)
 	
 	# If the scene is a map
 	if currentScene.has_method("is_map"):

@@ -1,8 +1,8 @@
 [gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Entities/Components/Sensor/Sensor.gd" type="Script" id=1]
-[ext_resource path="res://Entities/Components/Sensor/SensorEyeOuter.tres" type="Material" id=2]
-[ext_resource path="res://Entities/Components/Sensor/SensorEyeInner.tres" type="Material" id=3]
+[ext_resource path="res://Assets/White.tres" type="Material" id=2]
+[ext_resource path="res://Assets/Black.tres" type="Material" id=3]
 
 [sub_resource type="CylinderShape" id=1]
 
@@ -26,7 +26,7 @@ collision_layer = 0
 shape = SubResource( 1 )
 
 [node name="Head" type="MeshInstance" parent="."]
-transform = Transform( -3.49691e-08, 0, -0.8, 0, 0.8, 0, 0.8, 0, -3.49691e-08, 0, 0, 0 )
+transform = Transform( 0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0 )
 mesh = SubResource( 2 )
 material/0 = SubResource( 3 )
 

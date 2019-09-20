@@ -84,7 +84,6 @@ func add_directory(root: TreeItem, dirPath: String, createNew: bool = true):
 			# Get the file name
 			var fileSplit = file.split(".")
 			var fileName = fileSplit[0]
-			print(fileSplit)
 			
 			# Create a tree item with it, with folder as the parent
 			var treeItem = create_item(folder)

@@ -93,7 +93,7 @@ func handle_movement():
 		var moveDirection = currOrders.move / abs(currOrders.move)
 		
 		# Get the movement vector
-		movement = -global_transform.basis.x * moveSpeed * moveDirection
+		movement = global_transform.basis.z * moveSpeed * moveDirection
 		
 		# If the distance is greater than the amount we wanted to move, stop
 		if startPosition.distance_to(global_transform.origin) > abs(currOrders.move):

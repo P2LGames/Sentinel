@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://Player/Player.gd" type="Script" id=1]
 [ext_resource path="res://Player/Windows/IDE/IDE.tscn" type="PackedScene" id=2]
@@ -8,10 +8,7 @@
 [ext_resource path="res://Assets/Fonts/NunitoBodyBold.tres" type="DynamicFont" id=6]
 [ext_resource path="res://Scenes/Shared/SaveGameList.tscn" type="PackedScene" id=7]
 [ext_resource path="res://Player/Windows/Menus/ConfirmOverwritePopup.gd" type="Script" id=8]
-
-
-
-
+[ext_resource path="res://Assets/Sounds/UISounds/ButtonClick.wav" type="AudioStream" id=9]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends LineEdit
@@ -58,6 +55,7 @@ script = ExtResource( 1 )
 layer = 2
 
 [node name="IDE" parent="IDE" instance=ExtResource( 2 )]
+margin_left = 544.0
 mouse_filter = 1
 
 [node name="InspectUI" type="Control" parent="IDE"]
@@ -80,6 +78,7 @@ anchor_bottom = 1.0
 text = "Edit Code"
 
 [node name="OutputPopupLayer" type="CanvasLayer" parent="."]
+editor/display_folded = true
 
 [node name="OutputPopup" parent="OutputPopupLayer" instance=ExtResource( 3 )]
 
@@ -94,7 +93,9 @@ visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="PauseGame" type="Button" parent="Menus/GameUI"]
+[node name="PauseGame" type="Button" parent="Menus/GameUI" groups=[
+"Button",
+]]
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -106.0
@@ -148,7 +149,9 @@ margin_right = 500.0
 margin_bottom = 164.0
 rect_min_size = Vector2( 0, 50 )
 
-[node name="QuitGameMenu" type="Button" parent="Menus/MenusContainer/PauseMenu/VBoxContainer/QuitContainer"]
+[node name="QuitGameMenu" type="Button" parent="Menus/MenusContainer/PauseMenu/VBoxContainer/QuitContainer" groups=[
+"Button",
+]]
 anchor_right = 1.0
 anchor_bottom = 1.0
 custom_fonts/font = ExtResource( 6 )
@@ -166,7 +169,9 @@ margin_right = 500.0
 margin_bottom = 242.0
 rect_min_size = Vector2( 0, 50 )
 
-[node name="SaveGameMenu" type="Button" parent="Menus/MenusContainer/PauseMenu/VBoxContainer/SaveContainer"]
+[node name="SaveGameMenu" type="Button" parent="Menus/MenusContainer/PauseMenu/VBoxContainer/SaveContainer" groups=[
+"Button",
+]]
 anchor_right = 1.0
 anchor_bottom = 1.0
 custom_fonts/font = ExtResource( 6 )
@@ -184,7 +189,9 @@ margin_right = 500.0
 margin_bottom = 320.0
 rect_min_size = Vector2( 0, 50 )
 
-[node name="Resume" type="Button" parent="Menus/MenusContainer/PauseMenu/VBoxContainer/ResumeContainer"]
+[node name="Resume" type="Button" parent="Menus/MenusContainer/PauseMenu/VBoxContainer/ResumeContainer" groups=[
+"Button",
+]]
 anchor_right = 1.0
 anchor_bottom = 1.0
 custom_fonts/font = ExtResource( 6 )
@@ -227,7 +234,9 @@ margin_right = 500.0
 margin_bottom = 164.0
 rect_min_size = Vector2( 0, 50 )
 
-[node name="QuitGame" type="Button" parent="Menus/MenusContainer/QuitMenu/VBoxContainer/QuitContainer"]
+[node name="QuitGame" type="Button" parent="Menus/MenusContainer/QuitMenu/VBoxContainer/QuitContainer" groups=[
+"Button",
+]]
 anchor_right = 1.0
 anchor_bottom = 1.0
 custom_fonts/font = ExtResource( 6 )
@@ -257,13 +266,16 @@ margin_right = 500.0
 margin_bottom = 320.0
 rect_min_size = Vector2( 0, 50 )
 
-[node name="Back" type="Button" parent="Menus/MenusContainer/QuitMenu/VBoxContainer/BackContainer"]
+[node name="Back" type="Button" parent="Menus/MenusContainer/QuitMenu/VBoxContainer/BackContainer" groups=[
+"Button",
+]]
 anchor_right = 1.0
 anchor_bottom = 1.0
 custom_fonts/font = ExtResource( 6 )
 text = "Back"
 
 [node name="SaveMenu" type="Panel" parent="Menus/MenusContainer"]
+editor/display_folded = true
 visible = false
 anchor_left = 0.5
 anchor_right = 0.5
@@ -332,13 +344,14 @@ margin_right = -20.0
 margin_bottom = -20.0
 
 [node name="BackContainer" type="Control" parent="Menus/MenusContainer/SaveMenu/HBoxContainer"]
-editor/display_folded = true
 margin_right = 266.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 0, 50 )
 size_flags_horizontal = 3
 
-[node name="Back" type="Button" parent="Menus/MenusContainer/SaveMenu/HBoxContainer/BackContainer"]
+[node name="Back" type="Button" parent="Menus/MenusContainer/SaveMenu/HBoxContainer/BackContainer" groups=[
+"Button",
+]]
 anchor_right = 1.0
 anchor_bottom = 1.0
 custom_fonts/font = ExtResource( 6 )
@@ -357,7 +370,9 @@ margin_bottom = 50.0
 rect_min_size = Vector2( 0, 50 )
 size_flags_horizontal = 3
 
-[node name="SaveGame" type="Button" parent="Menus/MenusContainer/SaveMenu/HBoxContainer/SaveContainer"]
+[node name="SaveGame" type="Button" parent="Menus/MenusContainer/SaveMenu/HBoxContainer/SaveContainer" groups=[
+"Button",
+]]
 anchor_right = 1.0
 anchor_bottom = 1.0
 custom_fonts/font = ExtResource( 6 )
@@ -375,12 +390,16 @@ margin_top = -100.0
 margin_right = 200.0
 margin_bottom = -168.0
 script = ExtResource( 8 )
+
+[node name="ButtonPressed" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 9 )
+volume_db = -25.0
 [connection signal="about_to_show" from="IDE/IDE" to="IDE/IDE" method="_on_IDE_about_to_show"]
-[connection signal="popup_hide" from="IDE/IDE" to="IDE/IDE" method="_on_IDE_popup_hide"]
 [connection signal="popup_hide" from="IDE/IDE" to="." method="_on_IDE_closing"]
+[connection signal="popup_hide" from="IDE/IDE" to="IDE/IDE" method="_on_IDE_popup_hide"]
 [connection signal="about_to_show" from="OutputPopupLayer/OutputPopup" to="OutputPopupLayer/OutputPopup" method="_on_OutputPopup_about_to_show"]
-[connection signal="popup_hide" from="OutputPopupLayer/OutputPopup" to="OutputPopupLayer/OutputPopup" method="_on_OutputPopup_popup_hide"]
 [connection signal="popup_hide" from="OutputPopupLayer/OutputPopup" to="." method="_on_OutputPopup_closing"]
+[connection signal="popup_hide" from="OutputPopupLayer/OutputPopup" to="OutputPopupLayer/OutputPopup" method="_on_OutputPopup_popup_hide"]
 [connection signal="id_pressed" from="OutputPopupLayer/Inspect" to="." method="_on_Inspect_id_pressed"]
 [connection signal="pressed" from="Menus/GameUI/PauseGame" to="." method="_on_PauseGame_pressed"]
 [connection signal="pressed" from="Menus/MenusContainer/PauseMenu/VBoxContainer/QuitContainer/QuitGameMenu" to="." method="_on_QuitGameMenu_pressed"]
@@ -391,8 +410,8 @@ script = ExtResource( 8 )
 [connection signal="file_selected" from="Menus/MenusContainer/SaveMenu/SaveGameList" to="Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit" method="_on_SaveGameList_file_selected"]
 [connection signal="game_save" from="Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit" to="." method="_on_game_save"]
 [connection signal="text_changed" from="Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit" to="Menus/MenusContainer/SaveMenu/HBoxContainer/SaveContainer/SaveGame" method="_on_LineEdit_text_changed"]
-[connection signal="pressed" from="Menus/MenusContainer/SaveMenu/HBoxContainer/BackContainer/Back" to="Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit" method="_on_Back_pressed"]
 [connection signal="pressed" from="Menus/MenusContainer/SaveMenu/HBoxContainer/BackContainer/Back" to="." method="_on_Back_pressed"]
+[connection signal="pressed" from="Menus/MenusContainer/SaveMenu/HBoxContainer/BackContainer/Back" to="Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit" method="_on_Back_pressed"]
 [connection signal="pressed" from="Menus/MenusContainer/SaveMenu/HBoxContainer/SaveContainer/SaveGame" to="." method="_on_game_save"]
-[connection signal="confirmed" from="Menus/ConfirmOverwritePopup" to="Menus/ConfirmOverwritePopup" method="_on_ConfirmOverwritePopup_confirmed"]
 [connection signal="confirmed" from="Menus/ConfirmOverwritePopup" to="." method="_on_game_save_overwrite"]
+[connection signal="confirmed" from="Menus/ConfirmOverwritePopup" to="Menus/ConfirmOverwritePopup" method="_on_ConfirmOverwritePopup_confirmed"]

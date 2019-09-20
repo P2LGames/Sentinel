@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Assets/Black.tres" type="Material" id=1]
+[ext_resource path="res://Assets/White.tres" type="Material" id=2]
+
+
+
+
+
+[sub_resource type="CylinderMesh" id=1]
+
+[sub_resource type="CylinderMesh" id=2]
+
+[node name="Interface" type="Spatial"]
+
+[node name="Outer" type="MeshInstance" parent="."]
+transform = Transform( 0.5, 0, 0, 0, -6.99382e-09, -0.5, 0, 0.16, -2.18557e-08, 0, -6.68251e-09, 0.152878 )
+mesh = SubResource( 1 )
+material/0 = ExtResource( 1 )
+
+[node name="Inner" type="MeshInstance" parent="Outer"]
+transform = Transform( 0.5, 0, 0, 0, 0.5, 0, 0, -7.10543e-15, 0.5, 0, 0.539227, -7.15256e-07 )
+mesh = SubResource( 2 )
+material/0 = ExtResource( 2 )

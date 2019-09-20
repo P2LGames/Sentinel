@@ -5,6 +5,10 @@ var viewStack = []
 var selectedFilePath = ""
 
 func _ready():
+	OS.set_borderless_window(true)
+	OS.set_window_size(OS.get_screen_size())
+	OS.set_window_position(Vector2(0, 0))
+	
 	# Add the main menu to the stack
 	viewStack.append(get_main_menu())
 	
@@ -13,6 +17,8 @@ func _ready():
 	
 	# Run the idle animation
 	run_idle()
+	
+	Player._on_new_scene(self)
 
 
 func run_idle():

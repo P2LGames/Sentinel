@@ -11,8 +11,8 @@ var entityMap := Dictionary()
 var entityPlaceholderMap := Dictionary()
 
 # Client variables
-const HOST = "localhost"
-#const HOST = "pgframework.westus.azurecontainer.io"
+#const HOST = "localhost"
+const HOST = "pgframework.westus.azurecontainer.io"
 const PORT = 5545
 var client = StreamPeerTCP.new()
 
@@ -97,7 +97,7 @@ func entity_register_handler(responseData: PoolByteArray):
 		
 		# Save the new id
 		entityMap[str(entityId)] = entity
-
+		
 		# Delete the old mapping in the placeholder
 		entityPlaceholderMap.erase(str(placeholderId))
 	else:
@@ -130,16 +130,19 @@ func command_handler(responseData: PoolByteArray):
 		# Get the command's return value
 		var value = PoolByteArray(Util.slice_array(responseData, 10))
 		
-		# Get the entity from the placeholder map, have it save its new id
-		var entity = entityMap[str(entityId)]
+		if str(entityId) in entityMap.keys():
+			# Get the entity from the placeholder map, have it save its new id
+			var entity = entityMap[str(entityId)]
 		
-		# Make sure he has the _handle_command method
-		if entity.has_method("_handle_command"):
-			# Send him the command and the return value of that command
-			entity._handle_command(commandId, value)
-		# If he doesn't throw an error
+			# Make sure he has the _handle_command method
+			if entity.has_method("_handle_command"):
+				# Send him the command and the return value of that command
+				entity._handle_command(commandId, value)
+			# If he doesn't throw an error
+			else:
+				print("ERROR: Reprogrammable entities must have the _handle_command(commandId: int, value: PoolByteArray) method")
 		else:
-			print("ERROR: Reprogrammable entities must have the _handle_command(commandId: int, value: PoolByteArray) method")
+			print("ERROR: Entity does not exist, ", entityId)
 	else:
 		# Get the entity and command id from the failed register request
 		var entityId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 2, 6)))
@@ -265,6 +268,10 @@ func register_entity(newEntity, entityTypeId: int) -> bool:
 
 
 func command(entityId: int, commandId: int, hasParameter: bool, parameter: PoolByteArray) -> bool:
+	# If the entityId is -1, then they are not setup yet, don't send anything
+	if entityId == -1:
+		return false
+	
 	# Create the request
 	var commandRequest = FrameworkModels.create_command_request(entityId, commandId, hasParameter, parameter)
 	
@@ -273,6 +280,10 @@ func command(entityId: int, commandId: int, hasParameter: bool, parameter: PoolB
 
 
 func file_update(entityId: int, commandId: int, className: String, fileContents: String) -> bool:
+	# If the entityId is -1, then they are not setup yet, don't send anything
+	if entityId == -1:
+		return false
+	
 	# Create the request
 	var fileUpdateRequest = FrameworkModels.create_file_update_request(entityId, commandId, className, fileContents)
 	

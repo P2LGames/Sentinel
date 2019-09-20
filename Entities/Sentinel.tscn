@@ -2,8 +2,9 @@
 
 [ext_resource path="res://Entities/Sentinel.gd" type="Script" id=1]
 [ext_resource path="res://Communication/Reprogrammable.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Entities/Components/Treads/Treads.tscn" type="PackedScene" id=3]
-[ext_resource path="res://Entities/Components/Sensor/Sensor.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Entities/AttachmentPoint.gd" type="Script" id=3]
+[ext_resource path="res://Entities/Components/Treads/Treads.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Entities/Components/Sensor/Sensor.tscn" type="PackedScene" id=5]
 
 [sub_resource type="CylinderShape" id=1]
 radius = 0.73
@@ -26,21 +27,6 @@ surfaces/0 = {
 albedo_color = Color( 0.054902, 1, 0, 1 )
 
 [sub_resource type="CubeMesh" id=4]
-
-[sub_resource type="GDScript" id=5]
-script/source = "extends Spatial
-
-export (int, \"SELF\", \"HEAD\", \"BASE\", \"LEFT\", \"RIGHT\", \"FRONT\", \"BACK\") var attachmentPosition = 0
-
-func get_attachment_position():
-	return attachmentPosition
-
-func get_attachment():
-	for child in get_children():
-		if child.has_method(\"pass_order\"):
-			return child
-	
-	return null"
 
 [node name="Sentinel" type="KinematicBody" groups=[
 "Persist",
@@ -71,14 +57,29 @@ transform = Transform( 0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0, 0 )
 
 [node name="Base" type="Spatial" parent="AttachmentContainer"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0 )
-script = SubResource( 5 )
+script = ExtResource( 3 )
 attachmentPosition = 2
 
-[node name="Treads" parent="AttachmentContainer/Base" instance=ExtResource( 3 )]
+[node name="Treads" parent="AttachmentContainer/Base" instance=ExtResource( 4 )]
 
 [node name="Head" type="Spatial" parent="AttachmentContainer"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0 )
-script = SubResource( 5 )
+script = ExtResource( 3 )
 attachmentPosition = 1
 
-[node name="Sensor" parent="AttachmentContainer/Head" instance=ExtResource( 4 )]
+[node name="Sensor" parent="AttachmentContainer/Head" instance=ExtResource( 5 )]
+
+[node name="Front" type="Spatial" parent="AttachmentContainer"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1 )
+script = ExtResource( 3 )
+attachmentPosition = 5
+
+[node name="Left" type="Spatial" parent="AttachmentContainer"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0 )
+script = ExtResource( 3 )
+attachmentPosition = 3
+
+[node name="Right" type="Spatial" parent="AttachmentContainer"]
+transform = Transform( -1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 0, 0, 1, -1, 0, 0 )
+script = ExtResource( 3 )
+attachmentPosition = 4

@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Assets/Blue.tres" type="Material" id=1]
+
+[sub_resource type="PrismMesh" id=1]
+
+[sub_resource type="CylinderShape" id=2]
+radius = 0.620569
+height = 1.10392
+
+[node name="MineralsPickup" type="Spatial"]
+
+[node name="MeshInstance" type="MeshInstance" parent="."]
+transform = Transform( 0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.1, 0, 0, 0 )
+mesh = SubResource( 1 )
+material/0 = ExtResource( 1 )
+
+[node name="MeshInstance2" type="MeshInstance" parent="."]
+transform = Transform( -0.18866, 0.0660349, -0.0034168, 0.0152245, 0.0630736, 0.0945911, 0.0646183, 0.177936, -0.0322621, 0, -7.15256e-07, 0 )
+mesh = SubResource( 1 )
+material/0 = ExtResource( 1 )
+
+[node name="MeshInstance3" type="MeshInstance" parent="."]
+transform = Transform( 0.158871, -0.120846, 0.00625284, 0, -0.020587, -0.0994688, 0.121491, 0.158027, -0.00817668, 0, -7.15256e-07, 0 )
+mesh = SubResource( 1 )
+material/0 = ExtResource( 1 )
+
+[node name="OmniLight" type="OmniLight" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.276549, 0 )
+light_color = Color( 0.027451, 0.0431373, 0.92549, 1 )
+light_energy = 1.5
+
+[node name="Area" type="Area" parent="."]
+
+[node name="CollisionShape" type="CollisionShape" parent="Area"]
+shape = SubResource( 2 )
+
+[node name="Pickable" type="Node" parent="."]

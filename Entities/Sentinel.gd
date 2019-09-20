@@ -13,6 +13,7 @@ var orders = []
 
 var movement = Vector3.ZERO
 var processing = false
+var lastProcess = 0.0
 
 func _ready():
 	# Super call to ready
@@ -39,9 +40,13 @@ func _process(delta):
 		if ORDER_TYPES.PRINT in orders[0]:
 			orders.remove(0)
 	
+	#lastProcess += delta
+	
 	# If we are ready to send stuff, and we haven't processed, process!
 	if is_reprogrammable_ready() and not processing:
 		processing = true
+		#print("Delta Process: ", lastProcess)
+		#lastProcess = 0.0
 		
 		CommunicationManager.command(get_reprogrammable_id(), COMMAND_ID_PROCESS, false, [])
 
@@ -114,6 +119,10 @@ func get_attachment_container():
 
 func get_attachment_positions():
 	return get_attachment_container().get_children()
+
+
+func has_attachment():
+	pass
 
 
 """ SETTERS """
@@ -235,7 +244,6 @@ func save():
 		if pos == Constants.ATTACHMENT_POSITIONS.SELF or positionToAttachment[pos] == null:
 			continue
 		
-		print("Position: ", pos)
 		saveData["attachmentData"][pos] = positionToAttachment[pos].save()
 	
 	# Return the save data
@@ -267,7 +275,6 @@ func load_from_data(data: Dictionary):
 		# Create a new attachment using the name and path
 		var attachment = load(attachmentData[pos]["filename"]).instance()
 		get_node(parentPath).add_child(attachment)
-		
 		
 		# Add the attachment
 		add_attachment(int(pos), attachment)
