@@ -190,7 +190,7 @@ func command_error_handler(responseData: PoolByteArray):
 
 func file_update_handler(responseData: PoolByteArray):
 	"""Handles file update responses"""
-	# If the first byte is a 1, then the command was successful
+	# If the first byte is a 1, then the update was successful
 	if responseData[0] == 1:
 		# Parse the command and entity id out of the arrays
 		var entityId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 2, 6)))

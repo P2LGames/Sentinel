@@ -45,6 +45,9 @@ func _process(delta):
 	# If we are ready to send stuff, and we haven't processed, process!
 	if is_reprogrammable_ready() and not processing:
 		processing = true
+		
+		# Start the reset process timer
+		get_reset_process().start()
 		#print("Delta Process: ", lastProcess)
 		#lastProcess = 0.0
 		
@@ -125,6 +128,10 @@ func has_attachment():
 	pass
 
 
+func get_reset_process():
+	return $ResetProcess
+
+
 """ SETTERS """
 
 func set_movement(movement: Vector3):
@@ -198,8 +205,9 @@ func _handle_command(commandId: int, value: PoolByteArray):
 			# Set the order bytes to no longer have the order we just pulled out of it
 			orderBytes = PoolByteArray(Util.slice_array(orderBytes, 12 + messageLength))
 		
-		# We have indeed processed
+		# We have indeed processed, interrupt the reset process
 		processing = false
+		get_reset_process().stop()
 	# Input command
 	elif commandId == COMMAND_ID_INPUT:
 		pass
@@ -223,10 +231,10 @@ func pass_order(orderType: int, orderBytes: PoolByteArray):
 
 
 func print_error(error: int, message: String):
-	var mess = "Error Code: " + str(error) + ". " + message
+	var errorMessage = "Error Code: " + str(error) + ". " + message
 	
 	# Print the error
-	print_message(mess, Constants.MESSAGE_TYPE.ERROR)
+	print_message(errorMessage, Constants.MESSAGE_TYPE.ERROR)
 
 
 """ PERSISTENCE """
@@ -285,3 +293,8 @@ func load_from_data(data: Dictionary):
 
 """ SIGNALS """
 
+func _on_ResetProcess_timeout():
+	"""This is called when a robot's process is taking too long, 
+	or if it was an infinite loop.
+	"""
+	processing = false

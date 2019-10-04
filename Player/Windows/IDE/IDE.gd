@@ -42,6 +42,12 @@ func _process(delta):
 		recompile()
 	elif Input.is_action_just_pressed("hide_window"):
 		hide()
+	elif Input.is_action_just_pressed("font_size_increase"):
+		get_text_editor().font_size_increase()
+		get_output_text_node().font_size_increase()
+	elif Input.is_action_just_pressed("font_size_decrease"):
+		get_text_editor().font_size_decrease()
+		get_output_text_node().font_size_decrease()
 	
 	if rect_global_position != savedPosition:
 		# Save it's position...

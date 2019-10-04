@@ -1,7 +1,7 @@
 [gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://Scenes/Level_1/Level_1.gd" type="Script" id=1]
-[ext_resource path="res://Scenes/Level_1/GridMap_Level_1.meshlib" type="MeshLibrary" id=2]
+[ext_resource path="res://Scenes/Shared/GridMaps/GridMapStoneGrass.meshlib" type="MeshLibrary" id=2]
 [ext_resource path="res://Entities/Sentinel.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Scenes/Shared/PressurePlate.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Scenes/Shared/SlidingDoor.tscn" type="PackedScene" id=5]
@@ -18,8 +18,8 @@ extents = Vector3( 2.87753, 1, 5.77111 )
 [sub_resource type="BoxShape" id=2]
 
 [node name="Level_1" type="Spatial" groups=[
-"PersistMap",
 "Level",
+"PersistMap",
 ]]
 script = ExtResource( 1 )
 

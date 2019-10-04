@@ -53,6 +53,7 @@ mesh = SubResource( 4 )
 material/0 = null
 
 [node name="AttachmentContainer" type="Spatial" parent="."]
+editor/display_folded = true
 transform = Transform( 0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0, 0 )
 
 [node name="Base" type="Spatial" parent="AttachmentContainer"]
@@ -83,3 +84,7 @@ attachmentPosition = 3
 transform = Transform( -1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 0, 0, 1, -1, 0, 0 )
 script = ExtResource( 3 )
 attachmentPosition = 4
+
+[node name="ResetProcess" type="Timer" parent="."]
+wait_time = 5.5
+[connection signal="timeout" from="ResetProcess" to="." method="_on_ResetProcess_timeout"]

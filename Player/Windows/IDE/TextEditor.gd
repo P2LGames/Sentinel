@@ -1,6 +1,18 @@
 extends TextEdit
 
 
+func font_size_increase():
+	set_font_size(get_font_size() + 1)
+
+
+func font_size_decrease():
+	var newFontSize = get_font_size() - 1
+	
+	# Cap the size at FONT_SIZE_MINIMUM
+	if newFontSize >= Constants.FONT_SIZE_MINIMUM:
+		set_font_size(newFontSize)
+
+
 func hide_rows():
 	
 	var startLine = 0
@@ -144,6 +156,11 @@ func _ready():
 	add_color_region("\"", "\"", Color(0.416, 0.53, 0.35))
 	add_color_region("'", "'", Color(0.416, 0.53, 0.35))
 
+""" GETTERS """
+
+func get_font_size():
+	return get("custom_fonts/font").get_size()
+
 
 """ SETTERS """
 
@@ -160,6 +177,10 @@ func set_focus(line: int, column: int):
 	
 	cursor_set_line(line)
 	cursor_set_column(column)
+
+
+func set_font_size(fontSize: int):
+	get("custom_fonts/font").set_size(fontSize)
 
 
 """ SIGNALS """

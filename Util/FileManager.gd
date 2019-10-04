@@ -29,7 +29,6 @@ func copy_dir(from: String, to: String, overwrite: bool = false):
 				copy_dir(filePath, toFolder)
 			# Otherwise, if the file exists, and we want to copy the file
 			elif dir.file_exists(toFilePath) and overwrite:
-				print("Overwrite!")
 				# Copy it!
 				dir.copy(filePath, toFilePath)
 			# Otherwise, if the file does not exist, copy it

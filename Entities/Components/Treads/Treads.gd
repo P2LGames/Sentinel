@@ -51,7 +51,7 @@ func parse_orders():
 			var moveAmount = Util.bytes2float(orders[0].parameter)
 			
 			# Set the move in the current orders to this
-			currOrders.move = moveAmount
+			currOrders.move = moveAmount * 2.0
 			
 			# Setup start position
 			startPosition = global_transform.origin
@@ -96,8 +96,9 @@ func handle_movement():
 		movement = global_transform.basis.z * moveSpeed * moveDirection
 		
 		# If the distance is greater than the amount we wanted to move, stop
-		if startPosition.distance_to(global_transform.origin) > abs(currOrders.move):
+		if startPosition.distance_to(global_transform.origin) >= abs(currOrders.move) - moveSpeed / 160.0:
 			currOrders.move = 0
+			movement = Vector3.ZERO
 			
 			# We want to tell the cpu that we finished
 			send_action_finished_event()
@@ -129,6 +130,9 @@ func handle_rotation(delta: float):
 		if currentTurnAmount >= abs(rotateAmount):
 			currOrders.rotate[0] = -1
 			currentTurnAmount = 0.0
+			
+			# We want to tell the cpu that we finished
+			send_action_finished_event()
 	# If the order it to rotate to...
 	elif currOrders.rotate[0] == ORDER_TYPES.ROTATE_TO:
 		pass

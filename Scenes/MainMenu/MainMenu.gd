@@ -51,7 +51,7 @@ func run_idle():
 
 
 func start_new_game():
-	SceneManager.go_to_level_1()
+	SceneManager.go_to_scene(SceneManager.LEVEL_1)
 
 
 func push_view_to_stack(view):

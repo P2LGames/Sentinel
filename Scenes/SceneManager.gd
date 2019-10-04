@@ -1,10 +1,13 @@
 extends Node
 
-var currentScene = null
+""" SCENES """
 
 const MAIN_MENU = "res://Scenes/MainMenu/MainMenu.tscn"
 const LEVEL_1 = "res://Scenes/Level_1/Level_1.tscn"
+const LEVEL_2 = "res://Scenes/Level_2/Level_2.tscn"
 
+
+var currentScene = null
 var loadData = null
 
 signal game_start()
@@ -22,10 +25,6 @@ func _ready():
 
 func go_to_main_menu():
 	go_to_scene(MAIN_MENU)
-
-
-func go_to_level_1():
-	go_to_scene(LEVEL_1)
 
 
 func load_scene_with_data(path, data):

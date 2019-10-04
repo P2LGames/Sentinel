@@ -118,6 +118,7 @@ static func create_command_request(entityId: int, commandId: int, hasParameter: 
 	# Return the byte array
 	return bytes
 
+
 static func create_file_update_request(entityId: int, commandId: int, className: String, fileContents: String):
 	# Setup our register bytes, including our entityId and placeholderId
 	var fileUpdateBytes = PoolByteArray()

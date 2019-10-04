@@ -3,43 +3,12 @@
 [ext_resource path="res://Player/Windows/IDE/IDE.gd" type="Script" id=1]
 [ext_resource path="res://Assets/Fonts/NunitoBodyBold.tres" type="DynamicFont" id=2]
 [ext_resource path="res://Player/Windows/IDE/FileTree.gd" type="Script" id=3]
-[ext_resource path="res://Player/Windows/IDE/TextEditor.gd" type="Script" id=4]
-[ext_resource path="res://Assets/Fonts/NunitoBody.tres" type="DynamicFont" id=5]
-[ext_resource path="res://Player/Windows/Output/OutputText.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Assets/Fonts/NunitoCode.tres" type="DynamicFont" id=4]
+[ext_resource path="res://Player/Windows/IDE/TextEditor.gd" type="Script" id=5]
+[ext_resource path="res://Assets/Fonts/NunitoBody.tres" type="DynamicFont" id=6]
+[ext_resource path="res://Player/Windows/Output/OutputText.tscn" type="PackedScene" id=7]
 
 [sub_resource type="StyleBoxEmpty" id=1]
-
-[sub_resource type="GDScript" id=2]
-script/source = "extends TextEdit
-
-
-func add_output(printMessage):
-	# Add the text to the text edit
-	insert_text_at_cursor(printMessage.message)
-	
-	# Move the cursor to the end, this will move the viewport down
-	cursor_set_line(get_line_count())
-	
-	# TODO: Color the text depending on the type
-
-
-func set_output(output: Array):
-	# Clear the current text
-	text = \"\"
-	
-	# Loop through each message in the output and add it to the text edit
-	for message in output:
-		add_output(message)
-
-
-\"\"\" SIGNALS \"\"\"
-
-func _on_TargetEntity_print_message(printMessage):
-	add_output(printMessage)
-
-
-
-"
 
 [node name="IDE" type="WindowDialog" groups=[
 "CodePanel",
@@ -206,6 +175,7 @@ anchor_right = 1.0
 anchor_bottom = 0.8
 margin_left = 170.713
 margin_right = -3.28748
+custom_fonts/font = ExtResource( 4 )
 highlight_current_line = true
 syntax_highlighting = true
 show_line_numbers = true
@@ -213,7 +183,7 @@ breakpoint_gutter = true
 highlight_all_occurrences = true
 smooth_scrolling = true
 hiding_enabled = 1
-script = ExtResource( 4 )
+script = ExtResource( 5 )
 
 [node name="OutputArea" type="Control" parent="."]
 anchor_top = 0.8
@@ -226,12 +196,11 @@ margin_right = -2.0
 margin_left = -0.40918
 margin_right = 48.5908
 margin_bottom = 23.0
-custom_fonts/font = ExtResource( 5 )
+custom_fonts/font = ExtResource( 6 )
 text = "Output"
 
-[node name="OutputText" parent="OutputArea" instance=ExtResource( 6 )]
+[node name="OutputText" parent="OutputArea" instance=ExtResource( 7 )]
 custom_styles/read_only = SubResource( 1 )
-script = SubResource( 2 )
 [connection signal="file_dirtied" from="." to="LeftBar/FileTree" method="_on_IDE_file_dirtied"]
 [connection signal="resized" from="." to="." method="_on_IDE_resized"]
 [connection signal="text_changed" from="LeftBar/EntityData/EntityName/TargetName" to="." method="_on_TargetName_text_changed"]
@@ -241,5 +210,5 @@ script = SubResource( 2 )
 [connection signal="pressed" from="LeftBar/Buttons/SaveButton" to="." method="_on_SaveButton_pressed"]
 [connection signal="pressed" from="LeftBar/Buttons/CloseButton" to="." method="_on_CloseButton_pressed"]
 [connection signal="cursor_changed" from="TextEditor" to="." method="_on_TextEditor_cursor_changed"]
-[connection signal="text_changed" from="TextEditor" to="TextEditor" method="_on_TextEditor_text_changed"]
 [connection signal="text_changed" from="TextEditor" to="." method="_on_TextEditor_text_changed"]
+[connection signal="text_changed" from="TextEditor" to="TextEditor" method="_on_TextEditor_text_changed"]

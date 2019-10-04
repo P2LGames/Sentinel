@@ -15,6 +15,7 @@ const CLICK_RAY_LENGTH = 1000
 
 const GENERIC_CODE_DIR = "res://Code/Default/"
 const LEVEL_1_CODE_DIR = "res://Code/Level_1/"
+const LEVEL_2_CODE_DIR = "res://Code/Level_2/"
 
 const PLAYER_CODE_DIR = "user://Code/"
 
@@ -67,6 +68,8 @@ const INPUT_TYPES = {
 	
 	ACTION_FINISHED = 20
 }
+
+const FONT_SIZE_MINIMUM = 12
 
 """ SAVING INFORMATION/PATHS """
 
