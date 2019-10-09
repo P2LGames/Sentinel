@@ -78,19 +78,16 @@ func recompile():
 	# Save the current file
 	save_file()
 	
-	# Get the entity id
+	# Get the entity id, file path, class name and file text
 	var targetEntityId = Player.get_inspected_entity_id()
-	
-	# Get the class name
+	var filePath = currentFile.get_file_path()
 	var className = currentFile.get_class_name()
-	
-	# Get the file text
 	var fileText = get_text_editor().text
 	
 	# If the inspected entity exists and we have a class name
 	if targetEntityId != null and className != null:
 		# Recompile his code with this one
-		CommunicationManager.file_update(targetEntityId, -1, className, fileText)
+		CommunicationManager.file_update(targetEntityId, -1, filePath, className, fileText)
 		
 		# Set the current class folder
 		Player.get_inspected_entity().get_reprogrammable_component().currentClassPath = currentFilePath
@@ -104,16 +101,14 @@ func recompile_entity_from_file(entity, entityId, filePath):
 	if ideFile == null:
 		return
 	
-	# Get the class name
+	# Get the class name and file text
 	var className = ideFile.get_class_name()
-	
-	# Get the file text
 	var fileText = ideFile.get_text()
 	
 	# If the inspected entity exists and we have a class name
 	if className != null:
 		# Recompile his code with this one
-		CommunicationManager.file_update(entityId, -1, className, fileText)
+		CommunicationManager.file_update(entityId, -1, filePath, className, fileText)
 		
 		# Set the class folder
 		entity.get_reprogrammable_component().currentClassPath = filePath

@@ -53,7 +53,6 @@ mesh = SubResource( 4 )
 material/0 = null
 
 [node name="AttachmentContainer" type="Spatial" parent="."]
-editor/display_folded = true
 transform = Transform( 0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0, 0 )
 
 [node name="Base" type="Spatial" parent="AttachmentContainer"]

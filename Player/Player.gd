@@ -295,8 +295,11 @@ func inspect_entity(clickedEntity):
 
 """ UI HANDLING """
 
-
 func ide_show():
+	# If the IDE is already visible, stop
+	if ide.visible:
+		return
+	
 	# Show the IDE
 	ide.popup()
 	
@@ -309,15 +312,19 @@ func ide_show():
 
 
 func ide_hide():
+	# Update the pause button
+	update_pause_button()
+	
+	# If the IDE is already invisible, stop
+	if not ide.visible:
+		return
+	
 	# If we want to show our popup, do so
 	if outputRepopup:
 		get_output_popup().popup()
 	
 	# Set output visible to false
 	outputRepopup = false
-	
-	# Update the pause button
-	update_pause_button()
 
 
 func ide_update_files():
@@ -466,24 +473,26 @@ func set_inspected_entity(entity):
 		# Get the reprogrammable component
 		var reprogrammableComponent = inspectedEntity.get_reprogrammable_component()
 		
-		# Disconnect him from the print message in the output text
+		# Disconnect signals:
+		# The print message in the output text
 		reprogrammableComponent.disconnect("message_printed", 
 				ideOutputText, "_on_TargetEntity_print_message")
-		
-		# Disconnect the class changed from the ide
+		# The class changed from the ide
 		reprogrammableComponent.disconnect("class_changed", 
 				ide, "_on_TargetEntity_class_changed")
-		
-		# Disconnect the output stuff from the output text edit as well
+		# The output stuff from the output text
 		reprogrammableComponent.disconnect("message_printed", 
 				popupOutputText, "_on_TargetEntity_print_message")
-		
-		# Disconnect the display name change from the popup
+		# The display name change from the popup
 		inspectedEntity.disconnect("display_name_changed", 
 				popup, "_on_TargetEntity_name_changed")
 	
 	# Set the entity
 	inspectedEntity = entity
+	
+	# If a null value was passed, stop here
+	if inspectedEntity == null:
+		return
 	
 	# Get the reprogrammable component
 	var reprogrammableComponent = inspectedEntity.get_reprogrammable_component()
@@ -498,21 +507,17 @@ func set_inspected_entity(entity):
 	
 	# Pass the current output to the text edit
 	ideOutputText.set_output(outputText)
-	
-	# Connect the new messages to the text edit
-	reprogrammableComponent.connect("message_printed", ideOutputText, "_on_TargetEntity_print_message")
-	
-	# Connect the class changed to the output label
-	reprogrammableComponent.connect("class_changed", ide, "_on_TargetEntity_class_changed")
-	
-	# Pass the current output to the text edit
 	popupOutputText.set_output(outputText)
 	
-	# Connect the new messages to the popup
+	# Connect up signals:
+	# New messages to the text edit
+	reprogrammableComponent.connect("message_printed", ideOutputText, "_on_TargetEntity_print_message")
+	# Class changed to the output label
+	reprogrammableComponent.connect("class_changed", ide, "_on_TargetEntity_class_changed")
+	# The new messages to the popup
 	reprogrammableComponent.connect("message_printed", 
 		popupOutputText, "_on_TargetEntity_print_message")
-	
-	# Connect the name change to the popup
+	# The name change to the popup
 	inspectedEntity.connect("display_name_changed", popup, "_on_TargetEntity_name_changed")
 	
 	# Set the popup's window name

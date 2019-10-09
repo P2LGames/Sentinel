@@ -132,7 +132,7 @@ func get_tree_item_from_path(itemPath: String):
 	"""
 	Gets the item (file) using the given item (file) path.
 	The beginning of the path should match 'rootPath'.
-	It will be replaced with and empty string to get a root of '/'.
+	It will be replaced with an empty string to get a root of '/'.
 	
 	Returns the root if the path is invalid.
 	
@@ -143,7 +143,8 @@ func get_tree_item_from_path(itemPath: String):
 		item (TreeItem): The item found from the given path
 	"""
 	# Replace the root with nothing
-	itemPath = itemPath.replace(rootPath, "")
+	itemPath = itemPath.get_basename().replace(rootPath, "")
+	print(itemPath)
 	
 	# If the item path is a slash, or empty, return root
 	if itemPath == "/" or itemPath == "":
@@ -166,16 +167,11 @@ func get_tree_item_from_path(itemPath: String):
 		# If the part is empty, skip it
 		if part == "":
 			continue
-		
-		# Get the child text and make sure it doesn't have an asterisk
-#		var childText = child.get_text(0)
-#		if childText.ends_with("*"):
-#			print("Got here")
-#			childText.replace("*", "")
-#		print(childText)
+		print(part)
 		
 		# While the child's text does not equal the part
 		while child.get_text(0) != part:
+			print("Child Text: " + child.get_text(0))
 			child = child.get_next()
 			
 			# If the child is null, return the root
@@ -189,6 +185,7 @@ func get_tree_item_from_path(itemPath: String):
 			return child
 	
 	# Return the child
+	print("Child Text: " + child.get_text(0))
 	return child
 
 

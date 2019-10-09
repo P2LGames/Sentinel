@@ -51,7 +51,7 @@ func delete(path: String):
 
 
 func find(fileName: String, recursive: bool = true):
-	pass
+	return "NEEDS IMPLEMENTATION"
 
 
 func get_dir_contents(path: String):

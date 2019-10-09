@@ -119,17 +119,21 @@ static func create_command_request(entityId: int, commandId: int, hasParameter: 
 	return bytes
 
 
-static func create_file_update_request(entityId: int, commandId: int, className: String, fileContents: String):
+static func create_file_update_request(entityId: int, commandId: int, filePath: String, 
+	className: String, fileContents: String):
 	# Setup our register bytes, including our entityId and placeholderId
 	var fileUpdateBytes = PoolByteArray()
 	fileUpdateBytes += Util.int2bytes(entityId)
 	fileUpdateBytes += Util.int2bytes(commandId)
 	
 	# Turn each string into a byte array
+	var filePathBytes = filePath.to_ascii()
 	var classNameBytes = (file_package_prefix + className).to_ascii()
 	var fileContentsBytes = fileContents.to_ascii()
 	
 	# Add the lengths of each and the byte array
+	fileUpdateBytes += Util.int2bytes(filePathBytes.size())
+	fileUpdateBytes += filePathBytes
 	fileUpdateBytes += Util.int2bytes(classNameBytes.size())
 	fileUpdateBytes += classNameBytes
 	fileUpdateBytes += Util.int2bytes(fileContentsBytes.size())

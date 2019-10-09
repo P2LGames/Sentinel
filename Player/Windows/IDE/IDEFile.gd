@@ -1,6 +1,6 @@
 class_name IDEFile
 
-var _currPath
+var _filePath
 var _className
 var _fileType
 var _focusLine
@@ -19,7 +19,7 @@ var permissionsLevel = 0
 
 
 func _init(filePath: String, className: String, fileType: String):
-	self._currPath = filePath
+	self._filePath = filePath
 	self._className = className
 	self._fileType = fileType
 	self._focusLine = 0
@@ -36,7 +36,7 @@ func _init(filePath: String, className: String, fileType: String):
 	var fileReader = File.new()
 	
 	# Open it up
-	fileReader.open(self._currPath, File.READ)
+	fileReader.open(self._filePath, File.READ)
 	
 	# Get the text of the file
 	self._text = fileReader.get_as_text()
@@ -369,7 +369,7 @@ func save_to_disk():
 	
 	# Write a new file with the text
 	var fileWriter = File.new()
-	fileWriter.open(self._currPath, File.WRITE)
+	fileWriter.open(self._filePath, File.WRITE)
 	fileWriter.store_line(_text)
 
 
@@ -436,8 +436,8 @@ func get_display_text():
 	return self._displayText
 
 
-func get_curr_path():
-	return self._currPath
+func get_file_path():
+	return self._filePath
 
 
 func get_class_name():

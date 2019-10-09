@@ -18,6 +18,7 @@ const LEVEL_1_CODE_DIR = "res://Code/Level_1/"
 const LEVEL_2_CODE_DIR = "res://Code/Level_2/"
 
 const PLAYER_CODE_DIR = "user://Code/"
+const PLAYER_CODE_DIR_ACCESSED = PLAYER_CODE_DIR + "Accessed/"
 
 const HIDE_ROWS = "// HIDE ROWS:" # Put number at end to hide that many rows
 const DO_NOT_EDIT_START = '// DO NOT EDIT BELOW THIS LINE'

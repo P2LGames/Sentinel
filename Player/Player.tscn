@@ -394,11 +394,11 @@ script = ExtResource( 8 )
 stream = ExtResource( 9 )
 volume_db = -25.0
 [connection signal="about_to_show" from="IDE/IDE" to="IDE/IDE" method="_on_IDE_about_to_show"]
-[connection signal="popup_hide" from="IDE/IDE" to="." method="_on_IDE_closing"]
 [connection signal="popup_hide" from="IDE/IDE" to="IDE/IDE" method="_on_IDE_popup_hide"]
+[connection signal="popup_hide" from="IDE/IDE" to="." method="_on_IDE_closing"]
 [connection signal="about_to_show" from="OutputPopupLayer/OutputPopup" to="OutputPopupLayer/OutputPopup" method="_on_OutputPopup_about_to_show"]
-[connection signal="popup_hide" from="OutputPopupLayer/OutputPopup" to="OutputPopupLayer/OutputPopup" method="_on_OutputPopup_popup_hide"]
 [connection signal="popup_hide" from="OutputPopupLayer/OutputPopup" to="." method="_on_OutputPopup_closing"]
+[connection signal="popup_hide" from="OutputPopupLayer/OutputPopup" to="OutputPopupLayer/OutputPopup" method="_on_OutputPopup_popup_hide"]
 [connection signal="id_pressed" from="OutputPopupLayer/Inspect" to="." method="_on_Inspect_id_pressed"]
 [connection signal="pressed" from="Menus/GameUI/PauseGame" to="." method="_on_PauseGame_pressed"]
 [connection signal="pressed" from="Menus/MenusContainer/PauseMenu/VBoxContainer/QuitContainer/QuitGameMenu" to="." method="_on_QuitGameMenu_pressed"]

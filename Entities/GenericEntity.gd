@@ -19,13 +19,12 @@ func _handle_command(commandId: int, value: PoolByteArray):
 
 
 func print_message(message: String, type: int):
-	# If we are reprogrammable
+	# If we are reprogrammable, pass the print message to the reprogrammable node
 	if isReprogrammable:
-		# Pass the print message to the reprogrammable node
 		get_node("Reprogrammable").print_message(message, type)
 
 
-##### ENTITY ID AND COMMUNICATION #####
+""" ENTITY ID AND COMMUNICATION """
 
 func get_reprogrammable_component():
 	if isReprogrammable:
@@ -61,6 +60,24 @@ func get_current_class():
 	return null
 
 
+func get_default_class():
+	# If the reprogrammable exists, get its default class
+	if isReprogrammable != null:
+		return get_reprogrammable_component().defaultClass
+	
+	# Otherwise, return null
+	return null
+
+
+func get_current_class_path():
+	# If the reprogrammable exists, get its current class
+	if isReprogrammable != null:
+		return get_reprogrammable_component().currentClassPath
+	
+	# Otherwise, return null
+	return null
+
+
 func set_current_class(_class: String):
 	# If the reprogrammable exists, get its current class
 	if isReprogrammable != null:
@@ -70,10 +87,10 @@ func set_current_class(_class: String):
 	return null
 
 
-func get_default_class():
-	# If the reprogrammable exists, get its default class
+func set_current_class_path(filePath: String):
+	# If the reprogrammable exists, get its current class
 	if isReprogrammable != null:
-		return get_reprogrammable_component().defaultClass
+		return get_reprogrammable_component().set_current_class_path(filePath)
 	
 	# Otherwise, return null
 	return null

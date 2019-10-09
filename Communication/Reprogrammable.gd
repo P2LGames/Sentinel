@@ -87,6 +87,10 @@ func set_current_class(_class: String):
 	emit_signal("class_changed", _class)
 
 
+func set_current_class_path(filePath: String):
+	currentClassPath = filePath
+
+
 """ PERSISTENCE """
 
 func save():

@@ -11,8 +11,8 @@ var entityMap := Dictionary()
 var entityPlaceholderMap := Dictionary()
 
 # Client variables
-#const HOST = "localhost"
-const HOST = "pgframework.westus.azurecontainer.io"
+const HOST = "localhost"
+#const HOST = "pgframework.westus.azurecontainer.io"
 const PORT = 5545
 var client = StreamPeerTCP.new()
 
@@ -196,11 +196,18 @@ func file_update_handler(responseData: PoolByteArray):
 		var entityId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 2, 6)))
 		var commandId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 6, 10)))
 		
-		# Get the class name length
-		var classNameLength = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 10, 14)))
+		# Get the file path
+		var filePathLength = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 10, 14)))
+		var filePath := PoolByteArray(
+			Util.slice_array(responseData, 14, 14 + filePathLength)).get_string_from_ascii()
 		
-		# Get the class name
-		var classPackage := PoolByteArray(Util.slice_array(responseData, 14, 14 + classNameLength)).get_string_from_ascii()
+		# Get the class name from package
+		var classPackageStart = 14 + filePathLength
+		var classPackageLength = Util.bytes2int(PoolByteArray(
+			Util.slice_array(responseData, classPackageStart, classPackageStart + 4)))
+		var classPackage := PoolByteArray(
+			Util.slice_array(responseData, classPackageStart + 4, 
+			classPackageStart + 4 + classPackageLength)).get_string_from_ascii()
 		var classPackageSplit = classPackage.split(".")
 		var className = classPackageSplit[classPackageSplit.size() - 1]
 		
@@ -210,16 +217,25 @@ func file_update_handler(responseData: PoolByteArray):
 		
 		# Change the entity's current class
 		entityMap[str(entityId)].set_current_class(className)
+		entityMap[str(entityId)].set_current_class_path(filePath)
 	else:
 		# Get the entity and command id from the failed register request
 		var entityId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 2, 6)))
 		var commandId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 6, 10)))
 		
+		# Get the file path
+		var filePathLength = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 10, 14)))
+		
+		# Get the class name from package
+		var classPackageStart = 14 + filePathLength
+		var classPackageLength = Util.bytes2int(PoolByteArray(
+			Util.slice_array(responseData, classPackageStart, classPackageStart + 4)))
+		
 		# Get the class name length
-		var errorStringLength = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 10, 14)))
+		var errorStringStart = classPackageStart + 4 + classPackageLength
 		
 		# Slice off the first two values and the two ints, they are the failure short, etc
-		var stringData = PoolByteArray(Util.slice_array(responseData, 14 + errorStringLength))
+		var stringData = PoolByteArray(Util.slice_array(responseData, errorStringStart))
 		
 		# Turn the error data into a string and print it
 		var errorString = "File Update Error: " + stringData.get_string_from_ascii() + "\n"
@@ -279,13 +295,15 @@ func command(entityId: int, commandId: int, hasParameter: bool, parameter: PoolB
 	return send_message(commandRequest)
 
 
-func file_update(entityId: int, commandId: int, className: String, fileContents: String) -> bool:
+func file_update(entityId: int, commandId: int, filePath: String, 
+		className: String, fileContents: String) -> bool:
 	# If the entityId is -1, then they are not setup yet, don't send anything
 	if entityId == -1:
 		return false
 	
 	# Create the request
-	var fileUpdateRequest = FrameworkModels.create_file_update_request(entityId, commandId, className, fileContents)
+	var fileUpdateRequest = FrameworkModels.create_file_update_request(entityId, commandId, 
+		filePath, className, fileContents)
 	
 	# Send the request to the server
 	return send_message(fileUpdateRequest)

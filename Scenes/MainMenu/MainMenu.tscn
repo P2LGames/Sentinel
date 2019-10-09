@@ -16,24 +16,12 @@ func _on_Play_pressed():
 	SceneManager.go_to_scene(SceneManager.LEVEL_1)
 "
 
-[sub_resource type="GDScript" id=5]
+[sub_resource type="GDScript" id=2]
 script/source = "extends Button
 
 
 func _on_Play_pressed():
 	SceneManager.go_to_scene(SceneManager.LEVEL_2)
-"
-
-[sub_resource type="GDScript" id=2]
-script/source = "extends Button
-
-
-func _on_SaveGameList_file_selected(fileName, fileNameActual, filePath):
-	disabled = false
-
-
-func _on_SaveGameList_list_empty():
-	disabled = true
 "
 
 [sub_resource type="GDScript" id=3]
@@ -49,6 +37,18 @@ func _on_SaveGameList_list_empty():
 "
 
 [sub_resource type="GDScript" id=4]
+script/source = "extends Button
+
+
+func _on_SaveGameList_file_selected(fileName, fileNameActual, filePath):
+	disabled = false
+
+
+func _on_SaveGameList_list_empty():
+	disabled = true
+"
+
+[sub_resource type="GDScript" id=5]
 script/source = "extends Label
 
 const NOT_CONNECTED = \"Not connected to server\"
@@ -112,6 +112,7 @@ current = true
 [node name="Menus" type="CanvasLayer" parent="."]
 
 [node name="MenuContainer" type="Control" parent="Menus"]
+editor/display_folded = true
 anchor_left = 0.5
 anchor_top = 0.25
 anchor_right = 0.95
@@ -203,6 +204,7 @@ custom_fonts/font = ExtResource( 5 )
 text = "Quit Game"
 
 [node name="LevelSelect" type="Panel" parent="Menus/MenuContainer"]
+editor/display_folded = true
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -307,7 +309,7 @@ margin_right = -20.0
 margin_bottom = -10.0
 custom_fonts/font = ExtResource( 5 )
 text = "Play"
-script = SubResource( 5 )
+script = SubResource( 2 )
 
 [node name="HSeparator" type="HSeparator" parent="Menus/MenuContainer/LevelSelect/ScrollContainer/VBoxContainer/Sandbox"]
 anchor_top = 1.0
@@ -369,7 +371,7 @@ margin_bottom = 50.0
 size_flags_horizontal = 3
 disabled = true
 text = "Delete"
-script = SubResource( 2 )
+script = SubResource( 3 )
 
 [node name="LoadLevel" type="Button" parent="Menus/MenuContainer/LoadLevel/HBoxContainer" groups=[
 "Button",
@@ -380,7 +382,7 @@ margin_bottom = 50.0
 size_flags_horizontal = 3
 disabled = true
 text = "Load Game"
-script = SubResource( 3 )
+script = SubResource( 4 )
 
 [node name="ConnectionInfo" type="Label" parent="Menus/MenuContainer"]
 anchor_left = 1.0
@@ -392,7 +394,7 @@ margin_top = 4.0
 rect_scale = Vector2( 0.993769, 1 )
 text = "Not connected to server"
 align = 2
-script = SubResource( 4 )
+script = SubResource( 5 )
 [connection signal="tween_completed" from="Sentinel/Tween" to="." method="_on_Tween_tween_completed"]
 [connection signal="timeout" from="Sentinel/Timer" to="." method="_on_Timer_timeout"]
 [connection signal="pressed" from="Menus/MenuContainer/MainMenu/Container/NewGameContainer/NewGame" to="." method="_on_NewGame_pressed"]

@@ -26,7 +26,7 @@ func _ready():
 	reprogrammable.currentClass = "RobotDefault"
 	
 	# Setup the default path
-	var defaultPath = FileManager.join(Constants.PLAYER_CODE_DIR, "OriginalCode/RobotDefault.java")
+	var defaultPath = FileManager.join(Constants.LEVEL_1_CODE_DIR, "/RobotOverride.java")
 	reprogrammable.defaultClassPath = defaultPath
 	reprogrammable.currentClassPath = defaultPath
 	
@@ -231,7 +231,7 @@ func pass_order(orderType: int, orderBytes: PoolByteArray):
 
 
 func print_error(error: int, message: String):
-	var errorMessage = "Error Code: " + str(error) + ". " + message
+	var errorMessage = "\nError Code: " + str(error) + ". \n" + message + "\n"
 	
 	# Print the error
 	print_message(errorMessage, Constants.MESSAGE_TYPE.ERROR)
