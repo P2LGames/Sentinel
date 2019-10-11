@@ -30,8 +30,10 @@ func _ready():
 	# We want this node to loop
 	set_process(true)
 	
-	# Connect to the host
+	# Connect to the host, disable Nagle algorithm, we are sending lots
+	# of small packets
 	client.connect_to_host(HOST, PORT)
+	client.set_no_delay(false)
 	
 	# Send the setup data as soon as we are connected
 	var setupData = FrameworkModels.create_entity_setup_request()
@@ -217,7 +219,7 @@ func file_update_handler(responseData: PoolByteArray):
 		
 		# Change the entity's current class
 		entityMap[str(entityId)].set_current_class(className)
-		entityMap[str(entityId)].set_current_class_path(filePath)
+		entityMap[str(entityId)].set_current_file_path(filePath)
 	else:
 		# Get the entity and command id from the failed register request
 		var entityId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 2, 6)))

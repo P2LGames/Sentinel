@@ -1,4 +1,4 @@
-extends "res://Entities/GenericEntity.gd"
+extends "res://Entities/ReprogrammableEntity.gd"
 
 const COMMAND_ID_PROCESS = 0
 const COMMAND_ID_INPUT = 1
@@ -18,17 +18,6 @@ var lastProcess = 0.0
 func _ready():
 	# Super call to ready
 	._ready()
-	
-	var reprogrammable = get_reprogrammable_component()
-	
-	# Our default class is RobotDefault
-	reprogrammable.defaultClass = "RobotDefault"
-	reprogrammable.currentClass = "RobotDefault"
-	
-	# Setup the default path
-	var defaultPath = FileManager.join(Constants.LEVEL_1_CODE_DIR, "/RobotOverride.java")
-	reprogrammable.defaultClassPath = defaultPath
-	reprogrammable.currentClassPath = defaultPath
 	
 	# Setup my attachments
 	setup_attachments()

@@ -18,8 +18,8 @@ extents = Vector3( 2.87753, 1, 5.77111 )
 [sub_resource type="BoxShape" id=2]
 
 [node name="Level_1" type="Spatial" groups=[
-"Level",
 "PersistMap",
+"Level",
 ]]
 script = ExtResource( 1 )
 
@@ -39,11 +39,13 @@ __meta__ = {
 
 [node name="Objects" type="Spatial" parent="."]
 
+[node name="Temporary" type="Spatial" parent="Objects"]
+
 [node name="Sentinel3" parent="Objects" instance=ExtResource( 3 )]
 editor/display_folded = true
 transform = Transform( 0.609627, 0, -0.792689, 0, 1, 0, 0.792689, 0, 0.609627, 30.4583, 2.72375, 8.65621 )
-notReprogrammable = true
 selectable = false
+notReprogrammable = true
 displayName = "Robot 1"
 
 [node name="Fred" parent="Objects" instance=ExtResource( 3 )]
@@ -59,22 +61,22 @@ displayName = "George"
 [node name="Sentinel5" parent="Objects" instance=ExtResource( 3 )]
 editor/display_folded = true
 transform = Transform( -0.316127, 0, -0.948717, 0, 1, 0, 0.948717, 0, -0.316127, 31.3982, 2.72374, 14.9617 )
-notReprogrammable = true
 selectable = false
+notReprogrammable = true
 displayName = "Robot 1"
 
 [node name="Sentinel6" parent="Objects" instance=ExtResource( 3 )]
 editor/display_folded = true
 transform = Transform( 0.0232255, 0, -0.99973, 0, 1, 0, 0.99973, 0, 0.0232255, 31.719, 2.72375, 11.3422 )
-notReprogrammable = true
 selectable = false
+notReprogrammable = true
 displayName = "Robot 1"
 
 [node name="Sentinel4" parent="Objects" instance=ExtResource( 3 )]
 editor/display_folded = true
 transform = Transform( -0.313333, 0, -0.949643, 0, 1, 0, 0.949643, 0, -0.313333, 29.3845, 2.72375, 17.2143 )
-notReprogrammable = true
 selectable = false
+notReprogrammable = true
 displayName = "Robot 1"
 
 [node name="DoorAndPlate1" type="Spatial" parent="Objects"]
@@ -290,10 +292,10 @@ margin_bottom = 87.0
 custom_fonts/font = ExtResource( 11 )
 text = "- Find Fred's homie, George
 - Get Fred and George to their friends"
-[connection signal="toggle_off" from="Objects/DoorAndPlate1/PressurePlate" to="Objects/DoorAndPlate1/SlidingDoor" method="remove_powering_obj"]
 [connection signal="toggle_off" from="Objects/DoorAndPlate1/PressurePlate" to="Objects/DoorAndPlate1/SlidingDoor2" method="remove_powering_obj"]
-[connection signal="toggle_on" from="Objects/DoorAndPlate1/PressurePlate" to="Objects/DoorAndPlate1/SlidingDoor" method="add_powering_obj"]
+[connection signal="toggle_off" from="Objects/DoorAndPlate1/PressurePlate" to="Objects/DoorAndPlate1/SlidingDoor" method="remove_powering_obj"]
 [connection signal="toggle_on" from="Objects/DoorAndPlate1/PressurePlate" to="Objects/DoorAndPlate1/SlidingDoor2" method="add_powering_obj"]
+[connection signal="toggle_on" from="Objects/DoorAndPlate1/PressurePlate" to="Objects/DoorAndPlate1/SlidingDoor" method="add_powering_obj"]
 [connection signal="toggle_off" from="Objects/DoorAndPlate2/PressurePlate" to="Objects/DoorAndPlate2/SlidingDoor" method="remove_powering_obj"]
 [connection signal="toggle_off" from="Objects/DoorAndPlate2/PressurePlate" to="Objects/DoorAndPlate2/SlidingDoor2" method="remove_powering_obj"]
 [connection signal="toggle_on" from="Objects/DoorAndPlate2/PressurePlate" to="Objects/DoorAndPlate2/SlidingDoor" method="add_powering_obj"]

@@ -90,7 +90,7 @@ func recompile():
 		CommunicationManager.file_update(targetEntityId, -1, filePath, className, fileText)
 		
 		# Set the current class folder
-		Player.get_inspected_entity().get_reprogrammable_component().currentClassPath = currentFilePath
+		Player.get_inspected_entity().get_reprogrammable_component().currentFilePath = currentFilePath
 
 
 func recompile_entity_from_file(entity, entityId, filePath):
@@ -111,7 +111,7 @@ func recompile_entity_from_file(entity, entityId, filePath):
 		CommunicationManager.file_update(entityId, -1, filePath, className, fileText)
 		
 		# Set the class folder
-		entity.get_reprogrammable_component().currentClassPath = filePath
+		entity.get_reprogrammable_component().currentFilePath = filePath
 
 
 func save_focus():

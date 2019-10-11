@@ -1,20 +1,21 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://Scenes/Level_2/Level_2.gd" type="Script" id=1]
 [ext_resource path="res://Scenes/Shared/GridMaps/GridMapStoneGrass.meshlib" type="MeshLibrary" id=2]
 [ext_resource path="res://Entities/Sentinel.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Entities/Components/Interface/Interface.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Entities/Components/PlugArm/PlugArm.tscn" type="PackedScene" id=5]
-[ext_resource path="res://Player/Camera.gd" type="Script" id=6]
-[ext_resource path="res://Assets/Fonts/NunitoTitle.tres" type="DynamicFont" id=7]
-[ext_resource path="res://Assets/Fonts/NunitoHeader.tres" type="DynamicFont" id=8]
-[ext_resource path="res://Assets/Fonts/NunitoBodyBold.tres" type="DynamicFont" id=9]
+[ext_resource path="res://Entities/Components/Gun/GenericGun.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Player/Camera.gd" type="Script" id=7]
+[ext_resource path="res://Assets/Fonts/NunitoTitle.tres" type="DynamicFont" id=8]
+[ext_resource path="res://Assets/Fonts/NunitoHeader.tres" type="DynamicFont" id=9]
+[ext_resource path="res://Assets/Fonts/NunitoBodyBold.tres" type="DynamicFont" id=10]
 
 [sub_resource type="BoxShape" id=1]
 
 [node name="Level_2" type="Spatial" groups=[
-"Level",
 "PersistMap",
+"Level",
 ]]
 script = ExtResource( 1 )
 
@@ -46,11 +47,12 @@ transform = Transform( -4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -31, 2.
 displayName = "Fred2"
 
 [node name="Fred3" parent="Objects" instance=ExtResource( 3 )]
-editor/display_folded = true
 transform = Transform( -4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -31, 2.744, 13 )
 displayName = "Fred3"
 
 [node name="PlugArm" parent="Objects/Fred3/AttachmentContainer/Left" index="0" instance=ExtResource( 5 )]
+
+[node name="Gun" parent="Objects/Fred3/AttachmentContainer/Right" index="0" instance=ExtResource( 6 )]
 
 [node name="George" parent="Objects" instance=ExtResource( 3 )]
 editor/display_folded = true
@@ -70,7 +72,7 @@ shape = SubResource( 1 )
 [node name="Camera" type="Camera" parent="."]
 transform = Transform( 1, 0, 0, 0, 0.34202, 0.939693, 0, -0.939693, 0.34202, -31.1842, 20, 25.3906 )
 current = true
-script = ExtResource( 6 )
+script = ExtResource( 7 )
 
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
 transform = Transform( 0.613067, 0.646769, 0.453695, 0, -0.574274, 0.818663, 0.790031, -0.501895, -0.352069, 0, 0, 0 )
@@ -93,7 +95,7 @@ margin_left = 212.408
 margin_top = -463.662
 margin_right = 727.408
 margin_bottom = -328.662
-custom_fonts/font = ExtResource( 7 )
+custom_fonts/font = ExtResource( 8 )
 custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "You got the robot here! 
 Good job!"
@@ -128,7 +130,7 @@ anchor_right = 0.5
 margin_left = -107.5
 margin_right = 107.5
 margin_bottom = 66.0
-custom_fonts/font = ExtResource( 7 )
+custom_fonts/font = ExtResource( 8 )
 text = "You Won!"
 align = 1
 
@@ -141,7 +143,7 @@ margin_left = -251.5
 margin_top = -39.5
 margin_right = 251.5
 margin_bottom = 31.5
-custom_fonts/font = ExtResource( 8 )
+custom_fonts/font = ExtResource( 9 )
 text = "You helped Fred and George 
 find their friends! Great job!"
 align = 1
@@ -173,14 +175,14 @@ margin_bottom = 40.0
 [node name="Objectives" type="Label" parent="CanvasLayer/Objectives/VBoxContainer"]
 margin_right = 280.0
 margin_bottom = 34.0
-custom_fonts/font = ExtResource( 8 )
+custom_fonts/font = ExtResource( 9 )
 text = "Objectives"
 
 [node name="Objective1" type="Label" parent="CanvasLayer/Objectives/VBoxContainer"]
 margin_top = 38.0
 margin_right = 280.0
 margin_bottom = 87.0
-custom_fonts/font = ExtResource( 9 )
+custom_fonts/font = ExtResource( 10 )
 text = "- Find Fred's homie, George
 - Get Fred and George to their friends"
 [connection signal="pressed" from="CanvasLayer/ToggleVisible" to="." method="_on_ToggleVisible_pressed"]

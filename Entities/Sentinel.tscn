@@ -40,6 +40,7 @@ script = ExtResource( 1 )
 shape = SubResource( 1 )
 
 [node name="Reprogrammable" parent="." instance=ExtResource( 2 )]
+defaultFile = "RobotDefault.java"
 
 [node name="SelectionIndicator" type="MeshInstance" parent="."]
 transform = Transform( 0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0, 0 )

@@ -40,6 +40,10 @@ func plug_in():
 	Set the IDEs code to that code.
 	Popup the IDE.
 	"""
+	# If we already have a target, stop
+	if target != null:
+		return
+	
 	# Make sure that we have something in the target area
 	if targetsInArea.size() == 0:
 		robot.print_message("\nPlug Arm Error: No targets to plug in to.\n", Constants.MESSAGE_TYPE.ERROR)
@@ -49,7 +53,7 @@ func plug_in():
 	target = targetsInArea[0]
 	
 	# Copy the target's code into the player's code directory
-	var filePath = target.get_current_class_path()
+	var filePath = target.get_current_file_path()
 	var dir := Directory.new()
 	if not dir.dir_exists(Constants.PLAYER_CODE_DIR_ACCESSED):
 		dir.make_dir(Constants.PLAYER_CODE_DIR_ACCESSED)

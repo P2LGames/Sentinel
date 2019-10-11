@@ -1,6 +1,14 @@
 extends Node
 
 export (String, "Robot") var entityType = "Robot"
+# Default and current classes
+export var defaultCodePath = Constants.LEVEL_1_CODE_DIR
+export var defaultFile: String = ""
+
+onready var defaultFilePath: String = FileManager.join(defaultCodePath, defaultFile)
+onready var currentFilePath: String = FileManager.join(defaultCodePath, defaultFile)
+onready var defaultClass: String = defaultFile.get_basename()
+onready var currentClass: String = defaultFile.get_basename()
 
 var entityId: String = "-1"
 var ready: bool = false
@@ -8,12 +16,6 @@ var hasLoaded: bool = true
 var registerMessageSent: bool = false
 
 var currentOutput := Array()
-
-# Default and current classes
-var defaultClassPath: String = ""
-var currentClassPath: String = ""
-var defaultClass: String = ""
-var currentClass: String = ""
 
 signal message_printed(printMessage)
 signal class_changed(newClass)
@@ -48,7 +50,7 @@ func _process(delta: float):
 	elif not hasLoaded and ready:
 		# Try to recompile his code
 		Player.get_ide().recompile_entity_from_file(get_parent(), 
-			int(entityId), currentClassPath)
+			int(entityId), currentFilePath)
 		
 		hasLoaded = true
 	# Otherwise, meaning we sent the message, stop trying to send it, and turn process off
@@ -87,8 +89,8 @@ func set_current_class(_class: String):
 	emit_signal("class_changed", _class)
 
 
-func set_current_class_path(filePath: String):
-	currentClassPath = filePath
+func set_current_file_path(filePath: String):
+	currentFilePath = filePath
 
 
 """ PERSISTENCE """
@@ -96,7 +98,7 @@ func set_current_class_path(filePath: String):
 func save():
 	var saveData = {
 		"currentClass": currentClass,
-		"currentClassPath": currentClassPath
+		"currentFilePath": currentFilePath
 	}
 	
 	return saveData
@@ -104,10 +106,10 @@ func save():
 
 func load_from_data(data: Dictionary):
 	currentClass = data["currentClass"]
-	currentClassPath = data["currentClassPath"]
+	currentFilePath = data["currentFilePath"]
 	
 	# If the current class path is not equal to the default
-	if currentClassPath != defaultClassPath:
+	if currentFilePath != defaultFilePath:
 		# We have not yet completed our load in
 		hasLoaded = false
 		

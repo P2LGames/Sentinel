@@ -41,6 +41,10 @@ func is_map():
 	return true
 
 
+func _get_temp_node():
+	return null
+
+
 """ PERSITENCE """
 
 func save():

@@ -12,10 +12,6 @@ func _ready():
 	# Update the IDE
 	Player.ide_update_files()
 	
-	# Select the file we want
-#	var gettingStartedFile = FileManager.join(Constants.PLAYER_CODE_DIR, "Default/GettingStarted")
-#	Player.get_ide().set_selected_file(gettingStartedFile)
-	
 	# Set the camera bounds
 	set_camera_part1()
 

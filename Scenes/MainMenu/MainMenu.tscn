@@ -94,8 +94,8 @@ __meta__ = {
 [node name="Sentinel" parent="." instance=ExtResource( 3 )]
 editor/display_folded = true
 transform = Transform( 0.62306, 0, 0.501793, 0, 0.8, 0, -0.501793, 0, 0.62306, -3.69162, 0.856905, -1.39968 )
-notReprogrammable = true
 selectable = false
+notReprogrammable = true
 
 [node name="Body" parent="Sentinel" index="3"]
 transform = Transform( 0.6, 0, -4.47035e-08, 0, 0.6, 0, 4.47035e-08, 0, 0.6, 0, 0, 0 )
@@ -405,9 +405,9 @@ script = SubResource( 5 )
 [connection signal="pressed" from="Menus/MenuContainer/LevelSelect/ScrollContainer/VBoxContainer/Sandbox/Play" to="Menus/MenuContainer/LevelSelect/ScrollContainer/VBoxContainer/Sandbox/Play" method="_on_Play_pressed"]
 [connection signal="pressed" from="Menus/MenuContainer/LevelSelect/Back" to="." method="_on_Back_pressed"]
 [connection signal="file_chosen" from="Menus/MenuContainer/LoadLevel/SaveGameList" to="." method="_on_load_game"]
+[connection signal="file_selected" from="Menus/MenuContainer/LoadLevel/SaveGameList" to="." method="_on_SaveGameList_file_selected"]
 [connection signal="file_selected" from="Menus/MenuContainer/LoadLevel/SaveGameList" to="Menus/MenuContainer/LoadLevel/HBoxContainer/Delete" method="_on_SaveGameList_file_selected"]
 [connection signal="file_selected" from="Menus/MenuContainer/LoadLevel/SaveGameList" to="Menus/MenuContainer/LoadLevel/HBoxContainer/LoadLevel" method="_on_SaveGameList_file_selected"]
-[connection signal="file_selected" from="Menus/MenuContainer/LoadLevel/SaveGameList" to="." method="_on_SaveGameList_file_selected"]
 [connection signal="list_empty" from="Menus/MenuContainer/LoadLevel/SaveGameList" to="Menus/MenuContainer/LoadLevel/HBoxContainer/Delete" method="_on_SaveGameList_list_empty"]
 [connection signal="list_empty" from="Menus/MenuContainer/LoadLevel/SaveGameList" to="Menus/MenuContainer/LoadLevel/HBoxContainer/LoadLevel" method="_on_SaveGameList_list_empty"]
 [connection signal="pressed" from="Menus/MenuContainer/LoadLevel/HBoxContainer/Back" to="." method="_on_Back_pressed"]
