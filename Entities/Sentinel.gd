@@ -13,7 +13,7 @@ var orders = []
 
 var movement = Vector3.ZERO
 var processing = false
-var lastProcess = 0.0
+#var lastProcess = 0.0
 
 func _ready():
 	# Super call to ready

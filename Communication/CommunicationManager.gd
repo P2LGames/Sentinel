@@ -13,11 +13,13 @@ var entityPlaceholderMap := Dictionary()
 # Client variables
 const HOST = "localhost"
 #const HOST = "pgframework.westus.azurecontainer.io"
+#const HOST = "52.170.255.126"
 const PORT = 5545
 var client = StreamPeerTCP.new()
 
 var serverSetup = false
 var running = false
+var serverProcessID = -1
 
 # A list of messages to send to the server
 var toSend = []
@@ -27,9 +29,23 @@ signal failed_to_connect()
 
 
 func _ready():
-	# We want this node to loop
-	set_process(true)
-	
+	# Start up the framework
+	var launcher = './Communication/frameworkLauncher.sh'
+	var file = 'Communication/frameworkLauncher.sh'
+	print(OS.get_name())
+	if OS.get_name() == 'Windows':
+		launcher = './Communication/frameworkLauncher.bat'
+		file = 'Communication/frameworkLauncher.bat'
+	print(launcher)
+	var dir = Directory.new()
+	print("Jar exists: ", dir.file_exists(file))
+
+	serverProcessID = OS.execute(launcher, [], false)
+	print("Server Process is: ", serverProcessID)
+
+
+func setup_connection():
+	print("Attempting to connect")
 	# Connect to the host, disable Nagle algorithm, we are sending lots
 	# of small packets
 	client.connect_to_host(HOST, PORT)
@@ -94,14 +110,14 @@ func entity_register_handler(responseData: PoolByteArray):
 		var entityId = Util.bytes2int(entityIdArray)
 		print("Placeholder: ", placeholderId, " EntityId: ", entityId)
 		
-		var entity = entityPlaceholderMap[str(placeholderId)]
-		entity.get_node("Reprogrammable").set_id(str(entityId))
+		var entity = entityPlaceholderMap[placeholderId]
+		entity.get_node("Reprogrammable").set_id(entityId)
 		
 		# Save the new id
-		entityMap[str(entityId)] = entity
+		entityMap[entityId] = entity
 		
 		# Delete the old mapping in the placeholder
-		entityPlaceholderMap.erase(str(placeholderId))
+		entityPlaceholderMap.erase(placeholderId)
 	else:
 		# Get the placeholder id from the failed register request
 		var placeholderId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 2, 6)))
@@ -113,7 +129,7 @@ func entity_register_handler(responseData: PoolByteArray):
 		var errorString = "Register Error: " + stringData.get_string_from_ascii()
 		
 		# Pass the error and string to the entity
-		entityPlaceholderMap[str(placeholderId)].print_message(errorString, 
+		entityPlaceholderMap[placeholderId].print_message(errorString, 
 			Constants.MESSAGE_TYPE.ERROR)
 
 
@@ -132,9 +148,12 @@ func command_handler(responseData: PoolByteArray):
 		# Get the command's return value
 		var value = PoolByteArray(Util.slice_array(responseData, 10))
 		
-		if str(entityId) in entityMap.keys():
+		if entityId in entityMap.keys():
 			# Get the entity from the placeholder map, have it save its new id
-			var entity = entityMap[str(entityId)]
+			var entity = entityMap[entityId]
+			# If the entity is null, assume it is dead, cleanup
+			if not entity:
+				return
 		
 			# Make sure he has the _handle_command method
 			if entity.has_method("_handle_command"):
@@ -157,7 +176,7 @@ func command_handler(responseData: PoolByteArray):
 		var errorString = "Command Error: " + stringData.get_string_from_ascii()
 		
 		# Pass the error and string to the entity
-		entityMap[str(entityId)].print_message(errorString, 
+		entityMap[entityId].print_message(errorString, 
 			Constants.MESSAGE_TYPE.ERROR)
 
 
@@ -179,10 +198,10 @@ func command_error_handler(responseData: PoolByteArray):
 	var errorMessage = "Timeout: " + errorMessageData.get_string_from_ascii() + "\n"
 	
 	# Get the entity from the placeholder map, have it save its new id
-	var entity = entityMap[str(entityId)]
+	var entity = entityMap[entityId]
 	
 	# Pass the error to the entity
-	entityMap[str(entityId)].print_message(errorMessage, 
+	entityMap[entityId].print_message(errorMessage, 
 		Constants.MESSAGE_TYPE.ERROR)
 	
 	# It is no longer processing, all threads were closed in the framework
@@ -214,12 +233,12 @@ func file_update_handler(responseData: PoolByteArray):
 		var className = classPackageSplit[classPackageSplit.size() - 1]
 		
 		# Print a messsage
-		entityMap[str(entityId)].print_message("\nRecompile Successful, class swapped to " + className + "!\n", 
+		entityMap[entityId].print_message("\nRecompile Successful, class swapped to " + className + "!\n", 
 			Constants.MESSAGE_TYPE.NORMAL)
 		
 		# Change the entity's current class
-		entityMap[str(entityId)].set_current_class(className)
-		entityMap[str(entityId)].set_current_file_path(filePath)
+		entityMap[entityId].set_current_class(className)
+		entityMap[entityId].set_current_file_path(filePath)
 	else:
 		# Get the entity and command id from the failed register request
 		var entityId = Util.bytes2int(PoolByteArray(Util.slice_array(responseData, 2, 6)))
@@ -243,7 +262,7 @@ func file_update_handler(responseData: PoolByteArray):
 		var errorString = "File Update Error: " + stringData.get_string_from_ascii() + "\n"
 		
 		# Pass the error and string to the entity
-		entityMap[str(entityId)].print_message(errorString, 
+		entityMap[entityId].print_message(errorString, 
 			Constants.MESSAGE_TYPE.ERROR)
 
 
@@ -259,7 +278,7 @@ func add_entity(newEntity):
 	currPlaceholderId += 1
 	
 	# Map the entity to the current placeholder
-	entityPlaceholderMap[str(currPlaceholderId)] = newEntity
+	entityPlaceholderMap[currPlaceholderId] = newEntity
 	
 	# Return the current placeholder id
 	return currPlaceholderId
@@ -382,9 +401,17 @@ func _process(delta):
 
 func _notification(what):
 	if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
-		client.disconnect_from_host()
+		cleanup_and_shutdown()
 		
 		get_tree().quit()
+
+
+func cleanup_and_shutdown():
+	if serverProcessID > 0:
+			print("Killing server with process: ", serverProcessID)
+			OS.kill(serverProcessID)
+		
+	client.disconnect_from_host()
 
 
 func stop_running():
@@ -399,9 +426,17 @@ func stop_running():
 	entityPlaceholderMap = {}
 
 
+func disconnect_entity(entityId: int):
+	entityMap.erase(entityId)
+
+
 """ SIGNALS """
 
 func _on_ConnectionTimeout_timeout():
 	# Check to see if the client is connected
 	if client.get_status() != StreamPeerTCP.STATUS_CONNECTED:
 		emit_signal("failed_to_connect")
+
+
+func _on_ConnectTimer_timeout():
+	setup_connection()

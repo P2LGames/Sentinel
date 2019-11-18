@@ -40,10 +40,6 @@ func plug_in():
 	Set the IDEs code to that code.
 	Popup the IDE.
 	"""
-	# If we already have a target, stop
-	if target != null:
-		return
-	
 	# Make sure that we have something in the target area
 	if targetsInArea.size() == 0:
 		robot.print_message("\nPlug Arm Error: No targets to plug in to.\n", Constants.MESSAGE_TYPE.ERROR)
@@ -59,6 +55,7 @@ func plug_in():
 		dir.make_dir(Constants.PLAYER_CODE_DIR_ACCESSED)
 	
 	var newFilePath = Constants.PLAYER_CODE_DIR_ACCESSED + filePath.get_file()
+#	print("New File Path: ", newFilePath)
 	if not dir.file_exists(newFilePath):
 		print(filePath)
 		print(newFilePath)

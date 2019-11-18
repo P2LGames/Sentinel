@@ -394,8 +394,8 @@ script = ExtResource( 8 )
 stream = ExtResource( 9 )
 volume_db = -25.0
 [connection signal="about_to_show" from="IDE/IDE" to="IDE/IDE" method="_on_IDE_about_to_show"]
-[connection signal="popup_hide" from="IDE/IDE" to="IDE/IDE" method="_on_IDE_popup_hide"]
 [connection signal="popup_hide" from="IDE/IDE" to="." method="_on_IDE_closing"]
+[connection signal="popup_hide" from="IDE/IDE" to="IDE/IDE" method="_on_IDE_popup_hide"]
 [connection signal="about_to_show" from="OutputPopupLayer/OutputPopup" to="OutputPopupLayer/OutputPopup" method="_on_OutputPopup_about_to_show"]
 [connection signal="popup_hide" from="OutputPopupLayer/OutputPopup" to="." method="_on_OutputPopup_closing"]
 [connection signal="popup_hide" from="OutputPopupLayer/OutputPopup" to="OutputPopupLayer/OutputPopup" method="_on_OutputPopup_popup_hide"]
@@ -409,8 +409,8 @@ volume_db = -25.0
 [connection signal="file_selected" from="Menus/MenusContainer/SaveMenu/SaveGameList" to="Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit" method="_on_SaveGameList_file_selected"]
 [connection signal="game_save" from="Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit" to="." method="_on_game_save"]
 [connection signal="text_changed" from="Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit" to="Menus/MenusContainer/SaveMenu/HBoxContainer/SaveContainer/SaveGame" method="_on_LineEdit_text_changed"]
-[connection signal="pressed" from="Menus/MenusContainer/SaveMenu/HBoxContainer/BackContainer/Back" to="Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit" method="_on_Back_pressed"]
 [connection signal="pressed" from="Menus/MenusContainer/SaveMenu/HBoxContainer/BackContainer/Back" to="." method="_on_Back_pressed"]
+[connection signal="pressed" from="Menus/MenusContainer/SaveMenu/HBoxContainer/BackContainer/Back" to="Menus/MenusContainer/SaveMenu/LineEditContainer/LineEdit" method="_on_Back_pressed"]
 [connection signal="pressed" from="Menus/MenusContainer/SaveMenu/HBoxContainer/SaveContainer/SaveGame" to="." method="_on_game_save"]
-[connection signal="confirmed" from="Menus/ConfirmOverwritePopup" to="Menus/ConfirmOverwritePopup" method="_on_ConfirmOverwritePopup_confirmed"]
 [connection signal="confirmed" from="Menus/ConfirmOverwritePopup" to="." method="_on_game_save_overwrite"]
+[connection signal="confirmed" from="Menus/ConfirmOverwritePopup" to="Menus/ConfirmOverwritePopup" method="_on_ConfirmOverwritePopup_confirmed"]

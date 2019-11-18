@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Entities/Components/Gun/GenericBullet.gd" type="Script" id=1]
+[ext_resource path="res://Communication/Reprogrammable.tscn" type="PackedScene" id=2]
 
 [sub_resource type="SphereMesh" id=1]
 
@@ -16,6 +17,9 @@ collision_mask = 0
 script = ExtResource( 1 )
 notReprogrammable = true
 displayName = "Bullet"
+speed = 13
+
+[node name="Reprogrammable" parent="." instance=ExtResource( 2 )]
 
 [node name="Ball" type="MeshInstance" parent="."]
 transform = Transform( 0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0 )
@@ -25,16 +29,22 @@ material/0 = null
 [node name="CollisionShape" type="CollisionShape" parent="."]
 shape = SubResource( 2 )
 
-[node name="Area" type="Area" parent="."]
+[node name="MapCollider" type="Area" parent="."]
 collision_layer = 0
-collision_mask = 524289
+collision_mask = 524288
 
-[node name="CollisionShape" type="CollisionShape" parent="Area"]
+[node name="CollisionShape" type="CollisionShape" parent="MapCollider"]
+shape = SubResource( 3 )
+
+[node name="BodyCollider" type="Area" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape" type="CollisionShape" parent="BodyCollider"]
 shape = SubResource( 3 )
 
 [node name="Lifetime" type="Timer" parent="."]
 wait_time = 30.0
 autostart = true
-[connection signal="area_entered" from="Area" to="." method="_on_Bullet_area_entered"]
-[connection signal="body_entered" from="Area" to="." method="_on_Bullet_body_entered"]
+[connection signal="body_entered" from="MapCollider" to="." method="_on_Bullet_body_entered"]
+[connection signal="area_entered" from="BodyCollider" to="." method="_on_Bullet_area_entered"]
 [connection signal="timeout" from="Lifetime" to="." method="_on_Lifetime_timeout"]

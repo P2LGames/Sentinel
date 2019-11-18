@@ -1,7 +1,5 @@
 extends "res://Scenes/GenericMap.gd"
 
-var bodiesInFinish = []
-
 func _ready():
 	# Super call to ready
 	._ready()

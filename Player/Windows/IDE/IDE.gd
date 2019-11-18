@@ -1,7 +1,5 @@
 extends WindowDialog
 
-var IDEFile = load("res://Player/Windows/IDE/IDEFile.gd")
-
 var currentFile = null
 var currentFilePath: String = ""
 

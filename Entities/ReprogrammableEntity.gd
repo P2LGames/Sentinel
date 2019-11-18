@@ -13,6 +13,19 @@ func _ready():
 		isReprogrammable = true
 
 
+func death():
+	if isDead:
+		return
+	
+	.death()
+	
+	# If we are dead now, we want to remove
+	# ourselves from the reprogrammable entity list
+	if isDead and isReprogrammable:
+		var entityId = get_reprogrammable_id()
+		CommunicationManager.disconnect_entity(entityId)
+
+
 func _handle_command(commandId: int, value: PoolByteArray):
 	pass
 
@@ -35,7 +48,7 @@ func get_reprogrammable_component():
 func get_reprogrammable_id():
 	# If the reprogrammable exists, get its entityId
 	if isReprogrammable:
-		return int(get_reprogrammable_component().entityId)
+		return get_reprogrammable_component().entityId
 	
 	# Otherwise, return null
 	return null

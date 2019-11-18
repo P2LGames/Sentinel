@@ -10,7 +10,7 @@ onready var currentFilePath: String = FileManager.join(defaultCodePath, defaultF
 onready var defaultClass: String = defaultFile.get_basename()
 onready var currentClass: String = defaultFile.get_basename()
 
-var entityId: String = "-1"
+var entityId: int = -1
 var ready: bool = false
 var hasLoaded: bool = true
 var registerMessageSent: bool = false
@@ -74,7 +74,7 @@ func get_default_class():
 
 """ SETTERS """
 
-func set_id(newId: String):
+func set_id(newId: int):
 	# Set our new id
 	entityId = newId
 	

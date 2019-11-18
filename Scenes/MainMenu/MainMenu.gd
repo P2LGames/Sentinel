@@ -111,6 +111,9 @@ func _on_LoadGameMenu_pressed():
 
 
 func _on_QuitGame_pressed():
+	# Cleanup the server
+	CommunicationManager.cleanup_and_shutdown()
+	
 	# Quit the game
 	get_tree().quit()
 

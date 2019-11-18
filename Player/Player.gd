@@ -645,10 +645,15 @@ func _on_new_scene(scene):
 	# BUTTON SETUP
 	# Loop through all of the buttons
 	var buttons = get_tree().get_nodes_in_group("Button")
-	
 	for button in buttons:
 		# Make sure it isn't already connected to the sound
-		if "_on_AnyButton_pressed" in button.get_signal_connection_list("pressed"):
+		var alreadyConnected = false
+		for connection in button.get_signal_connection_list("pressed"):
+			if connection["method"] == "_on_AnyButton_pressed":
+				alreadyConnected = true
+				break
+		
+		if alreadyConnected:
 			continue
 		
 		button.connect("pressed", self, "_on_AnyButton_pressed")

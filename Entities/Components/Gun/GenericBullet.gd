@@ -22,23 +22,17 @@ func _process(delta):
 	move_and_collide(toMove)
 
 
-func explode():
-	
-	call_deferred("queue_free")
-
-
 func _on_Bullet_area_entered(area):
 	if area.has_method("take_damage"):
 		area.take_damage(damage)
-	
-	explode()
+		death()
 
 
 func _on_Bullet_body_entered(body):
-	"""Called when we enter the map"""
-	explode()
+	"""Called when we enter the map, or another static object"""
+	death()
 
 
 func _on_Lifetime_timeout():
 	"""Explode if we have been alive for too long"""
-	explode()
+	death()
