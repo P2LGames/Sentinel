@@ -12,8 +12,7 @@ var entityPlaceholderMap := Dictionary()
 
 # Client variables
 const HOST = "localhost"
-#const HOST = "pgframework.westus.azurecontainer.io"
-#const HOST = "52.170.255.126"
+#const HOST = "pgframework.westus.azurecontainer.io
 const PORT = 5545
 var client = StreamPeerTCP.new()
 
@@ -55,7 +54,8 @@ func setup_connection():
 	var setupData = FrameworkModels.create_entity_setup_request()
 	toSend.append(setupData)
 
-##### MESSAGE ROUTING #####
+
+""" MESSAGE ROUTING """
 
 func route_response(responseType: int, responseData: PoolByteArray):
 	# Run the entity setup no matter what
