@@ -9,5 +9,5 @@ Requirements
 
 After downloading Godot and the JRE, open up this project using Godot and run it. Everything should work beautifully.
 
-### Developer's Note from Luzzotica
+## Developer's Note from Luzzotica
 I feel that the design of this game is pretty novel. The reprogrammability of the Sentinels themselves is a super cool concept that deserves more exploration, and more ideas beyond my own. Please, take the project and make something amazing with it!
