@@ -92,7 +92,6 @@ __meta__ = {
 }
 
 [node name="Sentinel" parent="." instance=ExtResource( 3 )]
-editor/display_folded = true
 transform = Transform( 0.62306, 0, 0.501793, 0, 0.8, 0, -0.501793, 0, 0.62306, -3.69162, 0.856905, -1.39968 )
 selectable = false
 notReprogrammable = true
@@ -118,7 +117,6 @@ anchor_right = 0.95
 anchor_bottom = 0.8
 
 [node name="MainMenu" type="Panel" parent="Menus/MenuContainer"]
-editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 
@@ -203,7 +201,6 @@ custom_fonts/font = ExtResource( 5 )
 text = "Quit Game"
 
 [node name="LevelSelect" type="Panel" parent="Menus/MenuContainer"]
-editor/display_folded = true
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -394,6 +391,7 @@ rect_scale = Vector2( 0.993769, 1 )
 text = "Not connected to server"
 align = 2
 script = SubResource( 5 )
+
 [connection signal="tween_completed" from="Sentinel/Tween" to="." method="_on_Tween_tween_completed"]
 [connection signal="timeout" from="Sentinel/Timer" to="." method="_on_Timer_timeout"]
 [connection signal="pressed" from="Menus/MenuContainer/MainMenu/Container/NewGameContainer/NewGame" to="." method="_on_NewGame_pressed"]

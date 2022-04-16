@@ -15,13 +15,13 @@ _global_script_classes=[ {
 "path": "res://Player/Windows/IDE/IDEFile.gd"
 }, {
 "base": "Node",
-"class": "PrintMessage",
+"class": "Order",
 "language": "GDScript",
 "path": "res://Util/Models.gd"
 } ]
 _global_script_class_icons={
 "IDEFile": "",
-"PrintMessage": ""
+"Order": ""
 }
 
 [application]

@@ -40,28 +40,25 @@ transform = Transform( -4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -31, 2.
 displayName = "Fred"
 
 [node name="Interface" parent="Objects/Fred/AttachmentContainer/Front" index="0" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, -1.06581e-14, 0, 1, 0, 1.06581e-14, 0, 1, 0, 0, 0 )
 
 [node name="Fred2" parent="Objects" instance=ExtResource( 3 )]
 transform = Transform( -4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -31, 2.744, 17 )
 displayName = "Fred2"
 
-[node name="AttachmentContainer" parent="Objects/Fred2" index="4"]
-editor/display_folded = false
+[node name="Sensor" parent="Objects/Fred2/AttachmentContainer/Head" index="0"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
 
 [node name="Fred3" parent="Objects" instance=ExtResource( 3 )]
 transform = Transform( -4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -31, 2.744, 13 )
 displayName = "Fred3"
 
-[node name="AttachmentContainer" parent="Objects/Fred3" index="4"]
-editor/display_folded = false
-
 [node name="PlugArm" parent="Objects/Fred3/AttachmentContainer/Left" index="0" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
+transform = Transform( 1, 0, -3.55271e-15, 0, 1, 0, 3.55271e-15, 0, 1, 0, 0, 0 )
 
 [node name="Gun" parent="Objects/Fred3/AttachmentContainer/Right" index="0" instance=ExtResource( 6 )]
 
 [node name="George" parent="Objects" instance=ExtResource( 3 )]
-editor/display_folded = true
 transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 11, 2.744, 11 )
 displayName = "George"
 
@@ -87,7 +84,6 @@ shadow_enabled = true
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="FinishedUI" type="Control" parent="CanvasLayer"]
-editor/display_folded = true
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -166,7 +162,6 @@ margin_bottom = -10.0
 text = "Quit"
 
 [node name="Objectives" type="Panel" parent="CanvasLayer"]
-editor/display_folded = true
 visible = false
 self_modulate = Color( 1, 1, 1, 0.490196 )
 margin_right = 289.0
@@ -191,10 +186,9 @@ margin_bottom = 87.0
 custom_fonts/font = ExtResource( 10 )
 text = "- Find Fred's homie, George
 - Get Fred and George to their friends"
+
 [connection signal="pressed" from="CanvasLayer/ToggleVisible" to="." method="_on_ToggleVisible_pressed"]
 
 [editable path="Objects/Fred"]
-
 [editable path="Objects/Fred2"]
-
 [editable path="Objects/Fred3"]
