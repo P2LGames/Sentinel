@@ -422,9 +422,9 @@ func determine_permissions():
 
 
 func permissions_sort(a, b):
-    if a[1] < b[1]:
-        return true
-    return false
+	if a[1] < b[1]:
+		return true
+	return false
 
 """ GETTERS """
 
@@ -484,6 +484,7 @@ func get_last_displayed_permission():
 
 
 func get_permission(permissionsString: String):
+	print(self._filePath)
 	if permissionsString == '':
 		return 'u'
 	

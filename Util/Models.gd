@@ -9,7 +9,6 @@ func Order(type: int, parameter: PoolByteArray):
 	
 	return order
 
-class_name PrintMessage
 func PrintMessage(message: String, type: int):
 	var mess = {
 		message = message,
